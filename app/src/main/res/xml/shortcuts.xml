@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut android:shortcutId="next_track" android:enabled="true"
+        android:icon="@drawable/ic_next" android:shortcutShortLabel="@string/shortcut_next"
+        android:shortcutLongLabel="@string/shortcut_next_long">
+        <intent android:action="android.intent.action.VIEW"
+            android:targetPackage="dev.local.mediaactions"
+            android:targetClass="dev.local.mediaactions.ActionActivity"
+            android:data="mediaactions://run/next" />
+    </shortcut>
+    <shortcut android:shortcutId="previous_track" android:enabled="true"
+        android:icon="@drawable/ic_previous" android:shortcutShortLabel="@string/shortcut_previous"
+        android:shortcutLongLabel="@string/shortcut_previous_long">
+        <intent android:action="android.intent.action.VIEW"
+            android:targetPackage="dev.local.mediaactions"
+            android:targetClass="dev.local.mediaactions.ActionActivity"
+            android:data="mediaactions://run/previous" />
+    </shortcut>
+    <shortcut android:shortcutId="toggle_playback" android:enabled="true"
+        android:icon="@drawable/ic_play_pause" android:shortcutShortLabel="@string/shortcut_toggle"
+        android:shortcutLongLabel="@string/shortcut_toggle_long">
+        <intent android:action="android.intent.action.VIEW"
+            android:targetPackage="dev.local.mediaactions"
+            android:targetClass="dev.local.mediaactions.ActionActivity"
+            android:data="mediaactions://run/toggle" />
+    </shortcut>
+</shortcuts>

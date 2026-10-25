@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_controls"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="156dp"
+    android:minHeight="56dp"
+    android:background="@drawable/widget_background"
+    android:clipToOutline="true"
+    android:orientation="horizontal"
+    android:padding="4dp">
+
+    <ImageButton
+        android:id="@+id/widget_previous"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:background="@drawable/widget_button_background"
+        android:contentDescription="@string/shortcut_previous"
+        android:padding="10dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_previous"
+        android:tint="@android:color/white" />
+
+    <ImageButton
+        android:id="@+id/widget_toggle"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:background="@drawable/widget_button_background"
+        android:contentDescription="@string/shortcut_toggle"
+        android:padding="10dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_play_pause"
+        android:tint="@android:color/white" />
+
+    <ImageButton
+        android:id="@+id/widget_next"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:background="@drawable/widget_button_background"
+        android:contentDescription="@string/shortcut_next"
+        android:padding="10dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_next"
+        android:tint="@android:color/white" />
+</LinearLayout>

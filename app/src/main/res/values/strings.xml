@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Media Actions</string>
+    <string name="heading">Media Actions for Routines</string>
+    <string name="experimental">Experimental • Samsung locked-button operation needs testing on your phone.</string>
+    <string name="listener_name">Media Actions — media session access</string>
+    <string name="access_granted">Notification access granted</string>
+    <string name="access_denied">Notification access not granted</string>
+    <string name="access_unknown">Session access could not be checked. Refresh or open Android settings.</string>
+    <string name="grant_access">Open Notification access</string>
+    <string name="access_reason">Enable Media Actions in Android settings to control media sessions. This system grant can expose notifications; this app does not read or store their content.</string>
+    <string name="player_selected">Automatic player: %1$s</string>
+    <string name="player_missing_access">Automatic player: grant Notification access first</string>
+    <string name="player_none">Automatic player: no eligible media session</string>
+    <string name="player_ambiguous">Automatic player: multiple idle players; start the intended player</string>
+    <string name="player_failure">Automatic player: session lookup failed</string>
+    <string name="refresh">Refresh player</string>
+    <string name="test_next">Test Next</string>
+    <string name="test_previous">Test Previous</string>
+    <string name="test_toggle">Test Play / Pause</string>
+    <string name="ready">Start local playback in Spotify, then test an action.</string>
+    <string name="sent">Command sent to %1$s. Check the player for the result.</string>
+    <string name="missing_access">Grant Notification access in Android settings, then retry.</string>
+    <string name="no_session">No eligible player. Start local music playback first.</string>
+    <string name="ambiguous">Several idle sessions are available. Start playback in the intended player first.</string>
+    <string name="unsupported">The player does not advertise this command, or playback is transitioning. No command sent.</string>
+    <string name="failure">Could not send the media command. Refresh the player and retry.</string>
+    <string name="settings_unavailable">Notification access settings could not be opened. Find Notification access in Android settings.</string>
+    <string name="setup_heading">Set up a Samsung routine</string>
+    <string name="setup_steps">1. Start Spotify playback on this phone.\n2. Open Settings → Modes and Routines → Routines → +.\n3. Choose an If trigger. For a physical key, look for Routines+ → Button action if installed and supported.\n4. Then → Apps → Open an app or do an app action → Media Actions → Next track (or another action).\n5. Save, test unlocked, then securely locked with the display off.\n\nMenu names and available buttons vary by firmware. Record whether unlock is requested and whether the display wakes. If the action is missing or blocked, this integration is unverified for your firmware.</string>
+    <string name="shortcut_next">Next track</string>
+    <string name="shortcut_next_long">Skip to the next track</string>
+    <string name="shortcut_previous">Previous track</string>
+    <string name="shortcut_previous_long">Go to the previous track</string>
+    <string name="shortcut_toggle">Play / Pause</string>
+    <string name="shortcut_toggle_long">Play or pause current media</string>
+    <string name="widget_name">Media controls</string>
+    <string name="widget_description">Resizable Previous, Play / Pause, and Next controls.</string>
+    <string name="widget_setup_heading">LockStar widget</string>
+    <string name="widget_setup_steps">In Good Lock → LockStar, enable lock-screen editing and open the widget area or Add widget control, if available. Choose Media Actions → Media controls, place it, and drag its resize handles. Menu names and sizing depend on your LockStar version.\n\nThe three buttons work directly without opening this app. Grant Notification access here first. The widget has no song title or live playback indicator. Locked interaction and LockStar compatibility need testing on your phone.</string>
+</resources>

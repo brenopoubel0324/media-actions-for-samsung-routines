@@ -1,0 +1,19 @@
+package: name='dev.local.mediaactions' versionCode='2' versionName='0.2-experimental' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'
+minSdkVersion:'33'
+targetSdkVersion:'36'
+application-label:'Media Actions'
+application-icon-160:'res/drawable/ic_app.xml'
+application: label='Media Actions' icon='res/drawable/ic_app.xml'
+application-debuggable
+launchable-activity: name='dev.local.mediaactions.MainActivity'  label='' icon=''
+feature-group: label=''
+  uses-feature: name='android.hardware.faketouch'
+  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'
+provides-component:'app-widget'
+provides-component:'notification-listener'
+main
+other-activities
+supports-screens: 'small' 'normal' 'large' 'xlarge'
+supports-any-density: 'true'
+locales: '--_--'
+densities: '160'

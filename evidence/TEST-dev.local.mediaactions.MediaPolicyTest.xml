@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.local.mediaactions.MediaPolicyTest" tests="22" skipped="0" failures="0" errors="0" timestamp="2026-10-25T19:41:05.236Z" hostname="71eed5309f5e" time="0.013">
+  <properties/>
+  <testcase name="frameworkOrderBreaksTiesBetweenPlayingPlayers" classname="dev.local.mediaactions.MediaPolicyTest" time="0.002"/>
+  <testcase name="staleFrameworkHintsCannotIntroduceAPlayer" classname="dev.local.mediaactions.MediaPolicyTest" time="0.001"/>
+  <testcase name="multipleIdleSessionsAreAmbiguousEvenInSamePackage" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="absentAndAmbiguousSessionsNeverSend" classname="dev.local.mediaactions.MediaPolicyTest" time="0.002"/>
+  <testcase name="uniqueFrameworkPackageWins" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="onePausedOrStoppedPlayerIsEligible" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="emptyAndUnavailableSessionsAreNotCommanded" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="playingWinsOverPausedWithoutFrameworkHint" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="transitionalToggleDoesNotGuessOrSend" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="playerStatusDoesNotControlPlayback" classname="dev.local.mediaactions.MediaPolicyTest" time="0.001"/>
+  <testcase name="commandExceptionNeverRetries" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="unavailableFrameworkSessionFallsBackToPlaying" classname="dev.local.mediaactions.MediaPolicyTest" time="0.001"/>
+  <testcase name="unsupportedCommandNeverFallsBackOrTargetsAnotherPlayer" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="pauseAndStoppedToggleOnlyToPlay" classname="dev.local.mediaactions.MediaPolicyTest" time="0.001"/>
+  <testcase name="vendorLookupFailureIsHandled" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="eachRequestSendsExactlyOneMatchingCommand" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="repeatedPressesSendOneCommandPerInvocation" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="revocationBetweenCheckAndQueryIsHandled" classname="dev.local.mediaactions.MediaPolicyTest" time="0.001"/>
+  <testcase name="exactFrameworkSessionWinsOverAnotherPlayingPlayer" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="deniedAccessDoesNotEvenReadSessions" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="revokedAccessDuringCommandIsHandled" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <testcase name="shortcutAcceptsOnlyThreeExactRequests" classname="dev.local.mediaactions.MediaPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
