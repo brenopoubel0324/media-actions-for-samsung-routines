@@ -1,6 +1,6 @@
 # Media Actions for Routines — experimental 0.3
 
-**Build:** experimental 0.3. See the supplied APK and source artifacts.
+**Download:** [APK and source — v0.3 experimental](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/releases/tag/v0.3-experimental).
 
 App Android offline com atalhos de Próxima faixa, Faixa anterior e Play/Pause para
 Rotinas Samsung, além de um widget redimensionável de três botões para hosts como
