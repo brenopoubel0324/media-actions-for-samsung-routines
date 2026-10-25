@@ -28,7 +28,7 @@
         android:contentDescription="@string/shortcut_previous"
         android:padding="4dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_widget_previous"
+        android:src="@drawable/ic_widget_outline_previous"
         android:tint="@android:color/white" />
 
     <!-- Zero is intentional: RemoteViews sets the user's requested spacing. -->
@@ -46,7 +46,7 @@
         android:contentDescription="@string/shortcut_toggle"
         android:padding="1dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_widget_toggle"
+        android:src="@drawable/ic_widget_outline_toggle"
         android:tint="@android:color/white" />
 
     <FrameLayout tools:ignore="Suspicious0dp" android:id="@+id/widget_gap_right" android:layout_width="0dp"
@@ -63,7 +63,7 @@
         android:contentDescription="@string/shortcut_next"
         android:padding="4dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_widget_next"
+        android:src="@drawable/ic_widget_outline_next"
         android:tint="@android:color/white" />
     </LinearLayout>
 </FrameLayout>

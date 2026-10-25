@@ -1,6 +1,6 @@
 {
-  "version": "0.3-experimental",
-  "version_code": 3,
+  "version": "0.4-experimental",
+  "version_code": 4,
   "build_host": "Linux x86_64",
   "jdk": "OpenJDK 21.0.2 (builder only)",
   "gradle": "8.14.6",
@@ -10,15 +10,14 @@
   "target_sdk": 36,
   "min_sdk": 33,
   "build_tools": "36.0.0",
-  "apk_bytes": 2613605,
-  "apk_sha256": "9e82128bc3309b4bc111178f830267eec08e930d32add53a24878d793f266420",
+  "apk_bytes": 2554282,
+  "apk_sha256": "8a64e66965f7821ef06304d917c3313bd48b8114a484387a21fea6b78ed460f1",
   "signing_certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a",
-  "same_signer_as_supplied_0_1_and_0_2": true,
   "native_libraries": [],
   "requested_permissions": [],
   "tests": {
     "dev.local.mediaactions.WidgetVisualTest": {
-      "tests": 3,
+      "tests": 5,
       "failures": 0,
       "errors": 0,
       "skipped": 0
@@ -36,7 +35,7 @@
       "skipped": 0
     },
     "dev.local.mediaactions.WidgetAppearanceTest": {
-      "tests": 6,
+      "tests": 9,
       "failures": 0,
       "errors": 0,
       "skipped": 0
@@ -48,16 +47,17 @@
       "skipped": 0
     },
     "dev.local.mediaactions.WidgetRendererTest": {
-      "tests": 12,
+      "tests": 16,
       "failures": 0,
       "errors": 0,
       "skipped": 0
     }
   },
-  "test_total": 79,
+  "test_total": 88,
   "lint": "No issues found.",
-  "widget": "transparent; size-adaptive compact controls; local icon size/spacing/color settings; no polling",
-  "native_visual_tests": "API 33 Skia rendering: transparent corners/gaps; icon color and size; preview export",
+  "widget": "transparent; Outline/Rounded/Classic styles; 0-64dp manual gaps or full-width automatic spacing",
+  "native_visual_tests": "API 33 Skia: distinct artwork and color for all three styles; transparent corners/gaps; size and visible spacing; comparison preview",
   "device_tests": "NOT RUN \u2014 no Android device connected; no emulator used",
-  "lockstar": "Visual fit, dimensions, hosting and keyguard interaction still need S25 testing"
+  "lockstar": "Visual fit, dimensions, hosting and keyguard interaction still need S25 testing",
+  "same_signer_as_previous_versions": true
 }

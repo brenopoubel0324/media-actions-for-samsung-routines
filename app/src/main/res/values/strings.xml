@@ -42,9 +42,16 @@
     <string name="widget_icons_white">White icons</string>
     <string name="widget_icons_dark">Dark icons</string>
     <string name="widget_icon_size">Icon size</string>
+    <string name="widget_icon_style">Icon style</string>
+    <string name="widget_style_outline">Outline · modern</string>
+    <string name="widget_style_rounded">Rounded · filled</string>
+    <string name="widget_style_classic">Classic</string>
     <string name="widget_icon_size_value">Icon size: %1$d%%</string>
     <string name="widget_button_spacing">Button spacing</string>
     <string name="widget_button_spacing_value">Button spacing: %1$d dp</string>
+    <string name="widget_spacing_automatic">Button spacing: automatic</string>
+    <string name="widget_fill_width">Spread buttons across the full widget width</string>
+    <string name="widget_spacing_help">Widen the widget to allow larger gaps. At small sizes, spacing is reduced to keep buttons easy to tap.</string>
     <string name="widget_style_scope">Applies to all Media controls widgets.</string>
     <string name="widget_apply_style">Apply to widgets</string>
     <string name="widget_style_applied">Widget appearance saved and applied.</string>

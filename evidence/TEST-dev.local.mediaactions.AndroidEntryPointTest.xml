@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="dev.local.mediaactions.AndroidEntryPointTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:31:12.228Z" hostname="71eed5309f5e" time="8.924">
+<testsuite name="dev.local.mediaactions.AndroidEntryPointTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-10-25T21:51:29.035Z" hostname="71eed5309f5e" time="8.62">
   <properties/>
-  <testcase name="recreationDoesNotSendMediaCommand[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="2.96"/>
-  <testcase name="androidAdapterMapsStatesAndAdvertisedTransportActions[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.034"/>
-  <testcase name="productionManifestHasNoRequestedPermissionsAndProtectedListener[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.04"/>
-  <testcase name="grantedAccessWithNoControllersProducesNoSession[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.037"/>
-  <testcase name="validShortcutFinishesWithoutPermissionPromptOrNewActivity[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.034"/>
-  <testcase name="settingsScreenCanCreateResumeAndRefreshWithoutAccess[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="1.092"/>
-  <testcase name="invalidShortcutAndRecreationFinishImmediately[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.031"/>
-  <testcase name="noNotificationGrantIsReportedWithoutCrashing[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.011"/>
-  <testcase name="manifestDeclaresThreeResolvableStaticShortcuts[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.039"/>
-  <testcase name="recreationDoesNotSendMediaCommand" classname="dev.local.mediaactions.AndroidEntryPointTest" time="3.488"/>
+  <testcase name="recreationDoesNotSendMediaCommand[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="2.948"/>
+  <testcase name="androidAdapterMapsStatesAndAdvertisedTransportActions[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.025"/>
+  <testcase name="productionManifestHasNoRequestedPermissionsAndProtectedListener[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.039"/>
+  <testcase name="grantedAccessWithNoControllersProducesNoSession[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.015"/>
+  <testcase name="validShortcutFinishesWithoutPermissionPromptOrNewActivity[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.057"/>
+  <testcase name="settingsScreenCanCreateResumeAndRefreshWithoutAccess[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="1.129"/>
+  <testcase name="invalidShortcutAndRecreationFinishImmediately[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.059"/>
+  <testcase name="noNotificationGrantIsReportedWithoutCrashing[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.013"/>
+  <testcase name="manifestDeclaresThreeResolvableStaticShortcuts[33]" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.016"/>
+  <testcase name="recreationDoesNotSendMediaCommand" classname="dev.local.mediaactions.AndroidEntryPointTest" time="3.232"/>
   <testcase name="androidAdapterMapsStatesAndAdvertisedTransportActions" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.019"/>
-  <testcase name="productionManifestHasNoRequestedPermissionsAndProtectedListener" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.023"/>
-  <testcase name="grantedAccessWithNoControllersProducesNoSession" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.012"/>
-  <testcase name="validShortcutFinishesWithoutPermissionPromptOrNewActivity" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.052"/>
-  <testcase name="settingsScreenCanCreateResumeAndRefreshWithoutAccess" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.961"/>
-  <testcase name="invalidShortcutAndRecreationFinishImmediately" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.054"/>
+  <testcase name="productionManifestHasNoRequestedPermissionsAndProtectedListener" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.022"/>
+  <testcase name="grantedAccessWithNoControllersProducesNoSession" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.011"/>
+  <testcase name="validShortcutFinishesWithoutPermissionPromptOrNewActivity" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.022"/>
+  <testcase name="settingsScreenCanCreateResumeAndRefreshWithoutAccess" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.939"/>
+  <testcase name="invalidShortcutAndRecreationFinishImmediately" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.039"/>
   <testcase name="noNotificationGrantIsReportedWithoutCrashing" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.013"/>
   <testcase name="manifestDeclaresThreeResolvableStaticShortcuts" classname="dev.local.mediaactions.AndroidEntryPointTest" time="0.015"/>
   <system-out><![CDATA[]]></system-out>

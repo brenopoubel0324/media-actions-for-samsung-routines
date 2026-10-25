@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="dev.local.mediaactions.WidgetAppearanceTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:31:21.757Z" hostname="71eed5309f5e" time="0.007">
+<testsuite name="dev.local.mediaactions.WidgetAppearanceTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-25T21:51:26.601Z" hostname="71eed5309f5e" time="0.047">
   <properties/>
-  <testcase name="invalidDimensionsAndPreferenceValuesAreBounded" classname="dev.local.mediaactions.WidgetAppearanceTest" time="0.003"/>
+  <testcase name="largerManualGapsAreAvailableWhenTheWidgetIsWideEnough" classname="dev.local.mediaactions.WidgetAppearanceTest" time="0.015"/>
+  <testcase name="fullWidthAddsSpacingWithoutStretchingTheButtons" classname="dev.local.mediaactions.WidgetAppearanceTest" time="0.0"/>
+  <testcase name="invalidDimensionsAndPreferenceValuesAreBounded" classname="dev.local.mediaactions.WidgetAppearanceTest" time="0.001"/>
   <testcase name="gapsShrinkToPreserveTouchTargetsAtMinimumSize" classname="dev.local.mediaactions.WidgetAppearanceTest" time="0.0"/>
   <testcase name="userScaleChangesIconsWithoutChangingTouchTargetsOrSpacing" classname="dev.local.mediaactions.WidgetAppearanceTest" time="0.0"/>
-  <testcase name="controlsFitAcrossSupportedSizesAndStyleExtremes" classname="dev.local.mediaactions.WidgetAppearanceTest" time="0.004"/>
+  <testcase name="automaticSpacingIgnoresTheDisabledManualGap" classname="dev.local.mediaactions.WidgetAppearanceTest" time="0.0"/>
+  <testcase name="controlsFitAcrossSupportedSizesAndStyleExtremes" classname="dev.local.mediaactions.WidgetAppearanceTest" time="0.028"/>
   <testcase name="compactControlsDoNotSpreadAcrossAWideShortWidget" classname="dev.local.mediaactions.WidgetAppearanceTest" time="0.0"/>
   <testcase name="increasingHeightAllowsControlsToGrow" classname="dev.local.mediaactions.WidgetAppearanceTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>

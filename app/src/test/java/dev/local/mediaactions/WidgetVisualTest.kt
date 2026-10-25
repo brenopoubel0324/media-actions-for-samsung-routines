@@ -67,33 +67,69 @@ class WidgetVisualTest {
             visible(render(240, 80, WidgetAppearance(iconScalePercent = 75))))
     }
 
-    @Test fun exportNativeWidgetPreviewAtSmallMediumAndLargeSizes() {
+    @Test fun allIconStylesHaveDistinctTransparentArtworkAndSupportDarkColor() {
+        val fingerprints = mutableSetOf<Int>()
+        for (style in WidgetIconStyle.entries) {
+            val white = render(360, 80, WidgetAppearance(iconStyle = style))
+            val dark = render(360, 80, WidgetAppearance(darkIcons = true, iconStyle = style))
+            assertEquals(0, Color.alpha(white.getPixel(0, 0)))
+            val pixels = IntArray(white.width * white.height)
+            white.getPixels(pixels, 0, white.width, 0, 0, white.width, white.height)
+            fingerprints += pixels.contentHashCode()
+            val opaque = pixels.indexOfFirst { it == Color.WHITE }
+            assertTrue(opaque >= 0)
+            assertEquals(Color.rgb(26, 29, 34), dark.getPixel(opaque % white.width, opaque / white.width))
+        }
+        assertEquals(3, fingerprints.size)
+    }
+
+    @Test fun largerSpacingAndFullWidthMoveTheVisibleIconsApart() {
+        fun visibleWidth(bitmap: Bitmap): Int {
+            var first = bitmap.width
+            var last = 0
+            for (y in 0 until bitmap.height) for (x in 0 until bitmap.width) {
+                if (Color.alpha(bitmap.getPixel(x, y)) > 127) {
+                    first = minOf(first, x)
+                    last = maxOf(last, x)
+                }
+            }
+            return last - first
+        }
+        val compact = visibleWidth(render(360, 56))
+        val manual = visibleWidth(render(360, 56, WidgetAppearance(spacingDp = 64)))
+        val full = visibleWidth(render(360, 56, WidgetAppearance(fillWidth = true)))
+        assertTrue(compact < manual)
+        assertTrue(manual < full)
+    }
+
+    @Test fun exportNativeStyleAndSpacingComparison() {
         val output = File("build/outputs/widget-previews").apply { mkdirs() }
-        val sheet = Bitmap.createBitmap(1248, 640, Bitmap.Config.ARGB_8888)
+        val sheet = Bitmap.createBitmap(1248, 736, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(sheet)
         canvas.drawColor(Color.rgb(13, 18, 27))
         val text = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; textSize = 34f }
-        canvas.drawText("Transparent media controls", 32f, 52f, text)
+        canvas.drawText("Icon styles + more spacing", 32f, 52f, text)
         text.color = Color.rgb(162, 176, 194)
         text.textSize = 18f
-        canvas.drawText("Actual Android widget rendering on sample wallpapers", 32f, 84f, text)
-        val sizes = listOf(144 to 48, 240 to 72, 360 to 112)
-        for ((row, darkIcons) in listOf(false, true).withIndex()) {
-            val top = if (row == 0) 120f else 360f
+        canvas.drawText("Actual Android rendering / transparent widget / 360 x 56 dp", 32f, 84f, text)
+        val columns = listOf("Compact / 0 dp", "Wide / 64 dp", "Full width / automatic")
+        for ((column, name) in columns.withIndex()) canvas.drawText(name, 48f + column * 400, 120f, text)
+        val names = listOf("Outline / modern", "Rounded / filled", "Classic")
+        for ((row, iconStyle) in WidgetIconStyle.entries.withIndex()) {
+            val top = 144f + row * 192
             val wallpaper = Paint().apply {
-                shader = LinearGradient(32f, top, 1216f, top + 192,
-                    if (darkIcons) intArrayOf(0xFFF1E8DC.toInt(), 0xFFBDD9D6.toInt())
-                    else intArrayOf(0xFF1C4B60.toInt(), 0xFF242A47.toInt()), null, Shader.TileMode.CLAMP)
+                shader = LinearGradient(32f, top, 1216f, top + 152,
+                    intArrayOf(0xFF1C4B60.toInt(), 0xFF242A47.toInt()), null, Shader.TileMode.CLAMP)
             }
-            canvas.drawRect(32f, top, 1216f, top + 192, wallpaper)
-            for ((column, dimensions) in sizes.withIndex()) {
-                val (width, height) = dimensions
-                val bitmap = render(width, height, WidgetAppearance(darkIcons = darkIcons))
-                canvas.drawBitmap(bitmap, 32f + column * 400 + (384 - width) / 2, top + (192 - height) / 2, null)
-                text.color = Color.rgb(162, 176, 194)
-                canvas.drawText("${if (darkIcons) "Dark" else "White"} icons / $width x $height dp",
-                    48f + column * 400, top + 220, text)
-                File(output, "widget-${width}x${height}-${if (darkIcons) "dark" else "white"}.png")
+            canvas.drawRect(32f, top, 1216f, top + 152, wallpaper)
+            text.color = Color.rgb(190, 208, 221)
+            canvas.drawText(names[row], 48f, top + 28, text)
+            for (column in 0..2) {
+                val style = WidgetAppearance(iconStyle = iconStyle,
+                    spacingDp = if (column == 1) 64 else 0, fillWidth = column == 2)
+                val bitmap = render(360, 56, style)
+                canvas.drawBitmap(bitmap, 44f + column * 400, top + 66, null)
+                File(output, "widget-${iconStyle.name.lowercase()}-${column}.png")
                     .outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
             }
         }

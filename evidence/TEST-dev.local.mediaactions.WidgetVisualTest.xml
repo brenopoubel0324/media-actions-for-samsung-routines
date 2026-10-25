@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="dev.local.mediaactions.WidgetVisualTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:31:22.425Z" hostname="71eed5309f5e" time="2.975">
+<testsuite name="dev.local.mediaactions.WidgetVisualTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-25T21:51:39.303Z" hostname="71eed5309f5e" time="3.045">
   <properties/>
-  <testcase name="exportNativeWidgetPreviewAtSmallMediumAndLargeSizes" classname="dev.local.mediaactions.WidgetVisualTest" time="2.673"/>
-  <testcase name="darkColorAndLargerIconSettingChangeActualRenderedPixels" classname="dev.local.mediaactions.WidgetVisualTest" time="0.212"/>
-  <testcase name="canvasAndSpacesBetweenButtonsRemainFullyTransparent" classname="dev.local.mediaactions.WidgetVisualTest" time="0.089"/>
+  <testcase name="allIconStylesHaveDistinctTransparentArtworkAndSupportDarkColor" classname="dev.local.mediaactions.WidgetVisualTest" time="2.631"/>
+  <testcase name="darkColorAndLargerIconSettingChangeActualRenderedPixels" classname="dev.local.mediaactions.WidgetVisualTest" time="0.115"/>
+  <testcase name="largerSpacingAndFullWidthMoveTheVisibleIconsApart" classname="dev.local.mediaactions.WidgetVisualTest" time="0.072"/>
+  <testcase name="canvasAndSpacesBetweenButtonsRemainFullyTransparent" classname="dev.local.mediaactions.WidgetVisualTest" time="0.028"/>
+  <testcase name="exportNativeStyleAndSpacingComparison" classname="dev.local.mediaactions.WidgetVisualTest" time="0.199"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

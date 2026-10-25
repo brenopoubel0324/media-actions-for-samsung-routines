@@ -7,6 +7,10 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.Button
 import android.widget.RadioButton
+import android.widget.Spinner
+import android.widget.CheckBox
+import android.widget.SeekBar
+import android.os.Looper
 import android.view.ViewGroup
 import org.junit.Assert.*
 import org.junit.Test
@@ -14,6 +18,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import org.robolectric.Shadows.shadowOf
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33, 36])
@@ -67,8 +72,8 @@ class WidgetRendererTest {
     }
 
     @Test fun appearancePreferencesPersistAndAreClamped() {
-        WidgetStyleStore.save(app, WidgetAppearance(999, -5, true))
-        assertEquals(WidgetAppearance(135, 0, true), WidgetStyleStore.load(app))
+        WidgetStyleStore.save(app, WidgetAppearance(999, -5, true, WidgetIconStyle.ROUNDED, true))
+        assertEquals(WidgetAppearance(135, 0, true, WidgetIconStyle.ROUNDED, true), WidgetStyleStore.load(app))
     }
 
     @Test fun appearanceEditorPreviewsChangesAndSavesOnlyWhenApplied() {
@@ -92,5 +97,32 @@ class WidgetRendererTest {
         assertTrue(small.findViewById<View>(R.id.widget_next).paddingTop >
             large.findViewById<View>(R.id.widget_next).paddingTop)
         assertEquals(0, small.findViewById<View>(R.id.widget_gap_left).layoutParams.width)
+    }
+
+    @Test fun oldPreferencesUpgradeToOutlineWithoutLosingExistingChoices() {
+        app.getSharedPreferences("widget_appearance", 0).edit()
+            .putInt("scale", 110).putInt("spacing", 24).putBoolean("dark_icons", true).apply()
+        assertEquals(WidgetAppearance(110, 24, true, WidgetIconStyle.OUTLINE, false), WidgetStyleStore.load(app))
+        app.getSharedPreferences("widget_appearance", 0).edit().putString("icon_style", "unknown").apply()
+        assertEquals(WidgetIconStyle.OUTLINE, WidgetStyleStore.load(app).iconStyle)
+    }
+
+    @Test fun stylePickerAndAutomaticSpacingApplyTogether() {
+        val section = WidgetAppearanceSection(app).create()
+        fun children(view: View): List<View> = listOf(view) +
+            if (view is ViewGroup) (0 until view.childCount).flatMap { children(view.getChildAt(it)) } else emptyList()
+        val picker = children(section).filterIsInstance<Spinner>().single()
+        picker.setSelection(WidgetIconStyle.ROUNDED.ordinal)
+        section.measure(View.MeasureSpec.makeMeasureSpec(360, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(1200, View.MeasureSpec.AT_MOST))
+        section.layout(0, 0, 360, section.measuredHeight)
+        shadowOf(Looper.getMainLooper()).idle()
+        val views = children(section)
+        views.filterIsInstance<CheckBox>().single().performClick()
+        assertFalse(views.filterIsInstance<SeekBar>().first { it.max == 64 }.isEnabled)
+        assertFalse(WidgetStyleStore.load(app).fillWidth)
+        views.filterIsInstance<Button>().first { it.text == app.getString(R.string.widget_apply_style) }.performClick()
+        assertEquals(WidgetIconStyle.ROUNDED, WidgetStyleStore.load(app).iconStyle)
+        assertTrue(WidgetStyleStore.load(app).fillWidth)
     }
 }

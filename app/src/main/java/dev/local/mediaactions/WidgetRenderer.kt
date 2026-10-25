@@ -37,6 +37,15 @@ object WidgetRenderer {
         bindControls: Boolean = true): RemoteViews =
         RemoteViews(context.packageName, R.layout.widget_media_controls).apply {
             val style = appearance.normalized()
+            val icons = when (style.iconStyle) {
+                WidgetIconStyle.OUTLINE -> listOf(R.drawable.ic_widget_outline_previous,
+                    R.drawable.ic_widget_outline_toggle, R.drawable.ic_widget_outline_next)
+                WidgetIconStyle.ROUNDED -> listOf(R.drawable.ic_widget_rounded_previous,
+                    R.drawable.ic_widget_rounded_toggle, R.drawable.ic_widget_rounded_next)
+                WidgetIconStyle.CLASSIC -> listOf(R.drawable.ic_widget_previous,
+                    R.drawable.ic_widget_toggle, R.drawable.ic_widget_next)
+            }
+            for (index in buttons.indices) setImageViewResource(buttons[index], icons[index])
             val color = if (style.darkIcons) Color.rgb(26, 29, 34) else Color.WHITE
             for (button in buttons) setInt(button, "setColorFilter", color)
             if (size != null) {

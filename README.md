@@ -1,6 +1,6 @@
-# Media Actions for Routines — experimental 0.3
+# Media Actions for Routines — experimental 0.4
 
-**Download:** [APK and source — v0.3 experimental](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/releases/tag/v0.3-experimental).
+**Download:** [APK and source — v0.4 experimental](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/releases/tag/v0.4-experimental).
 
 App Android offline com atalhos de Próxima faixa, Faixa anterior e Play/Pause para
 Rotinas Samsung, além de um widget redimensionável de três botões para hosts como
@@ -13,7 +13,7 @@ Samsung/LockStar e o uso com o telefone bloqueado ainda precisam de validação 
 A small, offline Android app exposing **Next track**, **Previous track**, and
 **Play / Pause** as static app shortcuts. Samsung Modes and Routines may offer
 these under **Open an app or do an app action**. Samsung compatibility and locked
-physical-button operation **have not been verified**. Version 0.3 includes a transparent,
+physical-button operation **have not been verified**. Version 0.4 includes a transparent,
 simple resizable **Media controls** widget for standard Android widget hosts,
 including LockStar if supported by your firmware. LockStar placement and locked
 widget interaction **have not been verified**. See [TEST_REPORT.md](TEST_REPORT.md).
@@ -23,9 +23,9 @@ widget interaction **have not been verified**. See [TEST_REPORT.md](TEST_REPORT.
 Requires Android 13 (API 33) or later. The intended device is Galaxy S25 SM-S931B.
 No Spotify login is required. The supplied debug APK is for private testing.
 
-1. Transfer `media-actions-0.3-experimental-debug.apk` to the phone and open it.
+1. Transfer `media-actions-0.4-experimental-debug.apk` to the phone and open it.
    Android may ask to allow installs from the app used to open the APK. Alternatively,
-   use `adb install -r media-actions-0.3-experimental-debug.apk` on an authorized computer.
+   use `adb install -r media-actions-0.4-experimental-debug.apk` on an authorized computer.
 2. Open **Media Actions**, tap **Open Notification access**, and enable the app
    in Android's settings. This is a powerful system authorization; it cannot be
    granted by the app. The app uses it only for media-session controllers.
@@ -42,8 +42,8 @@ No Spotify login is required. The supplied debug APK is for private testing.
 Installation and enabling access need interaction. Later shortcut invocations do not
 open the setup screen, settings, a toast, or a player app.
 
-The supplied 0.3 APK uses the same package and debug certificate as the supplied 0.1
-and 0.2 APKs, with a higher version code, so it can be installed as an update.
+The supplied 0.4 APK uses the same package and debug certificate as the supplied 0.1,
+0.2 and 0.3 APKs, with a higher version code, so it can be installed as an update.
 
 ## Resizable widget for LockStar
 
@@ -51,12 +51,15 @@ The widget shows **Previous**, **Play / Pause**, and **Next** icons on a fully
 transparent background. It requests a 3 × 1 starting size, resizes in both directions,
 and can shrink to 144 × 48 dp while keeping 48 dp touch targets. The group stays
 compact on wide widgets; increasing its available height allows larger icons.
-The host controls available sizes, grid, placement, and resize handles.
+The host controls available sizes, grid, placement, and resize handles. Widen the
+widget to allow bigger gaps; small widths reduce spacing to preserve touch areas.
 
 ![Android-rendered widget on sample wallpapers](evidence/widget-preview.png)
 
-Open **Media Actions → Widget appearance** to choose white/dark icons, adjust icon
-size (75–135%) and spacing (0–24 dp), and press **Apply to widgets**. This applies to
+Open **Media Actions → Widget appearance** to choose **Outline**, **Rounded**, or **Classic** icons,
+white/dark colors, icon size (75–135%) and spacing (0–64 dp). Enable **Spread buttons
+across the full widget width** for automatic spacing instead of a manual gap, then
+press **Apply to widgets**. This applies to
 all placed widgets. The preview wallpaper is not part of the widget. If LockStar
 retains the old design after installation, apply the style in the app, then remove
 and re-add the widget if the host still caches it. See [DESIGN_NOTES.md](DESIGN_NOTES.md)
@@ -89,7 +92,7 @@ app's test controls and `MediaActions` logs to diagnose them. The widget does no
 poll or periodically refresh (`updatePeriodMillis=0`). Resizing or host updates do
 not send playback commands. Removed widgets' control tokens are cancelled.
 
-Appearance preferences store only icon size, spacing, and color locally. If a host
+Appearance preferences store only icon size, spacing, color, icon style and full-width mode locally. If a host
 reports no dimensions, the fallback keeps flexible equal-width controls and applies
 icon tuning with collapsed gaps. Exact grouping/scaling requires host size reports.
 Any frame added by LockStar itself is separate from this fully transparent layout.
@@ -125,7 +128,7 @@ APIs or security workarounds are implemented.
   background or actually restarts/loses state. The shortcut launches a no-display
   Activity that calls `finish()` only on itself; an Activity/task focus change is a
   hypothesis, not a confirmed diagnosis. No corrective change for this report is
-  included in 0.3. The widget's direct-broadcast path does not launch that Activity.
+  included in 0.4. The widget's direct-broadcast path does not launch that Activity.
 * Automatic targeting uses an eligible active session matching the system media-key
   session token, then a unique match for the system media-key package. Stale hints
   cannot introduce controllers. Otherwise the first playing session in Android's

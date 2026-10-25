@@ -36,11 +36,14 @@ class WidgetAppearanceTest {
     @Test fun controlsFitAcrossSupportedSizesAndStyleExtremes() {
         for (width in listOf(144, 156, 180, 240, 360, 432, 600)) {
             for (height in listOf(48, 56, 64, 96, 112, 144, 300)) {
-                for (spacing in listOf(0, 12, 24)) for (scale in listOf(75, 100, 135)) {
-                    val size = WidgetGeometry.calculate(width.toFloat(), height.toFloat(), WidgetAppearance(scale, spacing))
+                for (spacing in listOf(0, 24, 48, 64)) for (scale in listOf(75, 100, 135)) {
+                    for (fillWidth in listOf(false, true)) {
+                    val size = WidgetGeometry.calculate(width.toFloat(), height.toFloat(),
+                        WidgetAppearance(scale, spacing, fillWidth = fillWidth))
                     assertTrue(size.widthDp <= width)
                     assertTrue(size.buttonDp in 48..minOf(height, 128))
                     assertTrue(size.sidePaddingDp >= 0 && size.centerPaddingDp >= 0)
+                    }
                 }
             }
         }
@@ -49,6 +52,27 @@ class WidgetAppearanceTest {
     @Test fun invalidDimensionsAndPreferenceValuesAreBounded() {
         val size = WidgetGeometry.calculate(Float.NaN, Float.POSITIVE_INFINITY, WidgetAppearance(-1, 999))
         assertTrue(size.widthDp <= 180)
-        assertEquals(WidgetAppearance(75, 24), WidgetAppearance(-1, 999).normalized())
+        assertEquals(WidgetAppearance(75, 64), WidgetAppearance(-1, 999).normalized())
+    }
+
+    @Test fun largerManualGapsAreAvailableWhenTheWidgetIsWideEnough() {
+        val size = WidgetGeometry.calculate(360f, 56f, WidgetAppearance(spacingDp = 64))
+        assertEquals(64, size.gapDp)
+        assertEquals(56, size.buttonDp)
+        assertTrue(size.widthDp <= 360)
+    }
+
+    @Test fun fullWidthAddsSpacingWithoutStretchingTheButtons() {
+        val compact = WidgetGeometry.calculate(360f, 56f, WidgetAppearance())
+        val spread = WidgetGeometry.calculate(360f, 56f, WidgetAppearance(fillWidth = true))
+        assertEquals(compact.buttonDp, spread.buttonDp)
+        assertEquals(360, spread.widthDp)
+        assertEquals(96, spread.gapDp)
+    }
+
+    @Test fun automaticSpacingIgnoresTheDisabledManualGap() {
+        val zero = WidgetGeometry.calculate(280f, 56f, WidgetAppearance(spacingDp = 0, fillWidth = true))
+        val wide = WidgetGeometry.calculate(280f, 56f, WidgetAppearance(spacingDp = 64, fillWidth = true))
+        assertEquals(zero, wide)
     }
 }

@@ -1,4 +1,4 @@
-# Test report — Media Actions 0.3 experimental
+# Test report — Media Actions 0.4 experimental
 
 Date: 2026-10-25 (UTC).
 
@@ -43,10 +43,10 @@ Use `tools/device-info.sh` and manually record the trigger before device testing
 | JVM policy tests | PASS: 22 tests, 0 failures/errors/skips |
 | Robolectric Android entry-point/adapter tests | PASS: 18 runs (9 cases × API 33 and API 36), 0 failures/errors/skips |
 | Robolectric widget tests | PASS: 18 runs (9 cases × API 33 and API 36), 0 failures/errors/skips |
-| Geometry/appearance tests | PASS: 6 JVM cases across supported sizes and style extremes |
-| Size reporting, editor and preferences | PASS: 12 runs (6 cases × API 33 and API 36) |
-| Native visual tests | PASS: 3 API 33 Skia cases; transparency, color/size changes, preview export |
-| Total host tests | PASS: 79 tests, 0 failures/errors/skips |
+| Geometry/appearance tests | PASS: 9 JVM cases across supported sizes and style extremes, including 64 dp gaps and full-width mode |
+| Size reporting, editor and preferences | PASS: 16 runs (8 cases × API 33 and API 36), including legacy preferences and the style/full-width editor |
+| Native visual tests | PASS: 5 API 33 Skia cases; transparency, all styles/colors, visible spacing changes and preview export |
+| Total host tests | PASS: 88 tests, 0 failures/errors/skips |
 | Android lint, warnings treated as errors | PASS: `No issues found.` |
 | APK signature (`apksigner verify --verbose --print-certs`) | PASS: one Android debug signer, APK Signature Scheme v2 |
 | Packaged manifest inspection | PASS: zero `uses-permission` declarations; two exported Activities; listener not exported and protected by system binding permission; one non-exported widget receiver; no content providers |
@@ -59,14 +59,14 @@ Use `tools/device-info.sh` and manually record the trigger before device testing
 
 Builder: Linux x86_64, full OpenJDK 21.0.2 (builder only), Gradle 8.14.6,
 Android Gradle Plugin 8.13.2, Kotlin 2.2.21, Android Build Tools 36.0.0.
-App: minimum SDK 33, compile/target SDK 36, version `0.3-experimental` (code 3).
+App: minimum SDK 33, compile/target SDK 36, version `0.4-experimental` (code 4).
 
-The delivered debug APK is **2,613,605 bytes** (~2.49 MiB).
-SHA-256: `9e82128bc3309b4bc111178f830267eec08e930d32add53a24878d793f266420`.
+The delivered debug APK is **2,554,282 bytes** (~2.44 MiB).
+SHA-256: `8a64e66965f7821ef06304d917c3313bd48b8114a484387a21fea6b78ed460f1`.
 Debug signing certificate SHA-256:
 `21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a`.
 The Gradle wrapper checks the official 8.14.6 distribution SHA-256.
-The signer matches the supplied 0.1 and 0.2 APKs, allowing an in-place update.
+The signer matches the supplied 0.1, 0.2 and 0.3 APKs, allowing an in-place update.
 
 Subsequent user report: running the Samsung routine appears to close the foreground
 app. Exact reproduction steps, foreground app, Android/One UI/module versions, and
@@ -102,8 +102,8 @@ icon-size tuning there is approximate rather than exact percentage scaling.
 Native pixel tests render the actual RemoteViews at API 33 using Skia. They verify
 alpha=0 at outer corners and between separated buttons, no filled panel, white/dark
 color changes, and larger glyphs with a larger icon-size setting.
-[widget-preview.png](evidence/widget-preview.png) shows native renders at 144 × 48,
-240 × 72, and 360 × 112 dp on sample wallpapers. It is not a device screenshot.
+[widget-preview.png](evidence/widget-preview.png) shows Outline, Rounded and Classic at 360 × 56 dp, each
+with compact, 64 dp, and automatic full-width spacing on sample wallpaper. It is not a device screenshot.
 Button growth is capped at 128 dp. Host maximum-size attributes are hints and may
 not be honored by every launcher/LockStar version.
 
@@ -114,6 +114,20 @@ shortcut resources, signature verification, and a machine-readable
 correcting compile errors, configuring Robolectric's host-JVM access, updating the
 Gradle patch version, and adding Android 12+ backup exclusions. There are no remaining
 known failing host checks. No physical test result is inferred from these checks.
+
+## Version 0.4 checks
+
+The new geometry tests include 0/24/48/64 dp gaps and manual/automatic modes across
+small and large dimensions. Full-width mode is verified to spread controls without
+stretching their touch areas and to ignore the disabled manual value. Renderer/editor
+tests verify persistence of both new settings, upgrade from 0.3 preferences, and safe
+fallback for an unknown style name. Pixel tests prove that all three icon sets render
+differently, support dark color, and keep the background transparent. Visible icon
+extents increase from compact to 64 dp to full-width at 360 × 56 dp.
+
+The requested manual gap can be reduced when the host gives too little width. Automatic
+spacing and precise gaps need valid host dimensions; no-dimension fallback limitations
+remain. Device validation of all new styles and spacing is still pending.
 
 ## LockStar widget device matrix — new in 0.2
 
@@ -129,13 +143,14 @@ known failing host checks. No physical test result is inferred from these checks
 | W08 | Transparency over actual wallpaper; distinguish any host-added frame | NOT TESTED on device; native pixel checks pass |
 | W09 | Resize in LockStar; icons grow, grouping remains compact, no clipping | NOT TESTED in LockStar; geometry/native render checks pass |
 | W10 | White/dark icons, icon size and spacing; Apply updates placed instances | NOT TESTED on device; editor/preferences/renderer checks pass |
+| W11 | Outline/Rounded/Classic, 64 dp manual spacing and automatic full-width mode in LockStar | NOT TESTED on device; host and native checks pass |
 
 Widget architecture: native RemoteViews, a non-exported AppWidgetProvider, three
 explicit immutable broadcast PendingIntents, and the existing one-shot dispatcher.
 There is no shortcut/Activity launch on a widget tap. Controls are static; the combined
 Play / Pause icon is not a live playback indicator. No media metadata or notification
 content is shown. No periodic refresh, observer, wake lock, or added permission.
-Appearance settings store only icon size, gap and color in private SharedPreferences.
+Appearance settings store only icon size, gap, color, icon style and full-width mode in private SharedPreferences.
 Existing backup exclusions cover these preferences. Resizing, preview editing and
 applying appearance never send playback commands.
 
