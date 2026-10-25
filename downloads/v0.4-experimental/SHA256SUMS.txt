@@ -1,0 +1,3 @@
+8a64e66965f7821ef06304d917c3313bd48b8114a484387a21fea6b78ed460f1  media-actions-0.4-experimental-debug.apk
+5cedf3047d9d31b734feb4f653282584a3479538277214890ee93868638cbd92  media-actions-0.4-source.zip
+f965338c045ac3c7951c09af90c993ab1f2c47ece03636c2eaedee45b9a8b6cf  widget-preview.png
