@@ -35,7 +35,19 @@
     <string name="shortcut_toggle">Play / Pause</string>
     <string name="shortcut_toggle_long">Play or pause current media</string>
     <string name="widget_name">Media controls</string>
-    <string name="widget_description">Resizable Previous, Play / Pause, and Next controls.</string>
+    <string name="widget_description">Transparent, resizable media controls with adjustable icon size and spacing.</string>
+    <string name="widget_appearance_heading">Widget appearance</string>
+    <string name="widget_appearance_help">The widget background is fully transparent. Resize it in LockStar, then fine-tune the icons here.</string>
+    <string name="widget_preview_caption">Preview on sample wallpaper. The wallpaper is not part of the widget.</string>
+    <string name="widget_icons_white">White icons</string>
+    <string name="widget_icons_dark">Dark icons</string>
+    <string name="widget_icon_size">Icon size</string>
+    <string name="widget_icon_size_value">Icon size: %1$d%%</string>
+    <string name="widget_button_spacing">Button spacing</string>
+    <string name="widget_button_spacing_value">Button spacing: %1$d dp</string>
+    <string name="widget_style_scope">Applies to all Media controls widgets.</string>
+    <string name="widget_apply_style">Apply to widgets</string>
+    <string name="widget_style_applied">Widget appearance saved and applied.</string>
     <string name="widget_setup_heading">LockStar widget</string>
     <string name="widget_setup_steps">In Good Lock → LockStar, enable lock-screen editing and open the widget area or Add widget control, if available. Choose Media Actions → Media controls, place it, and drag its resize handles. Menu names and sizing depend on your LockStar version.\n\nThe three buttons work directly without opening this app. Grant Notification access here first. The widget has no song title or live playback indicator. Locked interaction and LockStar compatibility need testing on your phone.</string>
 </resources>

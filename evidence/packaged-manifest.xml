@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="2"
-    android:versionName="0.2-experimental"
+    android:versionCode="3"
+    android:versionName="0.3-experimental"
     android:compileSdkVersion="36"
     android:compileSdkVersionCodename="16"
     package="dev.local.mediaactions"
@@ -50,7 +50,7 @@
             android:noHistory="true" />
 
         <receiver
-            android:label="@ref/0x7f040023"
+            android:label="@ref/0x7f04002c"
             android:name="dev.local.mediaactions.MediaWidgetProvider"
             android:exported="false">
 

@@ -1,4 +1,4 @@
-# Test report — Media Actions 0.2 experimental
+# Test report — Media Actions 0.3 experimental
 
 Date: 2026-10-25 (UTC).
 
@@ -42,12 +42,16 @@ Use `tools/device-info.sh` and manually record the trigger before device testing
 | `./gradlew assembleDebug testDebugUnitTest lintDebug :app:dependencies --configuration debugRuntimeClasspath` | PASS, exit 0; `BUILD SUCCESSFUL` |
 | JVM policy tests | PASS: 22 tests, 0 failures/errors/skips |
 | Robolectric Android entry-point/adapter tests | PASS: 18 runs (9 cases × API 33 and API 36), 0 failures/errors/skips |
-| Robolectric widget tests | PASS: 18 runs (9 cases × API 33 and API 36), 0 failures/errors/skips; 58 total host tests |
+| Robolectric widget tests | PASS: 18 runs (9 cases × API 33 and API 36), 0 failures/errors/skips |
+| Geometry/appearance tests | PASS: 6 JVM cases across supported sizes and style extremes |
+| Size reporting, editor and preferences | PASS: 12 runs (6 cases × API 33 and API 36) |
+| Native visual tests | PASS: 3 API 33 Skia cases; transparency, color/size changes, preview export |
+| Total host tests | PASS: 79 tests, 0 failures/errors/skips |
 | Android lint, warnings treated as errors | PASS: `No issues found.` |
 | APK signature (`apksigner verify --verbose --print-certs`) | PASS: one Android debug signer, APK Signature Scheme v2 |
 | Packaged manifest inspection | PASS: zero `uses-permission` declarations; two exported Activities; listener not exported and protected by system binding permission; one non-exported widget receiver; no content providers |
 | Packaged shortcut XML inspection | PASS: `next_track`, `previous_track`, `toggle_playback`; explicit Activity targets and three distinct allowlisted URIs |
-| Packaged widget XML/layout inspection | PASS: 3 × 1 default, resize both axes, 156 × 56 dp minimum, initial/preview/keyguard layout, home/keyguard categories, periodic updates disabled |
+| Packaged widget XML/layout inspection | PASS: transparent root; 3 × 1 default; both resize axes; 144 × 48 dp minimum; 432 × 144 dp requested maximum; no periodic updates |
 | Production runtime dependencies | Kotlin stdlib 2.2.21 + JetBrains annotations 13.0; no automation/network/media/UI library |
 | APK native libraries | None; no ABI-specific binaries |
 | `tools/device-info.sh` shell syntax | PASS (`sh -n`); not run against a phone |
@@ -55,14 +59,14 @@ Use `tools/device-info.sh` and manually record the trigger before device testing
 
 Builder: Linux x86_64, full OpenJDK 21.0.2 (builder only), Gradle 8.14.6,
 Android Gradle Plugin 8.13.2, Kotlin 2.2.21, Android Build Tools 36.0.0.
-App: minimum SDK 33, compile/target SDK 36, version `0.2-experimental` (code 2).
+App: minimum SDK 33, compile/target SDK 36, version `0.3-experimental` (code 3).
 
-The delivered debug APK is **2,512,623 bytes** (~2.40 MiB).
-SHA-256: `d4808f8c5dc483a187c62187531a65310ae5eb0147b66c7b8ba425b3ad2e98e4`.
+The delivered debug APK is **2,613,605 bytes** (~2.49 MiB).
+SHA-256: `9e82128bc3309b4bc111178f830267eec08e930d32add53a24878d793f266420`.
 Debug signing certificate SHA-256:
 `21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a`.
 The Gradle wrapper checks the official 8.14.6 distribution SHA-256.
-The signer matches the supplied 0.1 APK, allowing an in-place update.
+The signer matches the supplied 0.1 and 0.2 APKs, allowing an in-place update.
 
 Subsequent user report: running the Samsung routine appears to close the foreground
 app. Exact reproduction steps, foreground app, Android/One UI/module versions, and
@@ -78,7 +82,8 @@ The Android simulation checks packaged declarations, denied/granted access, no s
 state/action mapping into TransportControls, no-UI finishing, recreation suppression,
 and settings-screen lifecycle. These tests do not play real audio.
 
-The widget suite measures controls at 156 × 56, 240 × 64, and 360 × 112 dp and checks
+The widget suite measures generic and exact-size controls, including 144 × 48,
+156 × 56, 240 × 64, and 360 × 112 dp, and checks
 48 dp touch areas and accessibility labels. It checks distinct immutable broadcast
 tokens, rendered-button taps, no Activity launch, revoked access/no sessions,
 malformed/stale widget requests, immutable fill-in handling, resize/update behavior,
@@ -86,6 +91,21 @@ and cancellation of removed widgets' tokens. Robolectric requires a test-only
 in-process registration of the same private provider to simulate delivery of explicit
 broadcasts that do not match the receiver's manifest update filter. These checks do
 not validate Android cold-start delivery, Samsung's widget host, or keyguard policy.
+
+Version 0.3 adds exact host-size variants, compact centering, responsive icon scaling,
+and local appearance preferences. Geometry checks exercise width/height and icon/gap
+extremes, preserving 48 dp touch targets across supported dimensions. Editor checks
+verify that previews do not control media and that preferences save only on Apply.
+Hosts that omit dimensions get a flexible fallback with collapsed custom gaps;
+icon-size tuning there is approximate rather than exact percentage scaling.
+
+Native pixel tests render the actual RemoteViews at API 33 using Skia. They verify
+alpha=0 at outer corners and between separated buttons, no filled panel, white/dark
+color changes, and larger glyphs with a larger icon-size setting.
+[widget-preview.png](evidence/widget-preview.png) shows native renders at 144 × 48,
+240 × 72, and 360 × 112 dp on sample wallpapers. It is not a device screenshot.
+Button growth is capped at 128 dp. Host maximum-size attributes are hints and may
+not be honored by every launcher/LockStar version.
 
 Raw evidence is included in [evidence/](evidence/) with the delivered source: Gradle
 output/dependencies, JUnit XML reports, lint XML/text, decoded packaged manifest and
@@ -106,12 +126,18 @@ known failing host checks. No physical test result is inferred from these checks
 | W05 | Paused player resumes, Previous follows player semantics, and repeat taps do not duplicate commands | NOT TESTED |
 | W06 | Denied/revoked access and no media produce no crash, stray launch, or audio | NOT TESTED on S25; simulated tests pass separately |
 | W07 | Tap after ordinary process death; removal/re-addition; reboot before/after first unlock | NOT TESTED on device |
+| W08 | Transparency over actual wallpaper; distinguish any host-added frame | NOT TESTED on device; native pixel checks pass |
+| W09 | Resize in LockStar; icons grow, grouping remains compact, no clipping | NOT TESTED in LockStar; geometry/native render checks pass |
+| W10 | White/dark icons, icon size and spacing; Apply updates placed instances | NOT TESTED on device; editor/preferences/renderer checks pass |
 
 Widget architecture: native RemoteViews, a non-exported AppWidgetProvider, three
 explicit immutable broadcast PendingIntents, and the existing one-shot dispatcher.
 There is no shortcut/Activity launch on a widget tap. Controls are static; the combined
 Play / Pause icon is not a live playback indicator. No media metadata or notification
 content is shown. No periodic refresh, observer, wake lock, or added permission.
+Appearance settings store only icon size, gap and color in private SharedPreferences.
+Existing backup exclusions cover these preferences. Resizing, preview editing and
+applying appearance never send playback commands.
 
 During device testing, record the exact LockStar version, widget-menu availability,
 dimensions/resize controls, secure-lock method, prompts, and visible screen behavior.

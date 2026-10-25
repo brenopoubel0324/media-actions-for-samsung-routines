@@ -1,4 +1,4 @@
-package: name='dev.local.mediaactions' versionCode='2' versionName='0.2-experimental' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'
+package: name='dev.local.mediaactions' versionCode='3' versionName='0.3-experimental' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'
 minSdkVersion:'33'
 targetSdkVersion:'36'
 application-label:'Media Actions'

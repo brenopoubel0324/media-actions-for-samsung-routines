@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widget_controls"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:minWidth="156dp"
-    android:minHeight="56dp"
-    android:background="@drawable/widget_background"
-    android:clipToOutline="true"
-    android:orientation="horizontal"
-    android:padding="4dp">
+    android:minWidth="144dp"
+    android:minHeight="48dp"
+    android:background="@android:color/transparent">
+
+    <!-- The host-sized root centers this independently sized group of controls. -->
+    <LinearLayout
+        tools:ignore="UselessParent"
+        android:id="@+id/widget_controls_row"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
 
     <ImageButton
         android:id="@+id/widget_previous"
@@ -19,10 +26,14 @@
         android:minHeight="48dp"
         android:background="@drawable/widget_button_background"
         android:contentDescription="@string/shortcut_previous"
-        android:padding="10dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_previous"
+        android:padding="4dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_widget_previous"
         android:tint="@android:color/white" />
+
+    <!-- Zero is intentional: RemoteViews sets the user's requested spacing. -->
+    <FrameLayout tools:ignore="Suspicious0dp" android:id="@+id/widget_gap_left" android:layout_width="0dp"
+        android:layout_height="match_parent" android:importantForAccessibility="no" />
 
     <ImageButton
         android:id="@+id/widget_toggle"
@@ -33,10 +44,13 @@
         android:minHeight="48dp"
         android:background="@drawable/widget_button_background"
         android:contentDescription="@string/shortcut_toggle"
-        android:padding="10dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_play_pause"
+        android:padding="1dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_widget_toggle"
         android:tint="@android:color/white" />
+
+    <FrameLayout tools:ignore="Suspicious0dp" android:id="@+id/widget_gap_right" android:layout_width="0dp"
+        android:layout_height="match_parent" android:importantForAccessibility="no" />
 
     <ImageButton
         android:id="@+id/widget_next"
@@ -47,8 +61,9 @@
         android:minHeight="48dp"
         android:background="@drawable/widget_button_background"
         android:contentDescription="@string/shortcut_next"
-        android:padding="10dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_next"
+        android:padding="4dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_widget_next"
         android:tint="@android:color/white" />
-</LinearLayout>
+    </LinearLayout>
+</FrameLayout>

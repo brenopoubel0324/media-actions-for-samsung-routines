@@ -14,7 +14,8 @@ import android.widget.RemoteViews
 /** Static controls: no media metadata, polling, playback observer, or Activity launch. */
 class MediaWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, appWidgetIds: IntArray) {
-        for (id in appWidgetIds) manager.updateAppWidget(id, createViews(context, id))
+        for (id in appWidgetIds) manager.updateAppWidget(id,
+            WidgetRenderer.render(context, id, manager.getAppWidgetOptions(id)))
     }
 
     override fun onAppWidgetOptionsChanged(
@@ -23,7 +24,7 @@ class MediaWidgetProvider : AppWidgetProvider() {
         appWidgetId: Int,
         newOptions: Bundle,
     ) {
-        manager.updateAppWidget(appWidgetId, createViews(context, appWidgetId))
+        manager.updateAppWidget(appWidgetId, WidgetRenderer.render(context, appWidgetId, newOptions))
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -72,10 +73,12 @@ class MediaWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         internal fun createViews(context: Context, id: Int): RemoteViews =
-            RemoteViews(context.packageName, R.layout.widget_media_controls).apply {
-                setOnClickPendingIntent(R.id.widget_previous, controlIntent(context, id, MediaAction.PREVIOUS))
-                setOnClickPendingIntent(R.id.widget_toggle, controlIntent(context, id, MediaAction.PLAY_PAUSE))
-                setOnClickPendingIntent(R.id.widget_next, controlIntent(context, id, MediaAction.NEXT))
-            }
+            WidgetRenderer.render(context, id, AppWidgetManager.getInstance(context).getAppWidgetOptions(id))
+
+        fun refreshAll(context: Context) {
+            val manager = AppWidgetManager.getInstance(context)
+            val ids = manager.getAppWidgetIds(ComponentName(context, MediaWidgetProvider::class.java))
+            MediaWidgetProvider().onUpdate(context, manager, ids)
+        }
     }
 }

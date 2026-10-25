@@ -62,6 +62,7 @@ class MainActivity : Activity() {
             accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
             isSaveEnabled = false
         }
+        body.addView(WidgetAppearanceSection(this).create())
         label(R.string.setup_heading, 20f).isAccessibilityHeading = true
         label(R.string.setup_steps, 15f)
         label(R.string.widget_setup_heading, 20f).isAccessibilityHeading = true

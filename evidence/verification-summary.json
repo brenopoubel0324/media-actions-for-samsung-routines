@@ -1,6 +1,6 @@
 {
-  "version": "0.2-experimental",
-  "version_code": 2,
+  "version": "0.3-experimental",
+  "version_code": 3,
   "build_host": "Linux x86_64",
   "jdk": "OpenJDK 21.0.2 (builder only)",
   "gradle": "8.14.6",
@@ -10,13 +10,19 @@
   "target_sdk": 36,
   "min_sdk": 33,
   "build_tools": "36.0.0",
-  "apk_bytes": 2512623,
-  "apk_sha256": "d4808f8c5dc483a187c62187531a65310ae5eb0147b66c7b8ba425b3ad2e98e4",
+  "apk_bytes": 2613605,
+  "apk_sha256": "9e82128bc3309b4bc111178f830267eec08e930d32add53a24878d793f266420",
   "signing_certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a",
-  "same_signer_as_supplied_0_1": true,
+  "same_signer_as_supplied_0_1_and_0_2": true,
   "native_libraries": [],
   "requested_permissions": [],
   "tests": {
+    "dev.local.mediaactions.WidgetVisualTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
     "dev.local.mediaactions.AndroidEntryPointTest": {
       "tests": 18,
       "failures": 0,
@@ -29,16 +35,29 @@
       "errors": 0,
       "skipped": 0
     },
+    "dev.local.mediaactions.WidgetAppearanceTest": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
     "dev.local.mediaactions.MediaWidgetTest": {
       "tests": 18,
       "failures": 0,
       "errors": 0,
       "skipped": 0
+    },
+    "dev.local.mediaactions.WidgetRendererTest": {
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
     }
   },
-  "test_total": 58,
+  "test_total": 79,
   "lint": "No issues found.",
-  "widget": "private receiver; immutable broadcast controls; resizable both axes; updatePeriodMillis=0",
+  "widget": "transparent; size-adaptive compact controls; local icon size/spacing/color settings; no polling",
+  "native_visual_tests": "API 33 Skia rendering: transparent corners/gaps; icon color and size; preview export",
   "device_tests": "NOT RUN \u2014 no Android device connected; no emulator used",
-  "lockstar": "NOT TESTED \u2014 placement, sizing, host delivery and keyguard interaction need S25 validation"
+  "lockstar": "Visual fit, dimensions, hosting and keyguard interaction still need S25 testing"
 }

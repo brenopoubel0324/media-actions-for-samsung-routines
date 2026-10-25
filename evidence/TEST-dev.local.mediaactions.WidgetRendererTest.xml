@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.local.mediaactions.WidgetRendererTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:31:21.797Z" hostname="71eed5309f5e" time="0.526">
+  <properties/>
+  <testcase name="exactHostSizesWinOverLegacyRangesAndInvalidSizesAreIgnored[33]" classname="dev.local.mediaactions.WidgetRendererTest" time="0.023"/>
+  <testcase name="nonReportingHostsStillApplyIconScaleWithoutAddingUnsafeGaps[33]" classname="dev.local.mediaactions.WidgetRendererTest" time="0.024"/>
+  <testcase name="appearancePreferencesPersistAndAreClamped[33]" classname="dev.local.mediaactions.WidgetRendererTest" time="0.056"/>
+  <testcase name="legacyHostRangesProduceOrientationSpecificSizes[33]" classname="dev.local.mediaactions.WidgetRendererTest" time="0.013"/>
+  <testcase name="exactSizeRenderingKeepsTouchAreasInsideTheHostAndScalesGlyphs[33]" classname="dev.local.mediaactions.WidgetRendererTest" time="0.029"/>
+  <testcase name="appearanceEditorPreviewsChangesAndSavesOnlyWhenApplied[33]" classname="dev.local.mediaactions.WidgetRendererTest" time="0.104"/>
+  <testcase name="exactHostSizesWinOverLegacyRangesAndInvalidSizesAreIgnored" classname="dev.local.mediaactions.WidgetRendererTest" time="0.015"/>
+  <testcase name="nonReportingHostsStillApplyIconScaleWithoutAddingUnsafeGaps" classname="dev.local.mediaactions.WidgetRendererTest" time="0.053"/>
+  <testcase name="appearancePreferencesPersistAndAreClamped" classname="dev.local.mediaactions.WidgetRendererTest" time="0.024"/>
+  <testcase name="legacyHostRangesProduceOrientationSpecificSizes" classname="dev.local.mediaactions.WidgetRendererTest" time="0.017"/>
+  <testcase name="exactSizeRenderingKeepsTouchAreasInsideTheHostAndScalesGlyphs" classname="dev.local.mediaactions.WidgetRendererTest" time="0.057"/>
+  <testcase name="appearanceEditorPreviewsChangesAndSavesOnlyWhenApplied" classname="dev.local.mediaactions.WidgetRendererTest" time="0.099"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
