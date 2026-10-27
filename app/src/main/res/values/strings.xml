@@ -38,7 +38,7 @@
     <string name="widget_description">Transparent, resizable media controls with adjustable icon size and spacing.</string>
     <string name="widget_appearance_heading">Widget appearance</string>
     <string name="widget_appearance_help">The widget background is fully transparent. Resize it in LockStar, then fine-tune the icons here.</string>
-    <string name="widget_preview_caption">Sample wallpaper. Tap the preview to try touch feedback.</string>
+    <string name="widget_preview_caption">Sample wallpaper and demonstration progress. Tap the preview to try touch feedback.</string>
     <string name="widget_preview_action">Appearance preview: %1$s</string>
     <string name="widget_icons_white">White icons</string>
     <string name="widget_icons_dark">Dark icons</string>
@@ -82,7 +82,7 @@
     <string name="widget_padding_heading">Widget inner padding</string>
     <string name="widget_padding_horizontal">Widget horizontal padding</string>
     <string name="widget_padding_vertical">Widget vertical padding</string>
-    <string name="widget_padding_help">Minimum space inside the widget. Controls stay centered. Padding is reduced when needed to keep 48 dp touch areas.</string>
+    <string name="widget_padding_help">Vertical padding accepts negative values to expand controls upward/downward. The host may clip them; this cannot enlarge the LockStar slot. Horizontal padding stays nonnegative. Positive padding is limited to preserve touch areas.</string>
     <string name="widget_effective_padding">Effective preview padding: horizontal %1$d dp · vertical %2$d dp</string>
     <string name="widget_padding_limited">Requested padding: horizontal %1$d dp · vertical %2$d dp. Limited by widget size.</string>
     <string name="widget_button_border">Borders around each button</string>
@@ -117,4 +117,7 @@
     <string name="widget_style_applied">Widget appearance saved and applied.</string>
     <string name="widget_setup_heading">LockStar widget</string>
     <string name="widget_setup_steps">In Good Lock → LockStar, enable lock-screen editing and open the widget area or Add widget control, if available. Choose Media Actions → Media controls, place it, and drag its resize handles. Menu names and sizing depend on your LockStar version.\n\nThe three buttons work directly without opening this app. Grant Notification access here first to synchronize Play/Pause with the player. The widget has no song title. Touch feedback is a temporary ripple; the background remains transparent. Locked interaction and LockStar compatibility need testing on your phone.</string>
+    <string name="widget_center_border_only">Border only around Play/Pause</string>
+    <string name="widget_progress_ring">Track progress around Play/Pause</string>
+    <string name="widget_progress_help">White progress arc and dark position marker. Updates every 5 seconds during playback while the screen is on. Unknown duration shows only the track; not a seek control.</string>
 </resources>

@@ -3,6 +3,7 @@ package dev.local.mediaactions
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.util.SizeF
@@ -35,10 +36,14 @@ object WidgetRenderer {
     fun render(context: Context, id: Int, options: Bundle,
         playback: WidgetPlaybackState = WidgetPlaybackState.read(AndroidSessionGateway(context))): RemoteViews {
         val style = WidgetStyleStore.load(context, id)
+        val progress = if (style.progressRing) WidgetTrackProgress.read(context) else null
+        val progressBitmap = if (style.progressRing) WidgetProgressArtwork.draw(context,
+            WidgetPlaybackIcons.center(style.iconStyle, playback),
+            if (style.darkIcons) Color.rgb(26, 29, 34) else Color.WHITE, style, progress) else null
         val sizes = reportedSizes(options)
-        if (sizes.isEmpty()) return build(context, id, style, null, playback = playback)
-        if (sizes.size == 1) return build(context, id, style, sizes.single(), playback = playback)
-        return RemoteViews(sizes.associateWith { build(context, id, style, it, playback = playback) })
+        if (sizes.isEmpty()) return build(context, id, style, null, playback = playback, progress = progress, progressBitmap = progressBitmap)
+        if (sizes.size == 1) return build(context, id, style, sizes.single(), playback = playback, progress = progress, progressBitmap = progressBitmap)
+        return RemoteViews(sizes.associateWith { build(context, id, style, it, playback = playback, progress = progress, progressBitmap = progressBitmap) })
     }
 
     internal fun reportedSizes(options: Bundle): List<SizeF> {
@@ -56,10 +61,12 @@ object WidgetRenderer {
     }
 
     internal fun build(context: Context, id: Int, appearance: WidgetAppearance, size: SizeF?,
-        bindControls: Boolean = true, playback: WidgetPlaybackState = WidgetPlaybackState.PAUSED): RemoteViews =
+        bindControls: Boolean = true, playback: WidgetPlaybackState = WidgetPlaybackState.PAUSED,
+        progress: WidgetTrackProgress? = null, progressBitmap: Bitmap? = null): RemoteViews =
         RemoteViews(context.packageName, R.layout.widget_media_controls).apply {
             val style = appearance.normalized()
-            val geometry = WidgetGeometry.calculate(size?.width ?: 144f, size?.height ?: 48f, style)
+            val geometry = WidgetGeometry.calculate(size?.width ?: 144f, size?.height ?: 48f,
+                if (size == null) style.copy(widgetPaddingHorizontalDp = 0, widgetPaddingVerticalDp = 0) else style)
             setInt(R.id.widget_controls, "setBackgroundResource", if (style.widgetBorder)
                 frameBorders[style.borderWidthDp - 1] else android.R.color.transparent)
             setColorStateList(R.id.widget_controls, "setBackgroundTintList",
@@ -90,17 +97,22 @@ object WidgetRenderer {
             setInt(R.id.widget_toggle, "setImageAlpha", if (playback == WidgetPlaybackState.TRANSITIONING) 150 else 255)
             val color = if (style.darkIcons) Color.rgb(26, 29, 34) else Color.WHITE
             for (index in buttons.indices) {
+                val hasBorder = style.buttonBorder && (!style.centerBorderOnly || index == 1) &&
+                    !(index == 1 && style.progressRing)
                 val background = when {
-                    style.buttonBorder && style.touchFeedback -> (if (style.darkIcons) buttonDarkTouchBorders else buttonTouchBorders)[style.buttonBorderWidthDp - 1]
-                    style.buttonBorder -> buttonBorders[style.buttonBorderWidthDp - 1]
+                    hasBorder && style.touchFeedback -> (if (style.darkIcons) buttonDarkTouchBorders else buttonTouchBorders)[style.buttonBorderWidthDp - 1]
+                    hasBorder -> buttonBorders[style.buttonBorderWidthDp - 1]
                     !style.touchFeedback -> android.R.color.transparent
                     style.darkIcons -> R.drawable.widget_button_background_dark
                     else -> R.drawable.widget_button_background
                 }
                 setInt(buttons[index], "setBackgroundResource", background)
                 setColorStateList(buttons[index], "setBackgroundTintList",
-                    if (style.buttonBorder) ColorStateList.valueOf(style.buttonBorderColor) else null)
-                if (style.iconShadow) {
+                    if (hasBorder) ColorStateList.valueOf(style.buttonBorderColor) else null)
+                if (index == 1 && style.progressRing) {
+                    setImageViewBitmap(buttons[index], progressBitmap ?: WidgetProgressArtwork.draw(context, icons[index], color, style, progress))
+                    setInt(buttons[index], "setColorFilter", Color.TRANSPARENT)
+                } else if (style.iconShadow) {
                     setImageViewBitmap(buttons[index], WidgetIconArtwork.shadowed(context, icons[index], color))
                     // Transparent SRC_ATOP preserves the shadow bitmap's original colors.
                     setInt(buttons[index], "setColorFilter", Color.TRANSPARENT)
@@ -135,6 +147,7 @@ object WidgetRenderer {
                     setViewPadding(button, px, px, px, px)
                 }
             }
+            if (style.progressRing) setViewPadding(R.id.widget_toggle, 0, 0, 0, 0)
             if (bindControls) {
                 setOnClickPendingIntent(R.id.widget_previous, MediaWidgetProvider.controlIntent(context, id, MediaAction.PREVIOUS))
                 setOnClickPendingIntent(R.id.widget_toggle, MediaWidgetProvider.controlIntent(context, id, MediaAction.PLAY_PAUSE))

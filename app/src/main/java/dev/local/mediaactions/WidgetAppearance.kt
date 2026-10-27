@@ -26,18 +26,21 @@ data class WidgetAppearance(
     val buttonBorderColor: Int = android.graphics.Color.WHITE,
     val widgetPaddingHorizontalDp: Int = 0,
     val widgetPaddingVerticalDp: Int = 0,
+    val centerBorderOnly: Boolean = false,
+    val progressRing: Boolean = false,
 ) {
     fun normalized() = copy(iconScalePercent = iconScalePercent.coerceIn(20, 150),
         spacingDp = spacingDp.coerceIn(0, MAX_SPACING_DP),
         borderWidthDp = borderWidthDp.coerceIn(1, MAX_BORDER_DP),
         buttonBorderWidthDp = buttonBorderWidthDp.coerceIn(1, MAX_BORDER_DP),
         widgetPaddingHorizontalDp = widgetPaddingHorizontalDp.coerceIn(0, MAX_PADDING_DP),
-        widgetPaddingVerticalDp = widgetPaddingVerticalDp.coerceIn(0, MAX_PADDING_DP))
+        widgetPaddingVerticalDp = widgetPaddingVerticalDp.coerceIn(MIN_PADDING_DP, MAX_PADDING_DP))
 
     companion object {
         const val MAX_SPACING_DP = 144
         const val MAX_BORDER_DP = 8
         const val MAX_PADDING_DP = 144
+        const val MIN_PADDING_DP = -24
     }
 }
 
@@ -58,7 +61,8 @@ object WidgetStyleStore {
             prefs.getInt("border_width", 1), prefs.getInt("border_color", android.graphics.Color.WHITE),
             prefs.getBoolean("button_border", false), prefs.getInt("button_border_width", 1),
             prefs.getInt("button_border_color", android.graphics.Color.WHITE),
-            prefs.getInt("widget_padding_horizontal", 0), prefs.getInt("widget_padding_vertical", 0)).normalized()
+            prefs.getInt("widget_padding_horizontal", 0), prefs.getInt("widget_padding_vertical", 0), prefs.getBoolean("center_border_only", false),
+            prefs.getBoolean("progress_ring", false)).normalized()
     }
 
     fun save(context: Context, appearance: WidgetAppearance, widgetId: Int? = null) {
@@ -75,6 +79,8 @@ object WidgetStyleStore {
             .putInt("button_border_width", style.buttonBorderWidthDp).putInt("button_border_color", style.buttonBorderColor)
             .putInt("widget_padding_horizontal", style.widgetPaddingHorizontalDp)
             .putInt("widget_padding_vertical", style.widgetPaddingVerticalDp)
+            .putBoolean("center_border_only", style.centerBorderOnly)
+            .putBoolean("progress_ring", style.progressRing)
             .putBoolean("has_override", widgetId != null).apply()
     }
 

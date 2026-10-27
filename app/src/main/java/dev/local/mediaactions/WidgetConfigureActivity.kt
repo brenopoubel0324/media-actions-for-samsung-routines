@@ -107,6 +107,8 @@ class WidgetConfigureActivity : Activity() {
             putBoolean("border", draft.widgetBorder)
             putInt("border_width", draft.borderWidthDp)
             putInt("border_color", draft.borderColor)
+            putBoolean("center_border_only", draft.centerBorderOnly)
+            putBoolean("progress_ring", draft.progressRing)
             putBoolean("button_border", draft.buttonBorder)
             putInt("button_border_width", draft.buttonBorderWidthDp)
             putInt("button_border_color", draft.buttonBorderColor)
@@ -125,7 +127,8 @@ class WidgetConfigureActivity : Activity() {
             draft.getBoolean("border", false), draft.getInt("border_width", 1),
             draft.getInt("border_color", android.graphics.Color.WHITE), draft.getBoolean("button_border", false),
             draft.getInt("button_border_width", 1), draft.getInt("button_border_color", android.graphics.Color.WHITE),
-            draft.getInt("widget_padding_horizontal", 0), draft.getInt("widget_padding_vertical", 0)).normalized()
+            draft.getInt("widget_padding_horizontal", 0), draft.getInt("widget_padding_vertical", 0), draft.getBoolean("center_border_only", false),
+            draft.getBoolean("progress_ring", false)).normalized()
     }
 
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()

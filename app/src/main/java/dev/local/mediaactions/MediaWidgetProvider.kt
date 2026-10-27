@@ -15,6 +15,7 @@ import android.widget.RemoteViews
 class MediaWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, appWidgetIds: IntArray) {
         if (appWidgetIds.isEmpty()) return
+        WidgetPlaybackObserver.settingsChanged(context)
         val playback = WidgetPlaybackState.read(AndroidSessionGateway(context))
         for (id in appWidgetIds) manager.updateAppWidget(id,
             WidgetRenderer.render(context, id, manager.getAppWidgetOptions(id), playback))

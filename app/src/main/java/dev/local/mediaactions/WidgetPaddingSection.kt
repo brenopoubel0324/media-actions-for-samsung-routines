@@ -31,7 +31,7 @@ class WidgetPaddingSection(
         body.addView(horizontalControl)
         text(R.string.widget_padding_vertical).labelFor = R.id.widget_padding_vertical_value
         verticalControl = WidgetNumberControl(context, context.getString(R.string.widget_padding_vertical),
-            0, WidgetAppearance.MAX_PADDING_DP, vertical, R.id.widget_padding_vertical_value,
+            WidgetAppearance.MIN_PADDING_DP, WidgetAppearance.MAX_PADDING_DP, vertical, R.id.widget_padding_vertical_value,
             R.id.widget_padding_vertical_slider, R.id.widget_padding_vertical_decrease,
             R.id.widget_padding_vertical_increase, "dp") { vertical = it; changed(horizontal, vertical) }
         body.addView(verticalControl)

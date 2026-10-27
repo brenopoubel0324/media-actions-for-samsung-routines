@@ -45,6 +45,7 @@ class WidgetAppearanceSection(
         WidgetStyleStore.save(context, draft, widgetId)
         if (widgetId == null) MediaWidgetProvider.refreshAll(context)
         else MediaWidgetProvider.refreshWidget(context, widgetId)
+        WidgetPlaybackObserver.settingsChanged(context)
         confirmation?.setText(R.string.widget_style_applied)
         onApplied?.invoke()
         return true
@@ -88,7 +89,7 @@ class WidgetAppearanceSection(
                 else intArrayOf(0xFF244B58.toInt(), 0xFF172335.toInt())).apply { cornerRadius = dp(18).toFloat() }
             preview.removeAllViews()
             val view = WidgetRenderer.build(context, AppWidgetManager.INVALID_APPWIDGET_ID, draft,
-                size, bindControls = false).apply(context, preview)
+                size, bindControls = false, progress = WidgetTrackProgress(0.42f)).apply(context, preview)
             val scale = min(1f, min(availableWidth / size.width, 80f / size.height))
             view.scaleX = scale
             view.scaleY = scale
@@ -202,6 +203,25 @@ class WidgetAppearanceSection(
             draft = draft.copy(buttonBorder = enabled, buttonBorderWidthDp = width, buttonBorderColor = color)
             updatePreview()
         }.also { body.addView(it.create()) }
+        body.addView(CheckBox(context).apply {
+            id = R.id.widget_center_border_only
+            minHeight = dp(48)
+            setText(R.string.widget_center_border_only)
+            isChecked = draft.centerBorderOnly
+            setOnCheckedChangeListener { _, checked ->
+                draft = draft.copy(centerBorderOnly = checked); updatePreview()
+            }
+        })
+        body.addView(CheckBox(context).apply {
+            id = R.id.widget_progress_ring
+            minHeight = dp(48)
+            setText(R.string.widget_progress_ring)
+            isChecked = draft.progressRing
+            setOnCheckedChangeListener { _, checked ->
+                draft = draft.copy(progressRing = checked); updatePreview()
+            }
+        })
+        text(R.string.widget_progress_help, 14f)
         borderControls = WidgetBorderSection(context, draft) { enabled, width, color ->
             draft = draft.copy(widgetBorder = enabled, borderWidthDp = width, borderColor = color)
             updatePreview()

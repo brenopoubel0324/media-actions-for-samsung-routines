@@ -1,5 +1,12 @@
 package dev.local.mediaactions
 
+import android.appwidget.AppWidgetManager
+import android.content.BroadcastReceiver
+import android.content.ComponentName
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.PowerManager
+import android.media.MediaMetadata
 import android.content.Context
 import android.media.session.MediaController
 import android.media.session.MediaSession
@@ -8,7 +15,7 @@ import android.media.session.PlaybackState
 import android.os.Handler
 import android.os.Looper
 
-/** Bound to the notification-listener lifecycle. No polling or media metadata callbacks. */
+/** Bound to the listener lifecycle; progress refresh is limited to opted-in widgets on an interactive screen. */
 class WidgetPlaybackObserver(context: Context,
     private val onChanged: (WidgetPlaybackState) -> Unit = { MediaWidgetProvider.refreshAll(context.applicationContext, it) },
 ) : AutoCloseable {
@@ -21,27 +28,53 @@ class WidgetPlaybackObserver(context: Context,
     private var keyRegistered = false
     private var lastState: WidgetPlaybackState? = null
     private var refreshPending = false
+    private var forceRefresh = false
+    private var receiverRegistered = false
+    private val pulse = Runnable { scheduleRefresh(true) }
+    private val visibilityReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            handler.removeCallbacks(pulse)
+            if (intent.action != Intent.ACTION_SCREEN_OFF) scheduleRefresh(true)
+        }
+    }
+    private fun progressWidgets(): Boolean = try {
+        val widgets = AppWidgetManager.getInstance(app)
+        widgets.getAppWidgetIds(ComponentName(app, MediaWidgetProvider::class.java)).any {
+            WidgetStyleStore.load(app, it).progressRing
+        }
+    } catch (_: RuntimeException) { false }
+    private fun updatePulse(state: WidgetPlaybackState) {
+        handler.removeCallbacks(pulse)
+        if (running && state == WidgetPlaybackState.PLAYING && progressWidgets() &&
+            app.getSystemService(PowerManager::class.java).isInteractive) handler.postDelayed(pulse, 5_000)
+    }
     private val refresh = Runnable {
         refreshPending = false
         if (running) {
             val state = WidgetPlaybackState.read(AndroidSessionGateway(app))
-            if (state != lastState) emit(state)
+            if (state != lastState || (forceRefresh && progressWidgets())) emit(state)
+            forceRefresh = false
+            updatePulse(state)
         }
     }
     private val activeListener = MediaSessionManager.OnActiveSessionsChangedListener { controllers ->
         if (running) {
             watch(controllers.orEmpty())
-            scheduleRefresh()
+            scheduleRefresh(true)
         }
     }
     private val keyListener = MediaSessionManager.OnMediaKeyEventSessionChangedListener { _, _ ->
-        scheduleRefresh()
+        scheduleRefresh(true)
     }
 
     fun start() {
         if (running) return
         running = true
         try {
+            app.registerReceiver(visibilityReceiver, IntentFilter(Intent.ACTION_SCREEN_ON).apply {
+                addAction(Intent.ACTION_SCREEN_OFF); addAction(SETTINGS_CHANGED)
+            }, Context.RECEIVER_NOT_EXPORTED)
+            receiverRegistered = true
             manager.addOnActiveSessionsChangedListener(activeListener,
                 AndroidSessionGateway.listenerComponent(app), handler)
             activeRegistered = true
@@ -72,12 +105,13 @@ class WidgetPlaybackObserver(context: Context,
             val token = controller.sessionToken
             if (token in watched) continue
             val callback = object : MediaController.Callback() {
-                override fun onPlaybackStateChanged(state: PlaybackState?) = scheduleRefresh()
+                override fun onPlaybackStateChanged(state: PlaybackState?) = scheduleRefresh(true)
+                override fun onMetadataChanged(metadata: MediaMetadata?) = scheduleRefresh(true)
                 override fun onSessionDestroyed() {
                     watched.remove(token)?.let { (old, registered) ->
                         try { old.unregisterCallback(registered) } catch (_: RuntimeException) { /* Already gone. */ }
                     }
-                    scheduleRefresh()
+                    scheduleRefresh(true)
                 }
             }
             try {
@@ -87,7 +121,8 @@ class WidgetPlaybackObserver(context: Context,
         }
     }
 
-    private fun scheduleRefresh() {
+    private fun scheduleRefresh(force: Boolean = false) {
+        forceRefresh = forceRefresh || force
         if (!running || refreshPending) return
         refreshPending = true
         handler.post(refresh)
@@ -102,10 +137,23 @@ class WidgetPlaybackObserver(context: Context,
         }
     }
 
+    companion object {
+        private const val SETTINGS_CHANGED = "dev.local.mediaactions.WIDGET_PROGRESS_SETTINGS"
+        fun settingsChanged(context: Context) {
+            context.sendBroadcast(Intent(SETTINGS_CHANGED).setPackage(context.packageName))
+        }
+    }
+
     override fun close() {
         running = false
         handler.removeCallbacks(refresh)
+        handler.removeCallbacks(pulse)
+        if (receiverRegistered) {
+            try { app.unregisterReceiver(visibilityReceiver) } catch (_: RuntimeException) { /* Already gone. */ }
+            receiverRegistered = false
+        }
         refreshPending = false
+        forceRefresh = false
         for ((controller, callback) in watched.values) {
             try { controller.unregisterCallback(callback) } catch (_: RuntimeException) { /* Already gone. */ }
         }

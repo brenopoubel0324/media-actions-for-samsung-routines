@@ -1,0 +1,45 @@
+{
+  "version": "0.12-experimental",
+  "phone_version_code": 12,
+  "application_id": "dev.local.mediaactions",
+  "wear_companion": "0.8-experimental unchanged",
+  "apk": {
+    "filename": "media-actions-phone-0.12-experimental-debug.apk",
+    "bytes": 5376489,
+    "sha256": "230d49b9a2b8521615e772e65bc5fcf257af2cceb84b95e85ed41c72d2a704b9",
+    "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+  },
+  "tests": {
+    "app": {
+      "tests": 284,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 315,
+  "lint": "No issues found in all modules",
+  "physical_host_tested": false,
+  "physical_player_tested": false,
+  "performance_benchmark": false,
+  "features": [
+    "optional center-only static button border",
+    "white track-progress arc and dark marker; actual session position/duration; 5s cadence only while playing with opted-in widget and interactive screen",
+    "vertical padding -24..144dp, horizontal 0..144dp; host clipping possible",
+    "single bounded center bitmap reused across responsive size variants"
+  ],
+  "review": "APROVADO, 3 rounds; 3 medium and 2 low findings fixed; no open findings",
+  "preview": "native Android/Skia with demonstration progress and example wallpaper; not a Samsung host screenshot"
+}

@@ -1,8 +1,8 @@
-# Media Actions for Routines — 0.11 experimental
+# Media Actions for Routines — 0.12 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.11](downloads/v0.11-experimental/media-actions-phone-0.11-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções 0.11](downloads/v0.11-experimental/README.md).
+**APKs:** [Celular 0.12](downloads/v0.12-experimental/media-actions-phone-0.12-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções 0.12](downloads/v0.12-experimental/README.md).
 
 Esta versão é experimental. Testes em Android simulado não confirmam integração física com S25/LockStar/Watch 8. As funções de mídia usam sessões elegíveis e ações anunciadas pelo player; Spotify Connect remoto pode não expor uma sessão local controlável.
 
@@ -24,6 +24,10 @@ URIs existentes preservadas:
 
 ## Widget e LockStar
 
+Novidade 0.12: **borda só no Play/Pause**, opção de **progresso circular branco com marcador escuro** e **padding negativo somente vertical**, de −24 a 144 dp. [Configuração e limites](docs/CIRCULAR_PROGRESS.md).
+
+![Prévia do centro com progresso](downloads/v0.12-experimental/progresso-circular.png)
+
 Novidade 0.10: **bordas dos botões e moldura do widget independentes**, cada grupo com ativação, espessura de 1–8 dp e cor/opacidade próprias. É possível usar as duas, uma ou nenhuma, mantendo os centros transparentes. **Padding horizontal e vertical somente do widget inteiro**, com campo numérico, slider e passos de 1 dp. [Configuração, limites e renderização](docs/INDEPENDENT_BORDERS.md). O companion Wear permanece na versão 0.8 e não precisa ser atualizado para estas funções.
 
 ![Comparação das bordas independentes](downloads/v0.10-experimental/bordas-independentes.png)
@@ -32,7 +36,7 @@ Novidade 0.10: **bordas dos botões e moldura do widget independentes**, cada gr
 
 O widget Media controls tem fundo transparente e três áreas de toque de pelo menos 48 dp. A aparência permite famílias de ícones distintas, tamanho, cor, sombra opcional, espaçamento com ajuste numérico preciso e feedback de toque. As configurações são por instância; valores legados continuam compatíveis.
 
-Play/Pause acompanha o estado informado pelo player: Pausa durante reprodução, Play em pausa/parada e símbolo neutro quando o estado é desconhecido/transitório. Mudanças externas atualizam por callbacks, sem polling nem persistência do estado de reprodução. Um clique não é tratado como confirmação de mudança.
+Play/Pause acompanha o estado informado pelo player: Pausa durante reprodução, Play em pausa/parada e símbolo neutro quando o estado é desconhecido/transitório. Mudanças externas atualizam por callbacks, sem persistência do estado de reprodução. Com progresso circular ativado, a posição também é atualizada aproximadamente a cada 5 segundos enquanto toca e a tela está interativa. Um clique não é tratado como confirmação de mudança.
 
 Para editar, use a configuração externa oferecida pelo host, quando disponível. O app declara suporte Android a reconfiguração e tem uma tela dedicada à instância escolhida. O menu do LockStar é controlado pela Samsung; declarar suporte não garante a presença de “Editar” em todo firmware. O botão **Edit existing widget** no app oferece acesso alternativo à configuração. Não há botão extra de edição dentro do widget. Veja [a pesquisa LockStar](docs/LOCKSTAR_WIDGET_EDITING.md).
 
@@ -72,4 +76,4 @@ JDK 21 para executar Gradle; bytecode Java/Kotlin 17. AGP 8.13.2, Kotlin 2.2.21,
 
 Os APKs debug fornecidos usam o mesmo certificado dos APKs anteriores para preservar atualização. Não há chave privada no repositório; para distribuição futura, manter sua chave fora do projeto e preservar a identidade das instalações. Celular e relógio precisam compartilhar applicationId/certificado para Data Layer.
 
-Resultados da versão: [self-audit 0.11](docs/reviews/spotify-fallback-0.11.md), [self-audit do widget 0.10](docs/reviews/independent-borders-0.10.md), [revisão Wear](docs/reviews/wear-button-remapper-implementation.md), [plano Wear](docs/planos/wear-os-galaxy-watch-8.md), [relatório de testes](TEST_REPORT.md), [créditos de ícones](THIRD_PARTY_NOTICES.md). Nenhum teste de host substitui as verificações físicas pendentes.
+Resultados da versão: [self-audit 0.12](docs/reviews/progress-ring-0.12.md), [self-audit 0.11](docs/reviews/spotify-fallback-0.11.md), [self-audit do widget 0.10](docs/reviews/independent-borders-0.10.md), [revisão Wear](docs/reviews/wear-button-remapper-implementation.md), [plano Wear](docs/planos/wear-os-galaxy-watch-8.md), [relatório de testes](TEST_REPORT.md), [créditos de ícones](THIRD_PARTY_NOTICES.md). Nenhum teste de host substitui as verificações físicas pendentes.

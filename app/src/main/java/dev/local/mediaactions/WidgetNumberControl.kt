@@ -67,7 +67,8 @@ class WidgetNumberControl(
         input.apply {
             id = inputId
             isSaveEnabled = false // The editor restores its draft; stale view state must not replace it.
-            inputType = InputType.TYPE_CLASS_NUMBER
+            inputType = InputType.TYPE_CLASS_NUMBER or
+                (if (minimum < 0) InputType.TYPE_NUMBER_FLAG_SIGNED else 0)
             imeOptions = EditorInfo.IME_ACTION_DONE
             setSingleLine()
             gravity = Gravity.CENTER
