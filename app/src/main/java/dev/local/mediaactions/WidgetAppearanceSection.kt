@@ -89,7 +89,9 @@ class WidgetAppearanceSection(
                 else intArrayOf(0xFF244B58.toInt(), 0xFF172335.toInt())).apply { cornerRadius = dp(18).toFloat() }
             preview.removeAllViews()
             val view = WidgetRenderer.build(context, AppWidgetManager.INVALID_APPWIDGET_ID, draft,
-                size, bindControls = false, progress = WidgetTrackProgress(0.42f)).apply(context, preview)
+                size, bindControls = false,
+                playback = if (draft.progressRing) WidgetPlaybackState.PLAYING else WidgetPlaybackState.PAUSED,
+                progress = WidgetTrackProgress(0.42f)).apply(context, preview)
             val scale = min(1f, min(availableWidth / size.width, 80f / size.height))
             view.scaleX = scale
             view.scaleY = scale

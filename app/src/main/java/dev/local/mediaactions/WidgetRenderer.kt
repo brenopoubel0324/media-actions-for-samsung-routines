@@ -36,8 +36,9 @@ object WidgetRenderer {
     fun render(context: Context, id: Int, options: Bundle,
         playback: WidgetPlaybackState = WidgetPlaybackState.read(AndroidSessionGateway(context))): RemoteViews {
         val style = WidgetStyleStore.load(context, id)
-        val progress = if (style.progressRing) WidgetTrackProgress.read(context) else null
-        val progressBitmap = if (style.progressRing) WidgetProgressArtwork.draw(context,
+        val showProgress = shouldShowProgress(style, playback)
+        val progress = if (showProgress) WidgetTrackProgress.read(context) else null
+        val progressBitmap = if (showProgress) WidgetProgressArtwork.draw(context,
             WidgetPlaybackIcons.center(style.iconStyle, playback),
             if (style.darkIcons) Color.rgb(26, 29, 34) else Color.WHITE, style, progress) else null
         val sizes = reportedSizes(options)
@@ -45,6 +46,9 @@ object WidgetRenderer {
         if (sizes.size == 1) return build(context, id, style, sizes.single(), playback = playback, progress = progress, progressBitmap = progressBitmap)
         return RemoteViews(sizes.associateWith { build(context, id, style, it, playback = playback, progress = progress, progressBitmap = progressBitmap) })
     }
+
+    private fun shouldShowProgress(style: WidgetAppearance, playback: WidgetPlaybackState) =
+        style.progressRing && playback == WidgetPlaybackState.PLAYING
 
     internal fun reportedSizes(options: Bundle): List<SizeF> {
         val exact = options.getParcelableArrayList(AppWidgetManager.OPTION_APPWIDGET_SIZES, SizeF::class.java)
@@ -65,6 +69,7 @@ object WidgetRenderer {
         progress: WidgetTrackProgress? = null, progressBitmap: Bitmap? = null): RemoteViews =
         RemoteViews(context.packageName, R.layout.widget_media_controls).apply {
             val style = appearance.normalized()
+            val showProgress = shouldShowProgress(style, playback)
             val geometry = WidgetGeometry.calculate(size?.width ?: 144f, size?.height ?: 48f,
                 if (size == null) style.copy(widgetPaddingHorizontalDp = 0, widgetPaddingVerticalDp = 0) else style)
             setInt(R.id.widget_controls, "setBackgroundResource", if (style.widgetBorder)
@@ -97,8 +102,9 @@ object WidgetRenderer {
             setInt(R.id.widget_toggle, "setImageAlpha", if (playback == WidgetPlaybackState.TRANSITIONING) 150 else 255)
             val color = if (style.darkIcons) Color.rgb(26, 29, 34) else Color.WHITE
             for (index in buttons.indices) {
-                val hasBorder = style.buttonBorder && (!style.centerBorderOnly || index == 1) &&
-                    !(index == 1 && style.progressRing)
+                val hasBorder = style.buttonBorder && playback != WidgetPlaybackState.UNKNOWN &&
+                    (!style.centerBorderOnly || index == 1) &&
+                    !(index == 1 && showProgress)
                 val background = when {
                     hasBorder && style.touchFeedback -> (if (style.darkIcons) buttonDarkTouchBorders else buttonTouchBorders)[style.buttonBorderWidthDp - 1]
                     hasBorder -> buttonBorders[style.buttonBorderWidthDp - 1]
@@ -109,7 +115,7 @@ object WidgetRenderer {
                 setInt(buttons[index], "setBackgroundResource", background)
                 setColorStateList(buttons[index], "setBackgroundTintList",
                     if (hasBorder) ColorStateList.valueOf(style.buttonBorderColor) else null)
-                if (index == 1 && style.progressRing) {
+                if (index == 1 && showProgress) {
                     setImageViewBitmap(buttons[index], progressBitmap ?: WidgetProgressArtwork.draw(context, icons[index], color, style, progress))
                     setInt(buttons[index], "setColorFilter", Color.TRANSPARENT)
                 } else if (style.iconShadow) {
@@ -147,7 +153,7 @@ object WidgetRenderer {
                     setViewPadding(button, px, px, px, px)
                 }
             }
-            if (style.progressRing) setViewPadding(R.id.widget_toggle, 0, 0, 0, 0)
+            if (showProgress) setViewPadding(R.id.widget_toggle, 0, 0, 0, 0)
             if (bindControls) {
                 setOnClickPendingIntent(R.id.widget_previous, MediaWidgetProvider.controlIntent(context, id, MediaAction.PREVIOUS))
                 setOnClickPendingIntent(R.id.widget_toggle, MediaWidgetProvider.controlIntent(context, id, MediaAction.PLAY_PAUSE))

@@ -119,5 +119,5 @@
     <string name="widget_setup_steps">In Good Lock → LockStar, enable lock-screen editing and open the widget area or Add widget control, if available. Choose Media Actions → Media controls, place it, and drag its resize handles. Menu names and sizing depend on your LockStar version.\n\nThe three buttons work directly without opening this app. Grant Notification access here first to synchronize Play/Pause with the player. The widget has no song title. Touch feedback is a temporary ripple; the background remains transparent. Locked interaction and LockStar compatibility need testing on your phone.</string>
     <string name="widget_center_border_only">Border only around Play/Pause</string>
     <string name="widget_progress_ring">Track progress around Play/Pause</string>
-    <string name="widget_progress_help">White progress arc and dark position marker. Updates every 5 seconds during playback while the screen is on. Unknown duration shows only the track; not a seek control.</string>
+    <string name="widget_progress_help">White progress arc and dark position marker, visible only during confirmed playback. Hidden when paused, buffering or unavailable. Updates every 5 seconds while the screen is on. Unknown duration shows only the track during playback; not a seek control.</string>
 </resources>

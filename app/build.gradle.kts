@@ -12,8 +12,8 @@ android {
         applicationId = "dev.local.mediaactions"
         minSdk = 33
         targetSdk = 36
-        versionCode = 13
-        versionName = "0.13-experimental"
+        versionCode = 14
+        versionName = "0.14-experimental"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

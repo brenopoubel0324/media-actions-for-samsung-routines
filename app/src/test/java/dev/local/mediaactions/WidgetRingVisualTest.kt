@@ -19,8 +19,8 @@ class WidgetRingVisualTest {
     private val app get()=RuntimeEnvironment.getApplication()
     private val base=WidgetAppearance(iconStyle=WidgetIconStyle.MATERIAL_ROUNDED,iconScalePercent=60,
         buttonBorder=true,centerBorderOnly=true,buttonBorderWidthDp=2,touchFeedback=false,progressRing=true,spacingDp=24)
-    private fun view(style: WidgetAppearance, fraction: Float?=0.42f): View {
-        val root=WidgetRenderer.build(app,42,style,SizeF(360f,96f),false,WidgetPlaybackState.PLAYING,
+    private fun view(style: WidgetAppearance, fraction: Float?=0.42f, state: WidgetPlaybackState=WidgetPlaybackState.PLAYING): View {
+        val root=WidgetRenderer.build(app,42,style,SizeF(360f,96f),false,state,
             fraction?.let(::WidgetTrackProgress)).apply(app,FrameLayout(app))
         root.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(96,View.MeasureSpec.EXACTLY));root.layout(0,0,360,96)
         return root
@@ -66,6 +66,49 @@ class WidgetRingVisualTest {
         WidgetRenderer.build(app,42,plain,SizeF(360f,96f),false,WidgetPlaybackState.PLAYING).reapply(app,root)
         root.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(96,View.MeasureSpec.EXACTLY));root.layout(0,0,360,96)
         assertTrue(pixels(bitmap(view(plain))).contentEquals(pixels(bitmap(root))))
+    }
+    @Test fun onlyConfirmedPlayingDrawsTheIndicatorAndOtherStatesMatchTheirStaticAppearance() {
+        for (shadow in listOf(false, true)) for (feedback in listOf(false, true)) {
+            val style = base.copy(iconShadow=shadow, touchFeedback=feedback)
+            for (state in WidgetPlaybackState.entries.filter { it != WidgetPlaybackState.PLAYING }) {
+                assertTrue("Unexpected indicator for $state", pixels(bitmap(view(style, state=state)))
+                    .contentEquals(pixels(bitmap(view(style.copy(progressRing=false), state=state)))))
+            }
+            assertFalse(pixels(bitmap(view(style))).contentEquals(pixels(bitmap(view(style.copy(progressRing=false))))))
+        }
+    }
+    @Test fun playPauseAndUnknownTransitionsClearAndRestoreTheRingOnReapply() {
+        val root = view(base)
+        for (state in listOf(WidgetPlaybackState.PAUSED, WidgetPlaybackState.PLAYING,
+            WidgetPlaybackState.UNKNOWN, WidgetPlaybackState.PLAYING, WidgetPlaybackState.TRANSITIONING)) {
+            WidgetRenderer.build(app,42,base,SizeF(360f,96f),false,state,WidgetTrackProgress(0.42f)).reapply(app,root)
+            root.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(96,View.MeasureSpec.EXACTLY));root.layout(0,0,360,96)
+            assertTrue("Stale bitmap/background/padding for $state", pixels(bitmap(view(base,state=state))).contentEquals(pixels(bitmap(root))))
+        }
+    }
+    @Test fun unavailableSessionRemovesButtonBordersAndReapplyRestoresThemWhenPaused() {
+        val root = view(base,state=WidgetPlaybackState.UNKNOWN)
+        assertTrue(root.findViewById<View>(R.id.widget_toggle).background is ColorDrawable)
+        WidgetRenderer.build(app,42,base,SizeF(360f,96f),false,WidgetPlaybackState.PAUSED).reapply(app,root)
+        root.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(96,View.MeasureSpec.EXACTLY));root.layout(0,0,360,96)
+        assertFalse(root.findViewById<View>(R.id.widget_toggle).background is ColorDrawable)
+        assertTrue(pixels(bitmap(view(base,state=WidgetPlaybackState.PAUSED))).contentEquals(pixels(bitmap(root))))
+    }
+    @Test fun exportPlayingOnlyComparison() {
+        val image=Bitmap.createBitmap(1180,300,Bitmap.Config.ARGB_8888);val canvas=Canvas(image);canvas.drawColor(0xFF111820.toInt())
+        val paint=Paint(Paint.ANTI_ALIAS_FLAG).apply { color=Color.WHITE;textSize=28f }
+        canvas.drawText("Indicador de progresso só durante reprodução",24f,42f,paint)
+        paint.textSize=17f;paint.color=0xFFBACCD5.toInt()
+        canvas.drawText("Prévia Android/Skia · progresso de demonstração · borda estática central ativada",24f,76f,paint)
+        val states=listOf(WidgetPlaybackState.PLAYING,WidgetPlaybackState.PAUSED,WidgetPlaybackState.UNKNOWN)
+        val labels=listOf("Tocando · indicador visível","Pausado · só borda estática","Sem sessão · sem borda")
+        for(i in states.indices) {
+            val x=16f+i*390;paint.color=0xFF233344.toInt();canvas.drawRoundRect(x,102f,x+378,278f,18f,18f,paint)
+            paint.color=Color.WHITE;paint.textSize=19f;canvas.drawText(labels[i],x+12,134f,paint)
+            canvas.drawBitmap(bitmap(view(base,state=states[i])),x+9,164f,null)
+        }
+        val out=File("build/outputs/widget-previews/progresso-so-em-play.png");requireNotNull(out.parentFile).mkdirs()
+        out.outputStream().use { assertTrue(image.compress(Bitmap.CompressFormat.PNG,100,it)) }
     }
     @Test fun exportNativeReferenceStyleAndVerticalPadding() {
         val sheet=Bitmap.createBitmap(1180,650,Bitmap.Config.ARGB_8888);val canvas=Canvas(sheet);canvas.drawColor(0xFF111820.toInt())

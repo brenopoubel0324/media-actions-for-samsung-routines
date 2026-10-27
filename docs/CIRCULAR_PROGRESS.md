@@ -1,4 +1,4 @@
-# Centro com progresso e padding vertical — 0.13 experimental
+# Centro com progresso e padding vertical — 0.14 experimental
 
 Em Widget settings, ative **Borders around each button** e **Border only around Play/Pause** para manter a borda estática somente no centro, com Anterior/Próxima livres. A moldura externa continua independente. Nenhuma preferência antiga muda automaticamente.
 
@@ -6,7 +6,7 @@ Ative **Track progress around Play/Pause** para usar o indicador circular no cen
 
 O progresso é a posição/duração da sessão selecionada, com projeção pelo relógio monotônico e velocidade anunciada pelo player. Não lê nem armazena título, artista ou capa. Atualiza em callbacks de estado, busca, duração e troca de sessão, e aproximadamente a cada **5 segundos** enquanto toca, há widget com indicador ativado, posição/duração calculáveis e a tela está interativa. Atualizações somente de progresso alcançam apenas as instâncias com indicador; mudanças reais de estado continuam atualizando todas. Não usa wake lock, alarmes ou serviço novo. Tela apagada/AOD pausa os ticks; pausa da mídia ou opção desativada também. Não há promessa de animação contínua ou benchmark de bateria/FPS.
 
-Duração desconhecida, acesso indisponível ou sessão ausente mostram apenas o trilho, sem fabricar percentual. Pausa mantém a posição informada. O indicador não permite arrastar para buscar. A prévia do editor usa progresso de demonstração identificado; o widget real usa a sessão.
+O indicador só aparece durante PLAYING confirmado. Em pausa, fica oculto e a borda estática segue a configuração. Sem sessão/estado disponível (UNKNOWN), as bordas decorativas dos botões também ficam ocultas. A moldura externa e contornos intrínsecos da família de ícones são independentes. Enquanto toca, duração desconhecida mostra apenas o trilho, sem fabricar percentual. O indicador não permite arrastar para buscar. A prévia do editor usa progresso de demonstração identificado; o widget real usa a sessão.
 
 ## Padding vertical negativo
 
@@ -14,8 +14,8 @@ Duração desconhecida, acesso indisponível ou sessão ausente mostram apenas o
 
 Negativo permite expandir os controles na direção vertical; não é deslocamento do widget nem remoção da margem do LockStar. O grupo continua centralizado e limitado pela largura disponível. O host pode cortar a parte que ultrapassa sua área. Em widgets muito estreitos a largura pode impedir crescimento adicional. Sem dimensões do host, usa-se padding zero conservador. Padding positivo continua limitado para preservar a linha mínima de áreas de toque quando o host comporta o tamanho mínimo.
 
-![Prévia nativa](../downloads/v0.12-experimental/progresso-circular.png)
+![Prévia por estado](../downloads/v0.14-experimental/progresso-so-em-play.png)
 
-A imagem compara borda central, progresso de demonstração de 25%/70% e padding vertical positivo/zero/negativo. Painéis azuis são o fundo de exemplo; o widget permanece transparente. Renderização Android/Skia, sem captura de host Samsung real.
+A imagem compara reprodução com progresso de demonstração, pausa com borda estática e estado desconhecido sem progresso/borda decorativa. Painéis azuis são o fundo de exemplo; o widget permanece transparente. Renderização Android/Skia, sem captura de host Samsung real.
 
 Instale o APK phone como atualização. Mesmo applicationId/certificado, preferências anteriores preservadas. Companion Wear 0.8 e protocolo de comandos não mudaram. O fallback Spotify da 0.11 continua igual.
