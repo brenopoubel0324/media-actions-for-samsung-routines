@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="widget_configuration_save" />
+    <item type="id" name="widget_configuration_cancel" />
+    <item type="id" name="widget_configuration_scroll" />
+    <item type="id" name="widget_edit_existing" />
+    <item type="id" name="widget_scale_value" />
+    <item type="id" name="widget_scale_slider" />
+    <item type="id" name="widget_scale_decrease" />
+    <item type="id" name="widget_scale_increase" />
+    <item type="id" name="widget_spacing_value" />
+    <item type="id" name="widget_spacing_slider" />
+    <item type="id" name="widget_spacing_decrease" />
+    <item type="id" name="widget_spacing_increase" />
+    <item type="id" name="widget_fill_width" />
+    <item type="id" name="widget_icon_shadow" />
+    <item type="id" name="widget_touch_feedback" />
+    <item type="id" name="widget_effective_spacing" />
+</resources>

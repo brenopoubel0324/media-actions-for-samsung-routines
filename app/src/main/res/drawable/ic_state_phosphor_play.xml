@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Phosphor Thin / MIT; adapted standalone play geometry. See THIRD_PARTY_NOTICES.md. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M6,4Q5.5,3.7 5.5,4.5V19.5Q5.5,20.3 6,20L19,12.5Q19.8,12 19,11.5Z" android:fillColor="#00000000" android:strokeColor="#FFFFFF" android:strokeWidth="0.75" android:strokeLineCap="round" android:strokeLineJoin="round" />
+</vector>

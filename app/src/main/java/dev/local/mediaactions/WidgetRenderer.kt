@@ -11,12 +11,13 @@ import android.widget.RemoteViews
 object WidgetRenderer {
     private val buttons = listOf(R.id.widget_previous, R.id.widget_toggle, R.id.widget_next)
 
-    fun render(context: Context, id: Int, options: Bundle): RemoteViews {
-        val style = WidgetStyleStore.load(context)
+    fun render(context: Context, id: Int, options: Bundle,
+        playback: WidgetPlaybackState = WidgetPlaybackState.read(AndroidSessionGateway(context))): RemoteViews {
+        val style = WidgetStyleStore.load(context, id)
         val sizes = reportedSizes(options)
-        if (sizes.isEmpty()) return build(context, id, style, null)
-        if (sizes.size == 1) return build(context, id, style, sizes.single())
-        return RemoteViews(sizes.associateWith { build(context, id, style, it) })
+        if (sizes.isEmpty()) return build(context, id, style, null, playback = playback)
+        if (sizes.size == 1) return build(context, id, style, sizes.single(), playback = playback)
+        return RemoteViews(sizes.associateWith { build(context, id, style, it, playback = playback) })
     }
 
     internal fun reportedSizes(options: Bundle): List<SizeF> {
@@ -34,20 +35,43 @@ object WidgetRenderer {
     }
 
     internal fun build(context: Context, id: Int, appearance: WidgetAppearance, size: SizeF?,
-        bindControls: Boolean = true): RemoteViews =
+        bindControls: Boolean = true, playback: WidgetPlaybackState = WidgetPlaybackState.PAUSED): RemoteViews =
         RemoteViews(context.packageName, R.layout.widget_media_controls).apply {
             val style = appearance.normalized()
-            val icons = when (style.iconStyle) {
-                WidgetIconStyle.OUTLINE -> listOf(R.drawable.ic_widget_outline_previous,
-                    R.drawable.ic_widget_outline_toggle, R.drawable.ic_widget_outline_next)
-                WidgetIconStyle.ROUNDED -> listOf(R.drawable.ic_widget_rounded_previous,
-                    R.drawable.ic_widget_rounded_toggle, R.drawable.ic_widget_rounded_next)
-                WidgetIconStyle.CLASSIC -> listOf(R.drawable.ic_widget_previous,
-                    R.drawable.ic_widget_toggle, R.drawable.ic_widget_next)
+            val sides = when (style.iconStyle) {
+                WidgetIconStyle.OUTLINE -> R.drawable.ic_widget_outline_previous to R.drawable.ic_widget_outline_next
+                WidgetIconStyle.ROUNDED -> R.drawable.ic_widget_rounded_previous to R.drawable.ic_widget_rounded_next
+                WidgetIconStyle.CLASSIC -> R.drawable.ic_widget_previous to R.drawable.ic_widget_next
+                WidgetIconStyle.LUCIDE -> R.drawable.ic_lucide_previous to R.drawable.ic_lucide_next
+                WidgetIconStyle.PHOSPHOR_THIN -> R.drawable.ic_phosphor_previous to R.drawable.ic_phosphor_next
+                WidgetIconStyle.MATERIAL_ROUNDED -> R.drawable.ic_material_previous to R.drawable.ic_material_next
+                WidgetIconStyle.CIRCULAR -> R.drawable.ic_circle_previous to R.drawable.ic_circle_next
+                WidgetIconStyle.CHEVRONS -> R.drawable.ic_chevron_previous to R.drawable.ic_chevron_next
+                WidgetIconStyle.DOUBLE_TRIANGLES -> R.drawable.ic_double_previous to R.drawable.ic_double_next
+                WidgetIconStyle.SQUARE -> R.drawable.ic_square_previous to R.drawable.ic_square_next
             }
-            for (index in buttons.indices) setImageViewResource(buttons[index], icons[index])
+            val icons = listOf(sides.first, WidgetPlaybackIcons.center(style.iconStyle, playback), sides.second)
+            setContentDescription(R.id.widget_toggle, context.getString(when (playback) {
+                WidgetPlaybackState.PLAYING -> R.string.widget_pause_action
+                WidgetPlaybackState.PAUSED -> R.string.widget_play_action
+                WidgetPlaybackState.TRANSITIONING -> R.string.widget_transitioning
+                WidgetPlaybackState.UNKNOWN -> R.string.widget_state_unknown
+            }))
+            setInt(R.id.widget_toggle, "setImageAlpha", if (playback == WidgetPlaybackState.TRANSITIONING) 150 else 255)
             val color = if (style.darkIcons) Color.rgb(26, 29, 34) else Color.WHITE
-            for (button in buttons) setInt(button, "setColorFilter", color)
+            for (index in buttons.indices) {
+                setInt(buttons[index], "setBackgroundResource", if (!style.touchFeedback)
+                    android.R.color.transparent else if (style.darkIcons) R.drawable.widget_button_background_dark
+                    else R.drawable.widget_button_background)
+                if (style.iconShadow) {
+                    setImageViewBitmap(buttons[index], WidgetIconArtwork.shadowed(context, icons[index], color))
+                    // Transparent SRC_ATOP preserves the shadow bitmap's original colors.
+                    setInt(buttons[index], "setColorFilter", Color.TRANSPARENT)
+                } else {
+                    setImageViewResource(buttons[index], icons[index])
+                    setInt(buttons[index], "setColorFilter", color)
+                }
+            }
             if (size != null) {
                 val geometry = WidgetGeometry.calculate(size.width, size.height, style)
                 setViewLayoutWidth(R.id.widget_controls_row, geometry.widthDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)

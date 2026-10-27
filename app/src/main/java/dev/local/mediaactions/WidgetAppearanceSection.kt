@@ -10,7 +10,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -19,45 +18,127 @@ import android.widget.Spinner
 import kotlin.math.min
 
 /** Appearance editing is deliberate user interaction; no widget tap opens this screen. */
-class WidgetAppearanceSection(private val context: Context) {
-    fun create(): View {
-        var draft = WidgetStyleStore.load(context)
+class WidgetAppearanceSection(
+    private val context: Context,
+    private val widgetId: Int? = null,
+    initialAppearance: WidgetAppearance? = null,
+    private val onApplied: (() -> Unit)? = null,
+) {
+    private var draft = (initialAppearance ?: WidgetStyleStore.load(context, widgetId)).normalized()
+    private var confirmation: TextView? = null
+    private var scaleControl: WidgetNumberControl? = null
+    private var spacingControl: WidgetNumberControl? = null
+
+    fun currentAppearance() = draft.normalized()
+
+    fun applyChanges(): Boolean {
+        if (scaleControl?.validate() == false || spacingControl?.validate() == false) return false
+        if (widgetId != null && !MediaWidgetProvider.isOwnWidget(context, widgetId)) {
+            confirmation?.setText(R.string.widget_configuration_missing)
+            return false
+        }
+        WidgetStyleStore.save(context, draft, widgetId)
+        if (widgetId == null) MediaWidgetProvider.refreshAll(context)
+        else MediaWidgetProvider.refreshWidget(context, widgetId)
+        confirmation?.setText(R.string.widget_style_applied)
+        onApplied?.invoke()
+        return true
+    }
+
+    fun create(showApplyButton: Boolean = true, previewContainer: LinearLayout? = null): View {
         val body = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-        fun text(resource: Int, size: Float = 16f): TextView = TextView(context).apply {
+        fun text(resource: Int, size: Float = 16f, parent: LinearLayout = body): TextView = TextView(context).apply {
             setText(resource)
             textSize = size
             setPadding(0, dp(10), 0, dp(6))
+            parent.addView(this)
+        }
+        if (previewContainer == null) {
+            text(R.string.widget_appearance_heading, 20f).isAccessibilityHeading = true
+            text(R.string.widget_appearance_help, 14f)
+        }
+        val previewGroup = previewContainer ?: LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
             body.addView(this)
         }
-        text(R.string.widget_appearance_heading, 20f).isAccessibilityHeading = true
-        text(R.string.widget_appearance_help, 14f)
         val preview = FrameLayout(context)
-        body.addView(preview, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(120)))
-        text(R.string.widget_preview_caption, 13f)
+        val hostSizes = if (widgetId == null) emptyList() else try {
+            WidgetRenderer.reportedSizes(AppWidgetManager.getInstance(context.applicationContext)
+                .getAppWidgetOptions(widgetId))
+        } catch (_: RuntimeException) { emptyList() }
+        var previewSize = hostSizes.firstOrNull()
+        previewGroup.addView(preview, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(96)))
+        text(R.string.widget_preview_caption, 12f, previewGroup)
+        val effectiveSpacing = text(R.string.widget_spacing_help, 13f, previewGroup).apply {
+            id = R.id.widget_effective_spacing
+            accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+        }
         fun updatePreview() {
-            val previewWidth = if (preview.width > 0)
+            val availableWidth = if (preview.width > 0)
                 min(360f, (preview.width / context.resources.displayMetrics.density - 32).coerceAtLeast(1f))
                 else 280f
+            val size = previewSize ?: SizeF(availableWidth, 56f)
             preview.background = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 if (draft.darkIcons) intArrayOf(0xFFF0ECE2.toInt(), 0xFFC7DCD5.toInt())
                 else intArrayOf(0xFF244B58.toInt(), 0xFF172335.toInt())).apply { cornerRadius = dp(18).toFloat() }
             preview.removeAllViews()
             val view = WidgetRenderer.build(context, AppWidgetManager.INVALID_APPWIDGET_ID, draft,
-                SizeF(previewWidth, 56f), bindControls = false).apply(context, preview)
+                size, bindControls = false).apply(context, preview)
+            val scale = min(1f, min(availableWidth / size.width, 80f / size.height))
+            view.scaleX = scale
+            view.scaleY = scale
             preview.addView(view, FrameLayout.LayoutParams(
-                (previewWidth * context.resources.displayMetrics.density).toInt(), dp(56), android.view.Gravity.CENTER))
+                (size.width * context.resources.displayMetrics.density).toInt(),
+                (size.height * context.resources.displayMetrics.density).toInt(), android.view.Gravity.CENTER))
             for (id in listOf(R.id.widget_previous, R.id.widget_toggle, R.id.widget_next)) {
-                view.findViewById<View>(id).isClickable = false
+                view.findViewById<View>(id).apply {
+                    contentDescription = context.getString(R.string.widget_preview_action, contentDescription)
+                    setOnClickListener { /* Try native touch feedback without a media PendingIntent. */ }
+                }
+            }
+            val geometry = WidgetGeometry.calculate(size.width, size.height, draft)
+            effectiveSpacing.text = buildString {
+                append(context.getString(if (hostSizes.isEmpty()) R.string.widget_sample_size
+                    else R.string.widget_reported_size, size.width.toInt(), size.height.toInt()))
+                append("\n")
+                append(context.getString(R.string.widget_effective_spacing,
+                    geometry.gapDp, geometry.buttonDp + geometry.gapDp))
+                if (!draft.fillWidth && geometry.gapDp < draft.spacingDp) {
+                    append("\n")
+                    append(context.getString(R.string.widget_spacing_limited, draft.spacingDp, geometry.gapDp))
+                }
+                if (widgetId != null && hostSizes.isEmpty()) {
+                    append("\n")
+                    append(context.getString(R.string.widget_size_unavailable))
+                }
             }
         }
         preview.addOnLayoutChangeListener { _, left, _, right, _, oldLeft, _, oldRight, _ ->
-            if (right - left != oldRight - oldLeft) updatePreview()
+            // Replacing children during layout can leave the initial preview unmeasured.
+            if (right - left != oldRight - oldLeft) preview.post { updatePreview() }
         }
+
+        if (hostSizes.size > 1) body.addView(Spinner(context).apply {
+            contentDescription = context.getString(R.string.widget_preview_size)
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item,
+                hostSizes.map { context.getString(R.string.widget_size_value, it.width.toInt(), it.height.toInt()) })
+                .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    previewSize = hostSizes[position]
+                    updatePreview()
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+            }
+        })
 
         text(R.string.widget_icon_style)
         val styles = WidgetIconStyle.entries
         val styleNames = listOf(R.string.widget_style_outline, R.string.widget_style_rounded,
-            R.string.widget_style_classic).map(context::getString)
+            R.string.widget_style_classic, R.string.widget_style_lucide,
+            R.string.widget_style_phosphor, R.string.widget_style_material,
+            R.string.widget_style_circular, R.string.widget_style_chevrons,
+            R.string.widget_style_double, R.string.widget_style_square).map(context::getString)
         body.addView(Spinner(context).apply {
             contentDescription = context.getString(R.string.widget_icon_style)
             minimumHeight = dp(48)
@@ -75,6 +156,7 @@ class WidgetAppearanceSection(private val context: Context) {
             }
         }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(48)))
 
+        text(R.string.widget_center_action_help, 14f)
         val colors = RadioGroup(context).apply { orientation = RadioGroup.HORIZONTAL }
         val light = RadioButton(context).apply {
             id = View.generateViewId()
@@ -92,65 +174,62 @@ class WidgetAppearanceSection(private val context: Context) {
             updatePreview()
         }
         body.addView(colors)
-
-        val scaleLabel = text(R.string.widget_icon_size)
-        val spacingLabel = text(R.string.widget_button_spacing)
-        var spacingControl: SeekBar? = null
-        fun updateLabels() {
-            scaleLabel.text = context.getString(R.string.widget_icon_size_value, draft.iconScalePercent)
-            spacingLabel.text = if (draft.fillWidth) context.getString(R.string.widget_spacing_automatic)
-                else context.getString(R.string.widget_button_spacing_value, draft.spacingDp)
-            spacingControl?.isEnabled = !draft.fillWidth
-        }
-        fun slider(maximum: Int, initial: Int, description: Int, label: TextView, changed: (Int) -> Unit): SeekBar {
-            val slider = SeekBar(context).apply {
-                max = maximum
-                progress = initial
-                contentDescription = context.getString(description)
-                setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                        if (!fromUser) return
-                        changed(progress)
-                        updateLabels()
-                        updatePreview()
-                    }
-                    override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
-                    override fun onStopTrackingTouch(seekBar: SeekBar) = Unit
-                })
-            }
-            body.addView(slider, body.indexOfChild(label) + 1,
-                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(48)))
-            return slider
-        }
-        slider(60, draft.iconScalePercent - 75, R.string.widget_icon_size, scaleLabel) {
-            draft = draft.copy(iconScalePercent = it + 75)
-        }
-        spacingControl = slider(64, draft.spacingDp, R.string.widget_button_spacing, spacingLabel) {
-            draft = draft.copy(spacingDp = it)
-        }
         body.addView(CheckBox(context).apply {
+            id = R.id.widget_icon_shadow
+            setText(R.string.widget_icon_shadow)
+            minHeight = dp(48)
+            isChecked = draft.iconShadow
+            setOnCheckedChangeListener { _, checked ->
+                draft = draft.copy(iconShadow = checked)
+                updatePreview()
+            }
+        })
+        body.addView(CheckBox(context).apply {
+            id = R.id.widget_touch_feedback
+            setText(R.string.widget_touch_feedback)
+            minHeight = dp(48)
+            isChecked = draft.touchFeedback
+            setOnCheckedChangeListener { _, checked ->
+                draft = draft.copy(touchFeedback = checked)
+                updatePreview()
+            }
+        })
+
+        text(R.string.widget_icon_size).labelFor = R.id.widget_scale_value
+        scaleControl = WidgetNumberControl(context, context.getString(R.string.widget_icon_size),
+            20, 150, draft.iconScalePercent, R.id.widget_scale_value, R.id.widget_scale_slider,
+            R.id.widget_scale_decrease, R.id.widget_scale_increase, "%") {
+            draft = draft.copy(iconScalePercent = it)
+            updatePreview()
+        }.also { body.addView(it) }
+        text(R.string.widget_icon_size_help, 14f)
+        body.addView(CheckBox(context).apply {
+            id = R.id.widget_fill_width
             setText(R.string.widget_fill_width)
             minHeight = dp(48)
             isChecked = draft.fillWidth
             setOnCheckedChangeListener { _, checked ->
                 draft = draft.copy(fillWidth = checked)
-                updateLabels()
+                spacingControl?.isEnabled = !checked
                 updatePreview()
             }
         })
+        text(R.string.widget_button_spacing).labelFor = R.id.widget_spacing_value
+        spacingControl = WidgetNumberControl(context, context.getString(R.string.widget_button_spacing),
+            0, WidgetAppearance.MAX_SPACING_DP, draft.spacingDp, R.id.widget_spacing_value,
+            R.id.widget_spacing_slider, R.id.widget_spacing_decrease, R.id.widget_spacing_increase, "dp") {
+            draft = draft.copy(spacingDp = it)
+            updatePreview()
+        }.also { body.addView(it); it.isEnabled = !draft.fillWidth }
         text(R.string.widget_spacing_help, 14f)
-        val confirmation = text(R.string.widget_style_scope, 14f).apply {
+        confirmation = text(if (widgetId == null) R.string.widget_style_scope
+            else R.string.widget_style_scope_single, 14f).apply {
             accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
         }
-        body.addView(Button(context).apply {
+        if (showApplyButton) body.addView(Button(context).apply {
             setText(R.string.widget_apply_style)
-            setOnClickListener {
-                WidgetStyleStore.save(context, draft)
-                MediaWidgetProvider.refreshAll(context)
-                confirmation.setText(R.string.widget_style_applied)
-            }
+            setOnClickListener { applyChanges() }
         }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
-        updateLabels()
         updatePreview()
         return body
     }

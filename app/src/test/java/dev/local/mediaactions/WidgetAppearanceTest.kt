@@ -36,7 +36,7 @@ class WidgetAppearanceTest {
     @Test fun controlsFitAcrossSupportedSizesAndStyleExtremes() {
         for (width in listOf(144, 156, 180, 240, 360, 432, 600)) {
             for (height in listOf(48, 56, 64, 96, 112, 144, 300)) {
-                for (spacing in listOf(0, 24, 48, 64)) for (scale in listOf(75, 100, 135)) {
+                for (spacing in listOf(0, 1, 24, 48, 64, 96, 144)) for (scale in listOf(20, 35, 50, 100, 150)) {
                     for (fillWidth in listOf(false, true)) {
                     val size = WidgetGeometry.calculate(width.toFloat(), height.toFloat(),
                         WidgetAppearance(scale, spacing, fillWidth = fillWidth))
@@ -52,7 +52,7 @@ class WidgetAppearanceTest {
     @Test fun invalidDimensionsAndPreferenceValuesAreBounded() {
         val size = WidgetGeometry.calculate(Float.NaN, Float.POSITIVE_INFINITY, WidgetAppearance(-1, 999))
         assertTrue(size.widthDp <= 180)
-        assertEquals(WidgetAppearance(75, 64), WidgetAppearance(-1, 999).normalized())
+        assertEquals(WidgetAppearance(20, 144), WidgetAppearance(-1, 999).normalized())
     }
 
     @Test fun largerManualGapsAreAvailableWhenTheWidgetIsWideEnough() {
@@ -74,5 +74,15 @@ class WidgetAppearanceTest {
         val zero = WidgetGeometry.calculate(280f, 56f, WidgetAppearance(spacingDp = 0, fillWidth = true))
         val wide = WidgetGeometry.calculate(280f, 56f, WidgetAppearance(spacingDp = 64, fillWidth = true))
         assertEquals(zero, wide)
+    }
+
+    @Test fun verySmallIconsKeepTheSameTouchAreasAndWideSpacing() {
+        val regular = WidgetGeometry.calculate(360f, 64f, WidgetAppearance(fillWidth = true))
+        val tiny = WidgetGeometry.calculate(360f, 64f, WidgetAppearance(iconScalePercent = 20, fillWidth = true))
+        assertEquals(regular.buttonDp, tiny.buttonDp)
+        assertEquals(regular.gapDp, tiny.gapDp)
+        assertEquals(regular.widthDp, tiny.widthDp)
+        assertTrue(tiny.buttonDp >= 48)
+        assertTrue(tiny.buttonDp - tiny.sidePaddingDp * 2 < 16)
     }
 }

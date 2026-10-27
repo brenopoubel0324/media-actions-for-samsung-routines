@@ -20,6 +20,7 @@ class ActionActivity : Activity() {
             }
             val result = MediaActionDispatcher(AndroidSessionGateway(this)).execute(action)
             Log.i(LOG_TAG, "${action.name}: ${result.javaClass.simpleName}")
+            MediaWidgetProvider.refreshAll(this)
         } finally {
             // Theme.NoDisplay requires finishing before onResume. No UI, unlock or wake flags.
             finish()

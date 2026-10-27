@@ -1,0 +1,54 @@
+{
+  "version": "0.8-experimental",
+  "version_code": 8,
+  "apks": {
+    "phone": {
+      "filename": "media-actions-phone-0.8-experimental-debug.apk",
+      "bytes": 5340229,
+      "sha256": "25e5fb9166af447f274c2e202a6556608fb269a36855e369ecec3660d30f6f67",
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a",
+      "launcher_components": [
+        "dev.local.mediaactions.MainActivity"
+      ],
+      "uses_permissions": []
+    },
+    "wear": {
+      "filename": "media-actions-wear-0.8-experimental-debug.apk",
+      "bytes": 5108008,
+      "sha256": "a024019bc8badd19b06d37586d01948b89fb88b54c2abe31e08f417906f094d3",
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a",
+      "launcher_components": [
+        "dev.local.mediaactions.PreviousActionActivity",
+        "dev.local.mediaactions.ToggleActionActivity",
+        "dev.local.mediaactions.NextActionActivity"
+      ],
+      "uses_permissions": []
+    }
+  },
+  "tests": {
+    "app": {
+      "tests": 182,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "tests_total": 213,
+  "lint": "No issues found in app, wear and shared",
+  "review": "APROVADO para distribuição experimental; testes físicos pendentes",
+  "physical_device_tests": false,
+  "wbr_reference_version": "1.06",
+  "wbr_reference_sha256": "c55801d4612c8ed6552165699f04537c21b9b15677ca00a362cb87621d8bcbd2"
+}

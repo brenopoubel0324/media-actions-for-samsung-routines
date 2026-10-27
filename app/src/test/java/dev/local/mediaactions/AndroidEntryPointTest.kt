@@ -88,7 +88,7 @@ class AndroidEntryPointTest {
     @Test fun productionManifestHasNoRequestedPermissionsAndProtectedListener() {
         val info = app.packageManager.getPackageInfo(app.packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_SERVICES)
         assertTrue(info.requestedPermissions.isNullOrEmpty())
-        val service = info.services!!.single()
+        val service = info.services!!.single { it.name == MediaNotificationListener::class.java.name }
         assertFalse(service.exported)
         assertEquals("android.permission.BIND_NOTIFICATION_LISTENER_SERVICE", service.permission)
     }

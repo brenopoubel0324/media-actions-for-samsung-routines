@@ -73,7 +73,7 @@ class WidgetRendererTest {
 
     @Test fun appearancePreferencesPersistAndAreClamped() {
         WidgetStyleStore.save(app, WidgetAppearance(999, -5, true, WidgetIconStyle.ROUNDED, true))
-        assertEquals(WidgetAppearance(135, 0, true, WidgetIconStyle.ROUNDED, true), WidgetStyleStore.load(app))
+        assertEquals(WidgetAppearance(150, 0, true, WidgetIconStyle.ROUNDED, true), WidgetStyleStore.load(app))
     }
 
     @Test fun appearanceEditorPreviewsChangesAndSavesOnlyWhenApplied() {
@@ -87,7 +87,10 @@ class WidgetRendererTest {
         views.filterIsInstance<Button>().first { it.text == app.getString(R.string.widget_apply_style) }.performClick()
         assertTrue(WidgetStyleStore.load(app).darkIcons)
         for (id in listOf(R.id.widget_previous, R.id.widget_toggle, R.id.widget_next)) {
-            assertFalse(section.findViewById<View>(id).isClickable)
+            val preview = section.findViewById<View>(id)
+            assertTrue(preview.isClickable)
+            assertTrue(preview.contentDescription.startsWith("Appearance preview:"))
+            assertTrue(preview.performClick())
         }
     }
 
@@ -118,8 +121,8 @@ class WidgetRendererTest {
         section.layout(0, 0, 360, section.measuredHeight)
         shadowOf(Looper.getMainLooper()).idle()
         val views = children(section)
-        views.filterIsInstance<CheckBox>().single().performClick()
-        assertFalse(views.filterIsInstance<SeekBar>().first { it.max == 64 }.isEnabled)
+        section.findViewById<CheckBox>(R.id.widget_fill_width).performClick()
+        assertFalse(section.findViewById<SeekBar>(R.id.widget_spacing_slider).isEnabled)
         assertFalse(WidgetStyleStore.load(app).fillWidth)
         views.filterIsInstance<Button>().first { it.text == app.getString(R.string.widget_apply_style) }.performClick()
         assertEquals(WidgetIconStyle.ROUNDED, WidgetStyleStore.load(app).iconStyle)

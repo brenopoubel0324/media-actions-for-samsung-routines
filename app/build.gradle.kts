@@ -12,8 +12,8 @@ android {
         applicationId = "dev.local.mediaactions"
         minSdk = 33
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.4-experimental"
+        versionCode = 8
+        versionName = "0.8-experimental"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -48,6 +48,7 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":shared"))
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.17")
 }

@@ -1,6 +1,9 @@
 package dev.local.mediaactions
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
@@ -41,14 +44,16 @@ class MainActivity : Activity() {
             setPadding(0, dp(10), 0, dp(10))
             body.addView(this)
         }
-        fun button(resource: Int, action: () -> Unit) {
-            body.addView(Button(this).apply {
-                setText(resource)
-                setOnClickListener { action() }
-            }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+        fun button(resource: Int, action: () -> Unit): Button = Button(this).apply {
+            setText(resource)
+            setOnClickListener { action() }
+            body.addView(this, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT))
         }
         label(R.string.heading, 26f).isAccessibilityHeading = true
+        label(R.string.app_version, 14f).text = getString(R.string.app_version,
+            packageManager.getPackageInfo(packageName, 0).versionName)
+        button(R.string.widget_edit_existing, ::editExistingWidget).id = R.id.widget_edit_existing
         label(R.string.experimental, 14f)
         access = label(R.string.access_denied)
         label(R.string.access_reason, 14f)
@@ -67,6 +72,11 @@ class MainActivity : Activity() {
         label(R.string.setup_steps, 15f)
         label(R.string.widget_setup_heading, 20f).isAccessibilityHeading = true
         label(R.string.widget_setup_steps, 15f)
+        button(R.string.icon_licenses) {
+            val notices = resources.openRawResource(R.raw.icon_licenses).bufferedReader().use { it.readText() }
+            AlertDialog.Builder(this).setTitle(R.string.icon_licenses)
+                .setMessage(notices).setPositiveButton(android.R.string.ok, null).show()
+        }
         setContentView(scroll)
         scroll.requestApplyInsets()
     }
@@ -103,6 +113,7 @@ class MainActivity : Activity() {
             ActionResult.UnsupportedAction -> getString(R.string.unsupported)
             ActionResult.Failure -> getString(R.string.failure)
         }
+        MediaWidgetProvider.refreshAll(this)
         refreshStatus()
     }
 
@@ -113,6 +124,33 @@ class MainActivity : Activity() {
         if (!tryOpenSettings(detail) &&
             !tryOpenSettings(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))) {
             result.setText(R.string.settings_unavailable)
+        }
+    }
+
+    private fun editExistingWidget() {
+        val manager = AppWidgetManager.getInstance(applicationContext)
+        val ids = manager.getAppWidgetIds(ComponentName(this, MediaWidgetProvider::class.java))
+            .filter { MediaWidgetProvider.isOwnWidget(this, it) }.sorted()
+        fun edit(id: Int) {
+            startActivity(Intent(this, WidgetConfigureActivity::class.java)
+                .setAction(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id))
+        }
+        when (ids.size) {
+            0 -> AlertDialog.Builder(this).setTitle(R.string.widget_edit_existing)
+                .setMessage(R.string.widget_none_installed).setPositiveButton(android.R.string.ok, null).show()
+            1 -> edit(ids.single())
+            else -> {
+                val labels = ids.map { id ->
+                    val size = WidgetRenderer.reportedSizes(manager.getAppWidgetOptions(id)).firstOrNull()
+                    getString(R.string.widget_existing_item, id, if (size == null)
+                        getString(R.string.widget_size_unknown) else getString(R.string.widget_size_value,
+                        size.width.toInt(), size.height.toInt()))
+                }.toTypedArray()
+                AlertDialog.Builder(this).setTitle(R.string.widget_choose_existing)
+                    .setItems(labels) { _, index -> edit(ids[index]) }
+                    .setNegativeButton(android.R.string.cancel, null).show()
+            }
         }
     }
 

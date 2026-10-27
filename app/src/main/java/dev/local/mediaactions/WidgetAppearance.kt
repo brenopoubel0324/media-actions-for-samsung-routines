@@ -5,7 +5,10 @@ import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-enum class WidgetIconStyle { OUTLINE, ROUNDED, CLASSIC }
+enum class WidgetIconStyle {
+    OUTLINE, ROUNDED, CLASSIC, LUCIDE, PHOSPHOR_THIN, MATERIAL_ROUNDED,
+    CIRCULAR, CHEVRONS, DOUBLE_TRIANGLES, SQUARE,
+}
 
 data class WidgetAppearance(
     val iconScalePercent: Int = 100,
@@ -13,29 +16,44 @@ data class WidgetAppearance(
     val darkIcons: Boolean = false,
     val iconStyle: WidgetIconStyle = WidgetIconStyle.OUTLINE,
     val fillWidth: Boolean = false,
+    val iconShadow: Boolean = false,
+    val touchFeedback: Boolean = true,
 ) {
-    fun normalized() = copy(iconScalePercent = iconScalePercent.coerceIn(75, 135),
-        spacingDp = spacingDp.coerceIn(0, 64))
+    fun normalized() = copy(iconScalePercent = iconScalePercent.coerceIn(20, 150),
+        spacingDp = spacingDp.coerceIn(0, MAX_SPACING_DP))
+
+    companion object { const val MAX_SPACING_DP = 144 }
 }
 
 object WidgetStyleStore {
     private const val PREFERENCES = "widget_appearance"
 
-    fun load(context: Context): WidgetAppearance {
-        val prefs = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+    private fun name(widgetId: Int?) = if (widgetId == null) PREFERENCES else "${PREFERENCES}_$widgetId"
+
+    fun load(context: Context, widgetId: Int? = null): WidgetAppearance {
+        val prefs = context.getSharedPreferences(name(widgetId), Context.MODE_PRIVATE)
+        if (widgetId != null && !prefs.getBoolean("has_override", false)) return load(context)
         return WidgetAppearance(prefs.getInt("scale", 100), prefs.getInt("spacing", 0),
             prefs.getBoolean("dark_icons", false),
             WidgetIconStyle.entries.firstOrNull { it.name == prefs.getString("icon_style", null) }
                 ?: WidgetIconStyle.OUTLINE,
-            prefs.getBoolean("fill_width", false)).normalized()
+            prefs.getBoolean("fill_width", false), prefs.getBoolean("icon_shadow", false),
+            prefs.getBoolean("touch_feedback", true)).normalized()
     }
 
-    fun save(context: Context, appearance: WidgetAppearance) {
+    fun save(context: Context, appearance: WidgetAppearance, widgetId: Int? = null) {
         val style = appearance.normalized()
-        context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
+        context.getSharedPreferences(name(widgetId), Context.MODE_PRIVATE).edit()
             .putInt("scale", style.iconScalePercent).putInt("spacing", style.spacingDp)
             .putBoolean("dark_icons", style.darkIcons)
-            .putString("icon_style", style.iconStyle.name).putBoolean("fill_width", style.fillWidth).apply()
+            .putString("icon_style", style.iconStyle.name).putBoolean("fill_width", style.fillWidth)
+            .putBoolean("icon_shadow", style.iconShadow)
+            .putBoolean("touch_feedback", style.touchFeedback)
+            .putBoolean("has_override", widgetId != null).apply()
+    }
+
+    fun remove(context: Context, widgetId: Int) {
+        context.deleteSharedPreferences(name(widgetId))
     }
 }
 

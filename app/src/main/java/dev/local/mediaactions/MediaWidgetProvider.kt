@@ -11,11 +11,13 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
 
-/** Static controls: no media metadata, polling, playback observer, or Activity launch. */
+/** Direct broadcasts for media commands; playback changes arrive through the bound listener. */
 class MediaWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, appWidgetIds: IntArray) {
+        if (appWidgetIds.isEmpty()) return
+        val playback = WidgetPlaybackState.read(AndroidSessionGateway(context))
         for (id in appWidgetIds) manager.updateAppWidget(id,
-            WidgetRenderer.render(context, id, manager.getAppWidgetOptions(id)))
+            WidgetRenderer.render(context, id, manager.getAppWidgetOptions(id), playback))
     }
 
     override fun onAppWidgetOptionsChanged(
@@ -35,15 +37,16 @@ class MediaWidgetProvider : AppWidgetProvider() {
         val id = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
         if (id <= AppWidgetManager.INVALID_APPWIDGET_ID) return
         val action = MediaAction.entries.firstOrNull { intent.data == commandUri(id, it) } ?: return
-        val manager = AppWidgetManager.getInstance(context)
         // A removed widget's old PendingIntent must not keep controlling playback.
-        if (manager.getAppWidgetInfo(id)?.provider != ComponentName(context, MediaWidgetProvider::class.java)) return
+        if (!isOwnWidget(context, id)) return
         val result = MediaActionDispatcher(AndroidSessionGateway(context)).execute(action)
         Log.i(ActionActivity.LOG_TAG, "Widget ${action.name}: ${result.javaClass.simpleName}")
+        refreshWidget(context, id)
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         for (id in appWidgetIds) {
+            WidgetStyleStore.remove(context, id)
             for (action in MediaAction.entries) {
                 PendingIntent.getBroadcast(context, id, commandIntent(context, id, action),
                     PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)?.cancel()
@@ -75,10 +78,29 @@ class MediaWidgetProvider : AppWidgetProvider() {
         internal fun createViews(context: Context, id: Int): RemoteViews =
             WidgetRenderer.render(context, id, AppWidgetManager.getInstance(context).getAppWidgetOptions(id))
 
-        fun refreshAll(context: Context) {
-            val manager = AppWidgetManager.getInstance(context)
+        internal fun isOwnWidget(context: Context, id: Int): Boolean {
+            if (id <= AppWidgetManager.INVALID_APPWIDGET_ID) return false
+            return try {
+                AppWidgetManager.getInstance(context.applicationContext).getAppWidgetInfo(id)?.provider ==
+                    ComponentName(context, MediaWidgetProvider::class.java)
+            } catch (_: RuntimeException) {
+                false
+            }
+        }
+
+        internal fun refreshWidget(context: Context, id: Int) {
+            if (!isOwnWidget(context, id)) return
+            val manager = AppWidgetManager.getInstance(context.applicationContext)
+            MediaWidgetProvider().onUpdate(context.applicationContext, manager, intArrayOf(id))
+        }
+
+        fun refreshAll(context: Context, playback: WidgetPlaybackState? = null) {
+            val manager = AppWidgetManager.getInstance(context.applicationContext)
             val ids = manager.getAppWidgetIds(ComponentName(context, MediaWidgetProvider::class.java))
-            MediaWidgetProvider().onUpdate(context, manager, ids)
+            if (ids.isEmpty()) return
+            val state = playback ?: WidgetPlaybackState.read(AndroidSessionGateway(context))
+            for (id in ids) manager.updateAppWidget(id,
+                WidgetRenderer.render(context, id, manager.getAppWidgetOptions(id), state))
         }
     }
 }

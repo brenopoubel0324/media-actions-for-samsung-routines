@@ -29,13 +29,14 @@ class AndroidSessionGateway(context: Context) : SessionGateway {
 
     companion object {
         fun listenerComponent(context: Context) =
-            ComponentName(context, MediaNotificationListener::class.java)
+            ComponentName(context.packageName, "${context.packageName}.MediaNotificationListener")
     }
 }
 
 private class AndroidPlayerSession(private val controller: MediaController) : PlayerSession {
     // Snapshot state once; do not choose a command from two inconsistent state reads.
     private val playback = controller.playbackState
+    override val sessionIdentity: Any = controller.sessionToken
     override val packageName: String = controller.packageName
     override val state = when (playback?.state) {
         PlaybackState.STATE_PLAYING,

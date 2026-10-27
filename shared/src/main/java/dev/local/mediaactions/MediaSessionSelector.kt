@@ -5,6 +5,8 @@ enum class TransportCommand { NEXT, PREVIOUS, PLAY, PAUSE }
 
 /** No title, artist, notification data, or persistent identifiers are needed. */
 interface PlayerSession {
+    /** Stable only within this process; never sent over the wire. */
+    val sessionIdentity: Any get() = this
     val packageName: String
     val state: SessionState
     val supportedCommands: Set<TransportCommand>

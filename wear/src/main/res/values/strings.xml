@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <string name="app_name">Media Actions</string>
+    <string name="action_previous">MA · Anterior</string>
+    <string name="action_toggle">MA · Play/Pause</string>
+    <string name="action_next">MA · Próxima</string>
+    <string name="listener_name">Media Actions — sessões do relógio</string>
+    <string name="unavailable">Player indisponível. Confira a conexão com o celular e o acesso às sessões de mídia.</string>
+    <string name="unconfirmed">Comando sem confirmação. Não foi reenviado.</string>
+    <string name="busy">Ação em andamento. Tente novamente.</string>
+    <string name="settings_unavailable">Este firmware não oferece a tela de acesso às sessões de mídia.</string>
+</resources>

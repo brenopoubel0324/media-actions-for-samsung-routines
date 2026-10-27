@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
     <!-- No uses-permission entries: notification access is a separate system grant. -->
     <application
         android:allowBackup="false"
@@ -14,6 +14,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity>
+        <!-- Host-invoked editor. Validates that the requested widget belongs to this app. -->
+        <activity
+            android:name=".WidgetConfigureActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="@string/widget_configuration_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
         <!-- Explicit shortcut entry point. Only the three exact URI/action pairs are accepted. -->
         <activity
@@ -32,6 +43,13 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/media_widget_info" />
         </receiver>
+        <!-- Google Play services validates Binder callers in WearableListenerService. An app-signature permission would block GMS. -->
+        <service android:name=".PhoneWearService" android:exported="true" tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.REQUEST_RECEIVED" />
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/mediaactions/v1/" />
+            </intent-filter>
+        </service>
         <service
             android:name=".MediaNotificationListener"
             android:exported="false"

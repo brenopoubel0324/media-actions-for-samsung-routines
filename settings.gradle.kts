@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "MediaActions"
-include(":app")
+include(":app", ":shared", ":wear")
