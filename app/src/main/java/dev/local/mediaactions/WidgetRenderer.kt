@@ -11,6 +11,26 @@ import android.widget.RemoteViews
 
 object WidgetRenderer {
     private val buttons = listOf(R.id.widget_previous, R.id.widget_toggle, R.id.widget_next)
+    private val frameBorders = intArrayOf(
+        R.drawable.widget_border_1, R.drawable.widget_border_2,
+        R.drawable.widget_border_3, R.drawable.widget_border_4,
+        R.drawable.widget_border_5, R.drawable.widget_border_6,
+        R.drawable.widget_border_7, R.drawable.widget_border_8)
+    private val buttonBorders = intArrayOf(
+        R.drawable.button_border_1, R.drawable.button_border_2,
+        R.drawable.button_border_3, R.drawable.button_border_4,
+        R.drawable.button_border_5, R.drawable.button_border_6,
+        R.drawable.button_border_7, R.drawable.button_border_8)
+    private val buttonTouchBorders = intArrayOf(
+        R.drawable.button_border_touch_1, R.drawable.button_border_touch_2,
+        R.drawable.button_border_touch_3, R.drawable.button_border_touch_4,
+        R.drawable.button_border_touch_5, R.drawable.button_border_touch_6,
+        R.drawable.button_border_touch_7, R.drawable.button_border_touch_8)
+    private val buttonDarkTouchBorders = intArrayOf(
+        R.drawable.button_border_touch_dark_1, R.drawable.button_border_touch_dark_2,
+        R.drawable.button_border_touch_dark_3, R.drawable.button_border_touch_dark_4,
+        R.drawable.button_border_touch_dark_5, R.drawable.button_border_touch_dark_6,
+        R.drawable.button_border_touch_dark_7, R.drawable.button_border_touch_dark_8)
 
     fun render(context: Context, id: Int, options: Bundle,
         playback: WidgetPlaybackState = WidgetPlaybackState.read(AndroidSessionGateway(context))): RemoteViews {
@@ -39,13 +59,15 @@ object WidgetRenderer {
         bindControls: Boolean = true, playback: WidgetPlaybackState = WidgetPlaybackState.PAUSED): RemoteViews =
         RemoteViews(context.packageName, R.layout.widget_media_controls).apply {
             val style = appearance.normalized()
-            val borders = intArrayOf(R.drawable.widget_border_1, R.drawable.widget_border_2,
-                R.drawable.widget_border_3, R.drawable.widget_border_4, R.drawable.widget_border_5,
-                R.drawable.widget_border_6, R.drawable.widget_border_7, R.drawable.widget_border_8)
+            val geometry = WidgetGeometry.calculate(size?.width ?: 144f, size?.height ?: 48f, style)
             setInt(R.id.widget_controls, "setBackgroundResource", if (style.widgetBorder)
-                borders[style.borderWidthDp - 1] else android.R.color.transparent)
+                frameBorders[style.borderWidthDp - 1] else android.R.color.transparent)
             setColorStateList(R.id.widget_controls, "setBackgroundTintList",
                 if (style.widgetBorder) ColorStateList.valueOf(style.borderColor) else null)
+            val density = context.resources.displayMetrics.density
+            val horizontalPadding = (geometry.widgetPaddingHorizontalDp * density).toInt()
+            val verticalPadding = (geometry.widgetPaddingVerticalDp * density).toInt()
+            setViewPadding(R.id.widget_controls, horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
             val sides = when (style.iconStyle) {
                 WidgetIconStyle.OUTLINE -> R.drawable.ic_widget_outline_previous to R.drawable.ic_widget_outline_next
                 WidgetIconStyle.ROUNDED -> R.drawable.ic_widget_rounded_previous to R.drawable.ic_widget_rounded_next
@@ -68,9 +90,16 @@ object WidgetRenderer {
             setInt(R.id.widget_toggle, "setImageAlpha", if (playback == WidgetPlaybackState.TRANSITIONING) 150 else 255)
             val color = if (style.darkIcons) Color.rgb(26, 29, 34) else Color.WHITE
             for (index in buttons.indices) {
-                setInt(buttons[index], "setBackgroundResource", if (!style.touchFeedback)
-                    android.R.color.transparent else if (style.darkIcons) R.drawable.widget_button_background_dark
-                    else R.drawable.widget_button_background)
+                val background = when {
+                    style.buttonBorder && style.touchFeedback -> (if (style.darkIcons) buttonDarkTouchBorders else buttonTouchBorders)[style.buttonBorderWidthDp - 1]
+                    style.buttonBorder -> buttonBorders[style.buttonBorderWidthDp - 1]
+                    !style.touchFeedback -> android.R.color.transparent
+                    style.darkIcons -> R.drawable.widget_button_background_dark
+                    else -> R.drawable.widget_button_background
+                }
+                setInt(buttons[index], "setBackgroundResource", background)
+                setColorStateList(buttons[index], "setBackgroundTintList",
+                    if (style.buttonBorder) ColorStateList.valueOf(style.buttonBorderColor) else null)
                 if (style.iconShadow) {
                     setImageViewBitmap(buttons[index], WidgetIconArtwork.shadowed(context, icons[index], color))
                     // Transparent SRC_ATOP preserves the shadow bitmap's original colors.
@@ -81,12 +110,12 @@ object WidgetRenderer {
                 }
             }
             if (size != null) {
-                val geometry = WidgetGeometry.calculate(size.width, size.height, style)
                 setViewLayoutWidth(R.id.widget_controls_row, geometry.widthDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
                 setViewLayoutHeight(R.id.widget_controls_row, geometry.buttonDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
                 for (gap in listOf(R.id.widget_gap_left, R.id.widget_gap_right)) {
                     setViewLayoutWidth(gap, geometry.gapDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
                 }
+                // Reapply geometry padding after any decorative background inset.
                 fun pad(id: Int, dp: Int) {
                     val px = (dp * context.resources.displayMetrics.density).toInt()
                     setViewPadding(id, px, px, px, px)
@@ -97,12 +126,11 @@ object WidgetRenderer {
             } else {
                 // A host that reports no dimensions still gets freely scaling transparent controls.
                 // Keep gaps collapsed to protect minimum touch targets; icon tuning still applies.
-                val fallback = WidgetGeometry.calculate(144f, 48f, style)
                 for (view in listOf(R.id.widget_gap_left, R.id.widget_gap_right)) {
                     setViewLayoutWidth(view, 0f, TypedValue.COMPLEX_UNIT_DIP)
                 }
                 for (button in buttons) {
-                    val dp = if (button == R.id.widget_toggle) fallback.centerPaddingDp else fallback.sidePaddingDp
+                    val dp = if (button == R.id.widget_toggle) geometry.centerPaddingDp else geometry.sidePaddingDp
                     val px = (dp * context.resources.displayMetrics.density).toInt()
                     setViewPadding(button, px, px, px, px)
                 }

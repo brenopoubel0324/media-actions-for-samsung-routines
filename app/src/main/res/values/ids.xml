@@ -12,8 +12,23 @@
     <item type="id" name="widget_spacing_slider" />
     <item type="id" name="widget_spacing_decrease" />
     <item type="id" name="widget_spacing_increase" />
+    <item type="id" name="widget_padding_horizontal_value" />
+    <item type="id" name="widget_padding_horizontal_slider" />
+    <item type="id" name="widget_padding_horizontal_decrease" />
+    <item type="id" name="widget_padding_horizontal_increase" />
+    <item type="id" name="widget_padding_vertical_value" />
+    <item type="id" name="widget_padding_vertical_slider" />
+    <item type="id" name="widget_padding_vertical_decrease" />
+    <item type="id" name="widget_padding_vertical_increase" />
     <item type="id" name="widget_fill_width" />
     <item type="id" name="widget_icon_shadow" />
+    <item type="id" name="widget_button_border" />
+    <item type="id" name="widget_button_border_width_value" />
+    <item type="id" name="widget_button_border_width_slider" />
+    <item type="id" name="widget_button_border_width_decrease" />
+    <item type="id" name="widget_button_border_width_increase" />
+    <item type="id" name="widget_button_border_color_value" />
+    <item type="id" name="widget_button_border_color_preset" />
     <item type="id" name="widget_border" />
     <item type="id" name="widget_border_width_value" />
     <item type="id" name="widget_border_width_slider" />

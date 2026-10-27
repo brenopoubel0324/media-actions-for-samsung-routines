@@ -1,8 +1,8 @@
-# Media Actions for Routines — 0.9 experimental
+# Media Actions for Routines — 0.10 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.9](downloads/v0.9-experimental/media-actions-phone-0.9-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções 0.9](downloads/v0.9-experimental/README.md).
+**APKs:** [Celular 0.10](downloads/v0.10-experimental/media-actions-phone-0.10-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções 0.10](downloads/v0.10-experimental/README.md).
 
 Esta versão é experimental. Testes em Android simulado não confirmam integração física com S25/LockStar/Watch 8. As funções de mídia usam sessões elegíveis e ações anunciadas pelo player; Spotify Connect remoto pode não expor uma sessão local controlável.
 
@@ -22,9 +22,11 @@ URIs existentes preservadas:
 
 ## Widget e LockStar
 
-Novidade 0.9: **moldura única do widget**, com espessura de 1–8 dp e cor/opacidade configuráveis, mantendo o interior transparente. [Configuração e desempenho](docs/WIDGET_BORDER.md). O companion Wear permanece na versão 0.8 e não precisa ser atualizado para esta função.
+Novidade 0.10: **bordas dos botões e moldura do widget independentes**, cada grupo com ativação, espessura de 1–8 dp e cor/opacidade próprias. É possível usar as duas, uma ou nenhuma, mantendo os centros transparentes. **Padding horizontal e vertical somente do widget inteiro**, com campo numérico, slider e passos de 1 dp. [Configuração, limites e renderização](docs/INDEPENDENT_BORDERS.md). O companion Wear permanece na versão 0.8 e não precisa ser atualizado para estas funções.
 
-![Comparação da moldura nativa](downloads/v0.9-experimental/borda-widget-comparacao.png)
+![Comparação das bordas independentes](downloads/v0.10-experimental/bordas-independentes.png)
+
+![Padding horizontal e vertical somente do widget](downloads/v0.10-experimental/padding-widget.png)
 
 O widget Media controls tem fundo transparente e três áreas de toque de pelo menos 48 dp. A aparência permite famílias de ícones distintas, tamanho, cor, sombra opcional, espaçamento com ajuste numérico preciso e feedback de toque. As configurações são por instância; valores legados continuam compatíveis.
 
@@ -68,4 +70,4 @@ JDK 21 para executar Gradle; bytecode Java/Kotlin 17. AGP 8.13.2, Kotlin 2.2.21,
 
 Os APKs debug fornecidos usam o mesmo certificado dos APKs anteriores para preservar atualização. Não há chave privada no repositório; para distribuição futura, manter sua chave fora do projeto e preservar a identidade das instalações. Celular e relógio precisam compartilhar applicationId/certificado para Data Layer.
 
-Resultados da versão: [revisão de implementação](docs/reviews/wear-button-remapper-implementation.md), [plano atualizado](docs/planos/wear-os-galaxy-watch-8.md), [relatório de testes](TEST_REPORT.md), [créditos de ícones](THIRD_PARTY_NOTICES.md). Nenhum teste de host substitui as verificações físicas pendentes.
+Resultados da versão: [self-audit 0.10](docs/reviews/independent-borders-0.10.md), [revisão Wear](docs/reviews/wear-button-remapper-implementation.md), [plano Wear](docs/planos/wear-os-galaxy-watch-8.md), [relatório de testes](TEST_REPORT.md), [créditos de ícones](THIRD_PARTY_NOTICES.md). Nenhum teste de host substitui as verificações físicas pendentes.

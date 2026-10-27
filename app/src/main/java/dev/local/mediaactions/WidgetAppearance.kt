@@ -21,12 +21,24 @@ data class WidgetAppearance(
     val widgetBorder: Boolean = false,
     val borderWidthDp: Int = 1,
     val borderColor: Int = android.graphics.Color.WHITE,
+    val buttonBorder: Boolean = false,
+    val buttonBorderWidthDp: Int = 1,
+    val buttonBorderColor: Int = android.graphics.Color.WHITE,
+    val widgetPaddingHorizontalDp: Int = 0,
+    val widgetPaddingVerticalDp: Int = 0,
 ) {
     fun normalized() = copy(iconScalePercent = iconScalePercent.coerceIn(20, 150),
         spacingDp = spacingDp.coerceIn(0, MAX_SPACING_DP),
-        borderWidthDp = borderWidthDp.coerceIn(1, MAX_BORDER_DP))
+        borderWidthDp = borderWidthDp.coerceIn(1, MAX_BORDER_DP),
+        buttonBorderWidthDp = buttonBorderWidthDp.coerceIn(1, MAX_BORDER_DP),
+        widgetPaddingHorizontalDp = widgetPaddingHorizontalDp.coerceIn(0, MAX_PADDING_DP),
+        widgetPaddingVerticalDp = widgetPaddingVerticalDp.coerceIn(0, MAX_PADDING_DP))
 
-    companion object { const val MAX_SPACING_DP = 144; const val MAX_BORDER_DP = 8 }
+    companion object {
+        const val MAX_SPACING_DP = 144
+        const val MAX_BORDER_DP = 8
+        const val MAX_PADDING_DP = 144
+    }
 }
 
 object WidgetStyleStore {
@@ -43,7 +55,10 @@ object WidgetStyleStore {
                 ?: WidgetIconStyle.OUTLINE,
             prefs.getBoolean("fill_width", false), prefs.getBoolean("icon_shadow", false),
             prefs.getBoolean("touch_feedback", true), prefs.getBoolean("widget_border", false),
-            prefs.getInt("border_width", 1), prefs.getInt("border_color", android.graphics.Color.WHITE)).normalized()
+            prefs.getInt("border_width", 1), prefs.getInt("border_color", android.graphics.Color.WHITE),
+            prefs.getBoolean("button_border", false), prefs.getInt("button_border_width", 1),
+            prefs.getInt("button_border_color", android.graphics.Color.WHITE),
+            prefs.getInt("widget_padding_horizontal", 0), prefs.getInt("widget_padding_vertical", 0)).normalized()
     }
 
     fun save(context: Context, appearance: WidgetAppearance, widgetId: Int? = null) {
@@ -56,6 +71,10 @@ object WidgetStyleStore {
             .putBoolean("touch_feedback", style.touchFeedback)
             .putBoolean("widget_border", style.widgetBorder)
             .putInt("border_width", style.borderWidthDp).putInt("border_color", style.borderColor)
+            .putBoolean("button_border", style.buttonBorder)
+            .putInt("button_border_width", style.buttonBorderWidthDp).putInt("button_border_color", style.buttonBorderColor)
+            .putInt("widget_padding_horizontal", style.widgetPaddingHorizontalDp)
+            .putInt("widget_padding_vertical", style.widgetPaddingVerticalDp)
             .putBoolean("has_override", widgetId != null).apply()
     }
 
@@ -70,6 +89,8 @@ data class WidgetGeometry(
     val gapDp: Int,
     val sidePaddingDp: Int,
     val centerPaddingDp: Int,
+    val widgetPaddingHorizontalDp: Int = 0,
+    val widgetPaddingVerticalDp: Int = 0,
 ) {
     val widthDp get() = buttonDp * 3 + gapDp * 2
 
@@ -78,16 +99,23 @@ data class WidgetGeometry(
             val width = widthDp.takeIf { it.isFinite() && it > 0 } ?: 180f
             val height = heightDp.takeIf { it.isFinite() && it > 0 } ?: 56f
             val style = appearance.normalized()
+            // Padding cannot consume the minimum 3 × 48dp row or its 48dp height.
+            val horizontalPadding = min(style.widgetPaddingHorizontalDp,
+                floor(((width - 144) / 2).coerceAtLeast(0f)).toInt())
+            val verticalPadding = min(style.widgetPaddingVerticalDp,
+                floor(((height - 48) / 2).coerceAtLeast(0f)).toInt())
+            val contentWidth = width - horizontalPadding * 2
+            val contentHeight = height - verticalPadding * 2
             // Reduce requested gaps before sacrificing 48dp touch targets at minimum size.
             // Automatic spacing ignores the saved manual gap, which is disabled in that mode.
             val requestedGap = if (style.fillWidth) 0f else style.spacingDp.toFloat()
-            var gap = floor(min(requestedGap, ((width - 144) / 2).coerceAtLeast(0f))).toInt()
-            val side = floor(min(height, (width - gap * 2) / 3)).toInt().coerceIn(1, 128)
-            if (style.fillWidth) gap = floor((width - 3 * side) / 2).toInt().coerceAtLeast(0)
+            var gap = floor(min(requestedGap, ((contentWidth - 144) / 2).coerceAtLeast(0f))).toInt()
+            val side = floor(min(contentHeight, (contentWidth - gap * 2) / 3)).toInt().coerceIn(1, 128)
+            if (style.fillWidth) gap = floor((contentWidth - 3 * side) / 2).toInt().coerceAtLeast(0)
             val scale = style.iconScalePercent / 100f
             fun padding(fraction: Float) = (side * (1 - min(1f, fraction * scale)) / 2)
                 .roundToInt().coerceAtLeast(0)
-            return WidgetGeometry(side, gap, padding(0.82f), padding(0.95f))
+            return WidgetGeometry(side, gap, padding(0.82f), padding(0.95f), horizontalPadding, verticalPadding)
         }
     }
 }

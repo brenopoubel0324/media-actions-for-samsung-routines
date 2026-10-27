@@ -1,0 +1,41 @@
+{
+  "version": "0.10-experimental",
+  "phone_version_code": 10,
+  "application_id": "dev.local.mediaactions",
+  "wear_companion": "0.8-experimental unchanged and compatible",
+  "apk": {
+    "filename": "media-actions-phone-0.10-experimental-debug.apk",
+    "bytes": 5404145,
+    "sha256": "2edbb4264daa4b6feb27c738cbac7bab1c8fac7b20bf64d90ed7155948865d53",
+    "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+  },
+  "tests": {
+    "app": {
+      "tests": 239,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 270,
+  "lint": "No issues found in all modules",
+  "uses_permission_count": 0,
+  "physical_host_tested": false,
+  "performance_benchmark": false,
+  "borders": "independent native button outlines and whole-widget frame, own widths/colors; transparent centers; no border bitmap or blur",
+  "padding": "whole-widget horizontal/vertical only, 0-144 dp requested, capped by host dimensions to preserve minimum touch targets; zero when host dimensions unknown",
+  "review": "APROVADO, 3 rounds; 3 low findings fixed; no open findings",
+  "images": "native Android/Skia renders; configuration sections composed; not a Samsung host screenshot"
+}

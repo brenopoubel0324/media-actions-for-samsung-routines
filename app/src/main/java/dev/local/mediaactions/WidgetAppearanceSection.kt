@@ -29,11 +29,15 @@ class WidgetAppearanceSection(
     private var scaleControl: WidgetNumberControl? = null
     private var spacingControl: WidgetNumberControl? = null
     private var borderControls: WidgetBorderSection? = null
+    private var buttonBorderControls: WidgetBorderSection? = null
+    private var paddingControls: WidgetPaddingSection? = null
 
     fun currentAppearance() = draft.normalized()
 
     fun applyChanges(): Boolean {
-        if (scaleControl?.validate() == false || spacingControl?.validate() == false || borderControls?.validate() == false) return false
+        if (scaleControl?.validate() == false || spacingControl?.validate() == false ||
+            borderControls?.validate() == false || buttonBorderControls?.validate() == false ||
+            paddingControls?.validate() == false) return false
         if (widgetId != null && !MediaWidgetProvider.isOwnWidget(context, widgetId)) {
             confirmation?.setText(R.string.widget_configuration_missing)
             return false
@@ -104,6 +108,15 @@ class WidgetAppearanceSection(
                 append("\n")
                 append(context.getString(R.string.widget_effective_spacing,
                     geometry.gapDp, geometry.buttonDp + geometry.gapDp))
+                append("\n")
+                append(context.getString(R.string.widget_effective_padding,
+                    geometry.widgetPaddingHorizontalDp, geometry.widgetPaddingVerticalDp))
+                if (geometry.widgetPaddingHorizontalDp < draft.widgetPaddingHorizontalDp ||
+                    geometry.widgetPaddingVerticalDp < draft.widgetPaddingVerticalDp) {
+                    append("\n")
+                    append(context.getString(R.string.widget_padding_limited,
+                        draft.widgetPaddingHorizontalDp, draft.widgetPaddingVerticalDp))
+                }
                 if (!draft.fillWidth && geometry.gapDp < draft.spacingDp) {
                     append("\n")
                     append(context.getString(R.string.widget_spacing_limited, draft.spacingDp, geometry.gapDp))
@@ -185,8 +198,16 @@ class WidgetAppearanceSection(
                 updatePreview()
             }
         })
+        buttonBorderControls = WidgetBorderSection(context, draft, WidgetBorderSection.Target.BUTTONS) { enabled, width, color ->
+            draft = draft.copy(buttonBorder = enabled, buttonBorderWidthDp = width, buttonBorderColor = color)
+            updatePreview()
+        }.also { body.addView(it.create()) }
         borderControls = WidgetBorderSection(context, draft) { enabled, width, color ->
             draft = draft.copy(widgetBorder = enabled, borderWidthDp = width, borderColor = color)
+            updatePreview()
+        }.also { body.addView(it.create()) }
+        paddingControls = WidgetPaddingSection(context, draft) { horizontal, vertical ->
+            draft = draft.copy(widgetPaddingHorizontalDp = horizontal, widgetPaddingVerticalDp = vertical)
             updatePreview()
         }.also { body.addView(it.create()) }
         body.addView(CheckBox(context).apply {

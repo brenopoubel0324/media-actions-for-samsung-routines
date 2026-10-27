@@ -20,11 +20,24 @@ import java.util.Locale
 class WidgetBorderSection(
     private val context: Context,
     initial: WidgetAppearance,
+    private val target: Target = Target.WIDGET,
     private val changed: (Boolean, Int, Int) -> Unit,
 ) {
-    private var enabled = initial.widgetBorder
-    private var width = initial.borderWidthDp
-    private var color = initial.borderColor
+    enum class Target { WIDGET, BUTTONS }
+    private data class Controls(val toggle: Int, val width: Int, val slider: Int, val decrease: Int,
+        val increase: Int, val color: Int, val preset: Int)
+    private val ids = when (target) {
+        Target.WIDGET -> Controls(R.id.widget_border, R.id.widget_border_width_value, R.id.widget_border_width_slider,
+            R.id.widget_border_width_decrease, R.id.widget_border_width_increase, R.id.widget_border_color_value, R.id.widget_border_color_preset)
+        Target.BUTTONS -> Controls(R.id.widget_button_border, R.id.widget_button_border_width_value, R.id.widget_button_border_width_slider,
+            R.id.widget_button_border_width_decrease, R.id.widget_button_border_width_increase, R.id.widget_button_border_color_value, R.id.widget_button_border_color_preset)
+    }
+    private val buttonTarget = target == Target.BUTTONS
+    private val widthLabel = if (buttonTarget) R.string.widget_button_border_width else R.string.widget_border_width
+    private val colorLabel = if (buttonTarget) R.string.widget_button_border_color else R.string.widget_border_color
+    private var enabled = if (buttonTarget) initial.buttonBorder else initial.widgetBorder
+    private var width = if (buttonTarget) initial.buttonBorderWidthDp else initial.borderWidthDp
+    private var color = if (buttonTarget) initial.buttonBorderColor else initial.borderColor
     private lateinit var thickness: WidgetNumberControl
     private lateinit var colorInput: EditText
     private lateinit var presets: Spinner
@@ -36,31 +49,30 @@ class WidgetBorderSection(
             setText(resource); textSize = 14f; body.addView(this)
         }
         val toggle = CheckBox(context).apply {
-            id = R.id.widget_border; setText(R.string.widget_border); minHeight = dp(48); isChecked = enabled
+            id = ids.toggle; setText(if (buttonTarget) R.string.widget_button_border else R.string.widget_border); minHeight = dp(48); isChecked = enabled
         }
         body.addView(toggle)
-        text(R.string.widget_border_help)
-        text(R.string.widget_border_width).labelFor = R.id.widget_border_width_value
-        thickness = WidgetNumberControl(context, context.getString(R.string.widget_border_width),
-            1, WidgetAppearance.MAX_BORDER_DP, width, R.id.widget_border_width_value,
-            R.id.widget_border_width_slider, R.id.widget_border_width_decrease,
-            R.id.widget_border_width_increase, "dp") { width = it; emit() }
+        text(if (buttonTarget) R.string.widget_button_border_help else R.string.widget_border_help)
+        text(widthLabel).labelFor = ids.width
+        thickness = WidgetNumberControl(context, context.getString(widthLabel),
+            1, WidgetAppearance.MAX_BORDER_DP, width, ids.width,
+            ids.slider, ids.decrease, ids.increase, "dp") { width = it; emit() }
         body.addView(thickness)
-        text(R.string.widget_border_color).labelFor = R.id.widget_border_color_value
+        text(colorLabel).labelFor = ids.color
         colorInput = EditText(context).apply {
-            id = R.id.widget_border_color_value
+            id = ids.color
             isSaveEnabled = false
             setSingleLine(); minHeight = dp(48)
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             filters = arrayOf(InputFilter.LengthFilter(9))
-            contentDescription = context.getString(R.string.widget_border_color)
+            contentDescription = context.getString(colorLabel)
             setText(String.format(Locale.ROOT, "#%08X", color))
         }
         val labels = listOf(R.string.widget_border_white, R.string.widget_border_dark, R.string.widget_border_mint,
             R.string.widget_border_blue, R.string.widget_border_gold, R.string.widget_border_custom).map(context::getString)
         presets = Spinner(context).apply {
-            id = R.id.widget_border_color_preset
-            contentDescription = context.getString(R.string.widget_border_color)
+            id = ids.preset
+            contentDescription = context.getString(colorLabel)
             minimumHeight = dp(48)
             adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, labels).apply {
                 setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

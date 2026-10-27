@@ -107,6 +107,11 @@ class WidgetConfigureActivity : Activity() {
             putBoolean("border", draft.widgetBorder)
             putInt("border_width", draft.borderWidthDp)
             putInt("border_color", draft.borderColor)
+            putBoolean("button_border", draft.buttonBorder)
+            putInt("button_border_width", draft.buttonBorderWidthDp)
+            putInt("button_border_color", draft.buttonBorderColor)
+            putInt("widget_padding_horizontal", draft.widgetPaddingHorizontalDp)
+            putInt("widget_padding_vertical", draft.widgetPaddingVerticalDp)
         })
     }
 
@@ -118,7 +123,9 @@ class WidgetConfigureActivity : Activity() {
             } ?: WidgetIconStyle.OUTLINE, draft.getBoolean("width", false),
             draft.getBoolean("shadow", false), draft.getBoolean("feedback", true),
             draft.getBoolean("border", false), draft.getInt("border_width", 1),
-            draft.getInt("border_color", android.graphics.Color.WHITE)).normalized()
+            draft.getInt("border_color", android.graphics.Color.WHITE), draft.getBoolean("button_border", false),
+            draft.getInt("button_border_width", 1), draft.getInt("button_border_color", android.graphics.Color.WHITE),
+            draft.getInt("widget_padding_horizontal", 0), draft.getInt("widget_padding_vertical", 0)).normalized()
     }
 
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
