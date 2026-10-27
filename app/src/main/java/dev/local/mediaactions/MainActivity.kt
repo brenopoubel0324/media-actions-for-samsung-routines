@@ -16,16 +16,14 @@ import android.widget.ScrollView
 import android.widget.TextView
 
 class MainActivity : Activity() {
-    private lateinit var gateway: AndroidSessionGateway
-    private lateinit var dispatcher: MediaActionDispatcher
+    private lateinit var dispatcher: PhoneMediaActions
     private lateinit var access: TextView
     private lateinit var player: TextView
     private lateinit var result: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        gateway = AndroidSessionGateway(this)
-        dispatcher = MediaActionDispatcher(gateway)
+        dispatcher = PhoneMediaActions(this)
         val body = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(24), dp(16), dp(24), dp(24))

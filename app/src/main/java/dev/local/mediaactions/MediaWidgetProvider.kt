@@ -39,7 +39,7 @@ class MediaWidgetProvider : AppWidgetProvider() {
         val action = MediaAction.entries.firstOrNull { intent.data == commandUri(id, it) } ?: return
         // A removed widget's old PendingIntent must not keep controlling playback.
         if (!isOwnWidget(context, id)) return
-        val result = MediaActionDispatcher(AndroidSessionGateway(context)).execute(action)
+        val result = PhoneMediaActions(context).execute(action)
         Log.i(ActionActivity.LOG_TAG, "Widget ${action.name}: ${result.javaClass.simpleName}")
         refreshWidget(context, id)
     }

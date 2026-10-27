@@ -1,7 +1,7 @@
 package dev.local.mediaactions
 
 sealed interface ActionResult {
-    /** A binder command was sent; this is not confirmation that playback changed. */
+    /** A transport command was sent; this is not confirmation that playback changed. */
     data class CommandSent(val packageName: String) : ActionResult
     data object MissingNotificationAccess : ActionResult
     data object NoActiveSession : ActionResult
