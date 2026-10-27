@@ -18,11 +18,15 @@ data class WidgetAppearance(
     val fillWidth: Boolean = false,
     val iconShadow: Boolean = false,
     val touchFeedback: Boolean = true,
+    val widgetBorder: Boolean = false,
+    val borderWidthDp: Int = 1,
+    val borderColor: Int = android.graphics.Color.WHITE,
 ) {
     fun normalized() = copy(iconScalePercent = iconScalePercent.coerceIn(20, 150),
-        spacingDp = spacingDp.coerceIn(0, MAX_SPACING_DP))
+        spacingDp = spacingDp.coerceIn(0, MAX_SPACING_DP),
+        borderWidthDp = borderWidthDp.coerceIn(1, MAX_BORDER_DP))
 
-    companion object { const val MAX_SPACING_DP = 144 }
+    companion object { const val MAX_SPACING_DP = 144; const val MAX_BORDER_DP = 8 }
 }
 
 object WidgetStyleStore {
@@ -38,7 +42,8 @@ object WidgetStyleStore {
             WidgetIconStyle.entries.firstOrNull { it.name == prefs.getString("icon_style", null) }
                 ?: WidgetIconStyle.OUTLINE,
             prefs.getBoolean("fill_width", false), prefs.getBoolean("icon_shadow", false),
-            prefs.getBoolean("touch_feedback", true)).normalized()
+            prefs.getBoolean("touch_feedback", true), prefs.getBoolean("widget_border", false),
+            prefs.getInt("border_width", 1), prefs.getInt("border_color", android.graphics.Color.WHITE)).normalized()
     }
 
     fun save(context: Context, appearance: WidgetAppearance, widgetId: Int? = null) {
@@ -49,6 +54,8 @@ object WidgetStyleStore {
             .putString("icon_style", style.iconStyle.name).putBoolean("fill_width", style.fillWidth)
             .putBoolean("icon_shadow", style.iconShadow)
             .putBoolean("touch_feedback", style.touchFeedback)
+            .putBoolean("widget_border", style.widgetBorder)
+            .putInt("border_width", style.borderWidthDp).putInt("border_color", style.borderColor)
             .putBoolean("has_override", widgetId != null).apply()
     }
 

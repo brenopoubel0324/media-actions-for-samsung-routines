@@ -114,7 +114,9 @@ class WidgetRendererTest {
         val section = WidgetAppearanceSection(app).create()
         fun children(view: View): List<View> = listOf(view) +
             if (view is ViewGroup) (0 until view.childCount).flatMap { children(view.getChildAt(it)) } else emptyList()
-        val picker = children(section).filterIsInstance<Spinner>().single()
+        val picker = children(section).filterIsInstance<Spinner>().single {
+            it.contentDescription == app.getString(R.string.widget_icon_style)
+        }
         picker.setSelection(WidgetIconStyle.ROUNDED.ordinal)
         section.measure(View.MeasureSpec.makeMeasureSpec(360, View.MeasureSpec.EXACTLY),
             View.MeasureSpec.makeMeasureSpec(1200, View.MeasureSpec.AT_MOST))

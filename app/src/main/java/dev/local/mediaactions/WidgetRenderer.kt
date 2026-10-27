@@ -2,6 +2,7 @@ package dev.local.mediaactions
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.util.SizeF
@@ -38,6 +39,13 @@ object WidgetRenderer {
         bindControls: Boolean = true, playback: WidgetPlaybackState = WidgetPlaybackState.PAUSED): RemoteViews =
         RemoteViews(context.packageName, R.layout.widget_media_controls).apply {
             val style = appearance.normalized()
+            val borders = intArrayOf(R.drawable.widget_border_1, R.drawable.widget_border_2,
+                R.drawable.widget_border_3, R.drawable.widget_border_4, R.drawable.widget_border_5,
+                R.drawable.widget_border_6, R.drawable.widget_border_7, R.drawable.widget_border_8)
+            setInt(R.id.widget_controls, "setBackgroundResource", if (style.widgetBorder)
+                borders[style.borderWidthDp - 1] else android.R.color.transparent)
+            setColorStateList(R.id.widget_controls, "setBackgroundTintList",
+                if (style.widgetBorder) ColorStateList.valueOf(style.borderColor) else null)
             val sides = when (style.iconStyle) {
                 WidgetIconStyle.OUTLINE -> R.drawable.ic_widget_outline_previous to R.drawable.ic_widget_outline_next
                 WidgetIconStyle.ROUNDED -> R.drawable.ic_widget_rounded_previous to R.drawable.ic_widget_rounded_next

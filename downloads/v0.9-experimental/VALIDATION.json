@@ -1,0 +1,37 @@
+{
+  "version": "0.9-experimental",
+  "phone_version_code": 9,
+  "wear_companion": "0.8-experimental unchanged and compatible",
+  "apk": {
+    "filename": "media-actions-phone-0.9-experimental-debug.apk",
+    "bytes": 5285033,
+    "sha256": "1a9f9ee8ad57293f53d04a01665e5aa2ca299c358c97974cc2ee95988b9b0052",
+    "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+  },
+  "tests": {
+    "app": {
+      "tests": 200,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 231,
+  "lint": "No issues found in all modules",
+  "physical_host_tested": false,
+  "performance_benchmark": false,
+  "frame": "one native rounded stroke, no fill or border bitmap",
+  "review": "APROVADO, 2 rounds; 1 medium and 1 low fixed"
+}

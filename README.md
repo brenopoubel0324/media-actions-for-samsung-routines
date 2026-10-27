@@ -1,8 +1,8 @@
-# Media Actions for Routines — 0.8 experimental
+# Media Actions for Routines — 0.9 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular](downloads/v0.8-experimental/media-actions-phone-0.8-experimental-debug.apk) · [Relógio](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções](downloads/v0.8-experimental/README.md).
+**APKs:** [Celular 0.9](downloads/v0.9-experimental/media-actions-phone-0.9-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções 0.9](downloads/v0.9-experimental/README.md).
 
 Esta versão é experimental. Testes em Android simulado não confirmam integração física com S25/LockStar/Watch 8. As funções de mídia usam sessões elegíveis e ações anunciadas pelo player; Spotify Connect remoto pode não expor uma sessão local controlável.
 
@@ -21,6 +21,10 @@ URIs existentes preservadas:
 - `mediaactions://run/toggle`
 
 ## Widget e LockStar
+
+Novidade 0.9: **moldura única do widget**, com espessura de 1–8 dp e cor/opacidade configuráveis, mantendo o interior transparente. [Configuração e desempenho](docs/WIDGET_BORDER.md). O companion Wear permanece na versão 0.8 e não precisa ser atualizado para esta função.
+
+![Comparação da moldura nativa](downloads/v0.9-experimental/borda-widget-comparacao.png)
 
 O widget Media controls tem fundo transparente e três áreas de toque de pelo menos 48 dp. A aparência permite famílias de ícones distintas, tamanho, cor, sombra opcional, espaçamento com ajuste numérico preciso e feedback de toque. As configurações são por instância; valores legados continuam compatíveis.
 

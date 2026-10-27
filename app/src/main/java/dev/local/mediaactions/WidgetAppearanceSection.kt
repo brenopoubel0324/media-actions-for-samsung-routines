@@ -28,11 +28,12 @@ class WidgetAppearanceSection(
     private var confirmation: TextView? = null
     private var scaleControl: WidgetNumberControl? = null
     private var spacingControl: WidgetNumberControl? = null
+    private var borderControls: WidgetBorderSection? = null
 
     fun currentAppearance() = draft.normalized()
 
     fun applyChanges(): Boolean {
-        if (scaleControl?.validate() == false || spacingControl?.validate() == false) return false
+        if (scaleControl?.validate() == false || spacingControl?.validate() == false || borderControls?.validate() == false) return false
         if (widgetId != null && !MediaWidgetProvider.isOwnWidget(context, widgetId)) {
             confirmation?.setText(R.string.widget_configuration_missing)
             return false
@@ -184,6 +185,10 @@ class WidgetAppearanceSection(
                 updatePreview()
             }
         })
+        borderControls = WidgetBorderSection(context, draft) { enabled, width, color ->
+            draft = draft.copy(widgetBorder = enabled, borderWidthDp = width, borderColor = color)
+            updatePreview()
+        }.also { body.addView(it.create()) }
         body.addView(CheckBox(context).apply {
             id = R.id.widget_touch_feedback
             setText(R.string.widget_touch_feedback)
