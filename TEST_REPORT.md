@@ -1,11 +1,11 @@
-# Validação — 0.12 experimental
+# Validação — 0.13 experimental
 
-Comando: `./gradlew :app:assembleDebug testDebugUnitTest lintDebug --console=plain`. **BUILD SUCCESSFUL: 315 testes** (app 284, wear 9, shared 22), zero falhas/erros/pulos. Lint dos três módulos sem apontamentos. Integridade: [VALIDATION.json](downloads/v0.12-experimental/VALIDATION.json).
+Comando: `./gradlew :app:assembleDebug testDebugUnitTest lintDebug --console=plain`. **BUILD SUCCESSFUL: 321 testes** — app 290, wear 9, shared 22 — sem falhas, erros ou pulos. Lint dos três módulos sem apontamentos. Integridade em [VALIDATION.json](downloads/v0.13-experimental/VALIDATION.json).
 
-As novas verificações cobrem projeção monotônica da posição, pausa, seek, duração desconhecida, limites e valores inválidos; borda só no centro; anel branco/marcador escuro e transparência; atualização/remoção no reapply; espessura máxima sem cortar o marcador; padding negativo somente vertical; entrada numérica assinada, limites, isolamento por instância e rascunho após recriação.
+A review da 0.12 encontrou dois problemas médios reproduzíveis: ticks sem duração e redesenho de widgets sem indicador em atualizações somente de progresso. Os dois testes de regressão, executados em APIs 33/36, falharam antes da correção. A suíte corrigida inclui também chegada/perda de duração para iniciar/parar os ticks, além da cadência de 5 s, tela on/off, pausa, desativação, close, posição/duração, reapply, aparência, padding vertical assinado e regressões de mídia/Wear.
 
-Observação: testes em APIs 33/36 verificam ticks de cinco segundos apenas com opção ativada, parada ao desativar, ao pausar, apagar a tela ou fechar o observer; retomada com tela acesa; callbacks de seek/duração mesmo sem mudar PLAYING. A suíte anterior de mídia, widget e Wear continua incluída. Renderização nativa Android/Skia em API 33 gera a prévia antes da publicação.
+A duração conhecida é uma fixture explícita nos testes de agendamento; os testes de ausência de duração e filtragem exercitam os caminhos de produção sem substituir a entrega ao widget. Estes testes não comprovam comportamento do Spotify ou host Samsung físico.
 
-Phone 0.12, código 12, mesmo applicationId/certificado, zero uses-permission. Wear 0.8/protocolo e fallback Spotify inalterados. Não houve teste físico de player/Samsung/LockStar/Watch 8 nem benchmark de FPS/GPU/bateria. O host pode cortar expansão vertical e a cadência é aproximada.
+Phone 0.13, código 13, mesmo applicationId/certificado, zero uses-permission. Wear 0.8/protocolo, fallback Spotify e aparência inalterados. Sem teste físico de player/Samsung/LockStar/Watch 8 nem benchmark de FPS/GPU/bateria. O intervalo continua em 5 s, e padding negativo continua sujeito ao corte pelo host.
 
-[Self-audit](docs/reviews/progress-ring-0.12.md) · [Comportamento](docs/CIRCULAR_PROGRESS.md).
+[Review pós-publicação](docs/reviews/post-release-0.12-audit.md) · [Configuração](docs/CIRCULAR_PROGRESS.md).

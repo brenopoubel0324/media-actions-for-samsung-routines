@@ -41,7 +41,7 @@ class WidgetProgressObserverTest {
     @Test fun tickRunsOnlyForOptedInWidgetsAndStopsWhenDisabledOrClosed() {
         val id=widget();val session=setupPlayer();var count=0
         try {
-            val observer=WidgetPlaybackObserver(app){count++};observer.start();idle();assertEquals(1,count)
+            val observer=WidgetPlaybackObserver(app, progressReader = { WidgetTrackProgress(0.1f) }){count++};observer.start();idle();assertEquals(1,count)
             advance();assertEquals(2,count)
             WidgetStyleStore.save(app,WidgetAppearance(progressRing=false),id);WidgetPlaybackObserver.settingsChanged(app);idle()
             val stopped=count;advance();advance();assertEquals(stopped,count)
@@ -50,7 +50,7 @@ class WidgetProgressObserverTest {
     }
     @Test fun screenOffStopsTicksAndScreenOnResumesThem() {
         widget();val session=setupPlayer();var count=0
-        try { WidgetPlaybackObserver(app){count++}.use { observer ->
+        try { WidgetPlaybackObserver(app, progressReader = { WidgetTrackProgress(0.1f) }){count++}.use { observer ->
             observer.start();idle();advance();assertEquals(2,count)
             shadowOf(app.getSystemService(PowerManager::class.java)).setIsInteractive(false)
             app.sendBroadcast(Intent(Intent.ACTION_SCREEN_OFF));idle();val stopped=count
@@ -62,7 +62,7 @@ class WidgetProgressObserverTest {
     }
     @Test fun seekAndDurationCallbacksRefreshEvenIfPlayingStateDoesNotChangeAndPauseStopsTicks() {
         widget();val session=setupPlayer();var count=0
-        try { WidgetPlaybackObserver(app){count++}.use { observer ->
+        try { WidgetPlaybackObserver(app, progressReader = { WidgetTrackProgress(0.1f) }){count++}.use { observer ->
             observer.start();idle()
             shadowOf(session.controller).executeOnMetadataChanged(MediaMetadata.Builder().putLong(MediaMetadata.METADATA_KEY_DURATION,10000).build());idle();assertEquals(2,count)
             shadowOf(session.controller).executeOnPlaybackStateChanged(PlaybackState.Builder().setState(PlaybackState.STATE_PLAYING,7000,1f).build());idle();assertEquals(3,count)
@@ -70,4 +70,22 @@ class WidgetProgressObserverTest {
             advance();advance();assertEquals(4,count)
         } } finally { session.release() }
     }
+    @Test fun durationArrivingStartsTicksAndLosingDurationStopsThemAgain() {
+        widget(); val session = setupPlayer(); var count = 0
+        var progress: WidgetTrackProgress? = null
+        try { WidgetPlaybackObserver(app, progressReader = { progress }) { count++ }.use { observer ->
+            observer.start(); idle(); assertEquals(1, count)
+            advance(); assertEquals(1, count)
+            progress = WidgetTrackProgress(0.4f)
+            shadowOf(session.controller).executeOnMetadataChanged(MediaMetadata.Builder()
+                .putLong(MediaMetadata.METADATA_KEY_DURATION, 10000).build())
+            idle(); assertEquals(2, count)
+            advance(); assertEquals(3, count)
+            progress = null
+            shadowOf(session.controller).executeOnMetadataChanged(MediaMetadata.Builder().build())
+            idle(); assertEquals(4, count)
+            advance(); advance(); assertEquals(4, count)
+        } } finally { session.release() }
+    }
+
 }

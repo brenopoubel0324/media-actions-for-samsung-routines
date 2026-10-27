@@ -95,9 +95,10 @@ class MediaWidgetProvider : AppWidgetProvider() {
             MediaWidgetProvider().onUpdate(context.applicationContext, manager, intArrayOf(id))
         }
 
-        fun refreshAll(context: Context, playback: WidgetPlaybackState? = null) {
+        fun refreshAll(context: Context, playback: WidgetPlaybackState? = null, progressOnly: Boolean = false) {
             val manager = AppWidgetManager.getInstance(context.applicationContext)
             val ids = manager.getAppWidgetIds(ComponentName(context, MediaWidgetProvider::class.java))
+                .filter { !progressOnly || WidgetStyleStore.load(context, it).progressRing }
             if (ids.isEmpty()) return
             val state = playback ?: WidgetPlaybackState.read(AndroidSessionGateway(context))
             for (id in ids) manager.updateAppWidget(id,

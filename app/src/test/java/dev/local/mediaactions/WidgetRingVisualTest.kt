@@ -87,7 +87,7 @@ class WidgetRingVisualTest {
         }
         paint.color=0xFFBACCD5.toInt();paint.textSize=17f
         canvas.drawText("Valores negativos ampliam para cima/baixo; o host pode cortar o desenho. A área do LockStar continua igual.",24f,608f,paint)
-        val out=File("build/outputs/widget-previews/progresso-circular.png");out.parentFile.mkdirs()
+        val out=File("build/outputs/widget-previews/progresso-circular.png");requireNotNull(out.parentFile).mkdirs()
         out.outputStream().use { assertTrue(sheet.compress(Bitmap.CompressFormat.PNG,100,it)) }
     }
 }

@@ -17,7 +17,8 @@ import android.os.Looper
 
 /** Bound to the listener lifecycle; progress refresh is limited to opted-in widgets on an interactive screen. */
 class WidgetPlaybackObserver(context: Context,
-    private val onChanged: (WidgetPlaybackState) -> Unit = { MediaWidgetProvider.refreshAll(context.applicationContext, it) },
+    private val progressReader: () -> WidgetTrackProgress? = { WidgetTrackProgress.read(context.applicationContext) },
+    private val onChanged: ((WidgetPlaybackState) -> Unit)? = null,
 ) : AutoCloseable {
     private val app = context.applicationContext
     private val manager = app.getSystemService(MediaSessionManager::class.java)
@@ -46,13 +47,15 @@ class WidgetPlaybackObserver(context: Context,
     private fun updatePulse(state: WidgetPlaybackState) {
         handler.removeCallbacks(pulse)
         if (running && state == WidgetPlaybackState.PLAYING && progressWidgets() &&
-            app.getSystemService(PowerManager::class.java).isInteractive) handler.postDelayed(pulse, 5_000)
+            app.getSystemService(PowerManager::class.java).isInteractive && progressReader() != null)
+            handler.postDelayed(pulse, 5_000)
     }
     private val refresh = Runnable {
         refreshPending = false
         if (running) {
             val state = WidgetPlaybackState.read(AndroidSessionGateway(app))
-            if (state != lastState || (forceRefresh && progressWidgets())) emit(state)
+            if (state != lastState) emit(state)
+            else if (forceRefresh && progressWidgets()) emit(state, progressOnly = true)
             forceRefresh = false
             updatePulse(state)
         }
@@ -128,9 +131,10 @@ class WidgetPlaybackObserver(context: Context,
         handler.post(refresh)
     }
 
-    private fun emit(state: WidgetPlaybackState) {
+    private fun emit(state: WidgetPlaybackState, progressOnly: Boolean = false) {
         try {
-            onChanged(state)
+            if (onChanged != null) onChanged.invoke(state)
+            else MediaWidgetProvider.refreshAll(app, state, progressOnly)
             lastState = state
         } catch (_: RuntimeException) {
             // A host failure must not kill the listener or mark an undelivered state as current.

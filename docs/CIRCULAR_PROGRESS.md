@@ -1,10 +1,10 @@
-# Centro com progresso e padding vertical — 0.12 experimental
+# Centro com progresso e padding vertical — 0.13 experimental
 
 Em Widget settings, ative **Borders around each button** e **Border only around Play/Pause** para manter a borda estática somente no centro, com Anterior/Próxima livres. A moldura externa continua independente. Nenhuma preferência antiga muda automaticamente.
 
 Ative **Track progress around Play/Pause** para usar o indicador circular no centro: trecho concluído branco, trilho branco translúcido e marcador cinza escuro com contorno branco. O indicador substitui a borda estática central; as bordas laterais continuam obedecendo à opção de somente centro. Ícones, tamanho, sombra, gaps, feedback de toque e moldura externa permanecem configuráveis. A espessura do grupo dos botões também ajusta a escala do traço do indicador, com mínimo visual próprio. As cores do progresso são fixas nesta versão.
 
-O progresso é a posição/duração da sessão selecionada, com projeção pelo relógio monotônico e velocidade anunciada pelo player. Não lê nem armazena título, artista ou capa. Atualiza em callbacks de estado, busca, duração e troca de sessão, e aproximadamente a cada **5 segundos** enquanto toca, há widget com indicador ativado e a tela está interativa. Não usa wake lock, alarmes ou serviço novo. Tela apagada/AOD pausa os ticks; pausa da mídia ou opção desativada também. Não há promessa de animação contínua ou benchmark de bateria/FPS.
+O progresso é a posição/duração da sessão selecionada, com projeção pelo relógio monotônico e velocidade anunciada pelo player. Não lê nem armazena título, artista ou capa. Atualiza em callbacks de estado, busca, duração e troca de sessão, e aproximadamente a cada **5 segundos** enquanto toca, há widget com indicador ativado, posição/duração calculáveis e a tela está interativa. Atualizações somente de progresso alcançam apenas as instâncias com indicador; mudanças reais de estado continuam atualizando todas. Não usa wake lock, alarmes ou serviço novo. Tela apagada/AOD pausa os ticks; pausa da mídia ou opção desativada também. Não há promessa de animação contínua ou benchmark de bateria/FPS.
 
 Duração desconhecida, acesso indisponível ou sessão ausente mostram apenas o trilho, sem fabricar percentual. Pausa mantém a posição informada. O indicador não permite arrastar para buscar. A prévia do editor usa progresso de demonstração identificado; o widget real usa a sessão.
 
