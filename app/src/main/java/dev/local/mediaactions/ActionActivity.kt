@@ -18,9 +18,11 @@ class ActionActivity : Activity() {
                 Log.i(LOG_TAG, "Invalid invocation ignored")
                 return
             }
-            val result = PhoneMediaActions(this).execute(action)
-            Log.i(LOG_TAG, "${action.name}: ${result.javaClass.simpleName}")
-            MediaWidgetProvider.refreshAll(this)
+            val app = applicationContext
+            PhoneMediaActions(app).execute(action) { result ->
+                Log.i(LOG_TAG, "${action.name}: ${result.javaClass.simpleName}")
+                MediaWidgetProvider.refreshAll(app)
+            }
         } finally {
             // Theme.NoDisplay requires finishing before onResume. No UI, unlock or wake flags.
             finish()

@@ -19,6 +19,7 @@ class MainActivity : Activity() {
     private lateinit var dispatcher: PhoneMediaActions
     private lateinit var access: TextView
     private lateinit var player: TextView
+    private lateinit var spotifyStatus: TextView
     private lateinit var result: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +58,10 @@ class MainActivity : Activity() {
         label(R.string.access_reason, 14f)
         button(R.string.grant_access, ::openNotificationSettings)
         player = label(R.string.player_none)
+        spotifyStatus = label(R.string.spotify_resume_idle, 14f).apply {
+            id = R.id.spotify_resume_status
+            accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+        }
         button(R.string.refresh, ::refreshStatus)
         button(R.string.test_next) { execute(MediaAction.NEXT) }
         button(R.string.test_previous) { execute(MediaAction.PREVIOUS) }
@@ -85,6 +90,9 @@ class MainActivity : Activity() {
     }
 
     private fun refreshStatus() {
+        val spotify = SpotifyPlaybackResumer.lastStatus(this)
+        spotifyStatus.text = getString(R.string.spotify_resume_last, getString(spotify.message))
+        spotifyStatus.visibility = if (spotify == SpotifyPlaybackResumer.Status.IDLE) View.GONE else View.VISIBLE
         val status = dispatcher.playerStatus()
         access.setText(when (status) {
             PlayerStatus.MissingNotificationAccess -> R.string.access_denied
@@ -101,17 +109,21 @@ class MainActivity : Activity() {
     }
 
     private fun execute(action: MediaAction) {
-        val outcome = dispatcher.execute(action)
-        Log.i(ActionActivity.LOG_TAG, "${action.name}: ${outcome.javaClass.simpleName}")
-        result.text = when (outcome) {
-            is ActionResult.CommandSent -> getString(R.string.sent, outcome.packageName)
-            ActionResult.MissingNotificationAccess -> getString(R.string.missing_access)
-            ActionResult.NoActiveSession -> getString(R.string.no_session)
-            ActionResult.AmbiguousSession -> getString(R.string.ambiguous)
-            ActionResult.UnsupportedAction -> getString(R.string.unsupported)
-            ActionResult.Failure -> getString(R.string.failure)
+        result.setText(R.string.action_pending)
+        dispatcher.execute(action) { outcome ->
+            MediaWidgetProvider.refreshAll(applicationContext)
+            if (isDestroyed) return@execute
+            Log.i(ActionActivity.LOG_TAG, "${action.name}: ${outcome.javaClass.simpleName}")
+            result.text = when (outcome) {
+                is ActionResult.CommandSent -> getString(R.string.sent, outcome.packageName)
+                ActionResult.MissingNotificationAccess -> getString(R.string.missing_access)
+                ActionResult.NoActiveSession -> getString(R.string.no_session)
+                ActionResult.AmbiguousSession -> getString(R.string.ambiguous)
+                ActionResult.UnsupportedAction -> getString(R.string.unsupported)
+                ActionResult.Failure -> getString(R.string.failure)
+            }
+            refreshStatus()
         }
-        MediaWidgetProvider.refreshAll(this)
         refreshStatus()
     }
 

@@ -1,8 +1,8 @@
-# Media Actions for Routines — 0.14 experimental
+# Media Actions for Routines — 0.15 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.14](downloads/v0.14-experimental/media-actions-phone-0.14-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções 0.14](downloads/v0.14-experimental/README.md).
+**APKs:** [Celular 0.15](downloads/v0.15-experimental/media-actions-phone-0.15-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções 0.15](downloads/v0.15-experimental/README.md).
 
 Esta versão é experimental. Testes em Android simulado não confirmam integração física com S25/LockStar/Watch 8. As funções de mídia usam sessões elegíveis e ações anunciadas pelo player; Spotify Connect remoto pode não expor uma sessão local controlável.
 
@@ -14,7 +14,7 @@ Inicie um player no celular e use os botões de teste. Em Modos e Rotinas, procu
 
 As chamadas por atalho executam a ação e encerram sem tela de player. O Android/Routines+ ainda pode alterar foco ou mostrar transições; a compatibilidade exata depende do sistema. O problema de restauração de gestos em rotinas por evento não foi resolvido por remapeamento próprio: veja [ROUTINES_BUTTON_RESTORE.md](docs/ROUTINES_BUTTON_RESTORE.md).
 
-Novidade 0.11: quando Play/Pause não encontra sessão elegível, tenta retomar o **Spotify em segundo plano** por um comando Play direcionado. Disponível no widget, atalhos de Rotinas e testes locais do celular. A entrega não confirma reprodução; depende do receiver e do estado do Spotify instalado. Não inicia Spotify em Anterior/Próxima nem substitui uma sessão selecionada. O protocolo Wear permanece igual. [Comportamento e teste no aparelho](docs/SPOTIFY_FALLBACK.md).
+Correção 0.15: Play/Pause sem sessão conecta ao serviço de mídia do **Spotify**, solicita retomada e aguarda confirmação de PLAYING por até seis segundos. O broadcast da 0.11–0.14 não funcionou no aparelho do usuário e foi removido. A linha **Last Spotify resume** no app mostra o último resultado concluído, com motivo de falha. Não abre interface nem interfere na prioridade de uma sessão existente. [Fluxo, fontes e teste no aparelho](docs/SPOTIFY_FALLBACK.md). Testes simulam a conexão; Spotify ainda pode rejeitar o cliente ou não ter fila reproduzível. O protocolo Wear permanece igual.
 
 URIs existentes preservadas:
 
@@ -82,4 +82,4 @@ JDK 21 para executar Gradle; bytecode Java/Kotlin 17. AGP 8.13.2, Kotlin 2.2.21,
 
 Os APKs debug fornecidos usam o mesmo certificado dos APKs anteriores para preservar atualização. Não há chave privada no repositório; para distribuição futura, manter sua chave fora do projeto e preservar a identidade das instalações. Celular e relógio precisam compartilhar applicationId/certificado para Data Layer.
 
-Resultados da versão: [self-audit 0.14](docs/reviews/playing-only-0.14.md), [review pós-publicação](docs/reviews/post-release-0.12-audit.md), [self-audit 0.12](docs/reviews/progress-ring-0.12.md), [self-audit 0.11](docs/reviews/spotify-fallback-0.11.md), [self-audit do widget 0.10](docs/reviews/independent-borders-0.10.md), [revisão Wear](docs/reviews/wear-button-remapper-implementation.md), [plano Wear](docs/planos/wear-os-galaxy-watch-8.md), [relatório de testes](TEST_REPORT.md), [créditos de ícones](THIRD_PARTY_NOTICES.md). Nenhum teste de host substitui as verificações físicas pendentes.
+Resultados da versão: [self-audit 0.15](docs/reviews/spotify-browser-0.15.md), [self-audit 0.14](docs/reviews/playing-only-0.14.md), [review pós-publicação](docs/reviews/post-release-0.12-audit.md), [self-audit 0.12](docs/reviews/progress-ring-0.12.md), [self-audit 0.11](docs/reviews/spotify-fallback-0.11.md), [self-audit do widget 0.10](docs/reviews/independent-borders-0.10.md), [revisão Wear](docs/reviews/wear-button-remapper-implementation.md), [plano Wear](docs/planos/wear-os-galaxy-watch-8.md), [relatório de testes](TEST_REPORT.md), [créditos de ícones](THIRD_PARTY_NOTICES.md). Nenhum teste de host substitui as verificações físicas pendentes.

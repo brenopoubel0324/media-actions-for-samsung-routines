@@ -18,4 +18,4 @@ Negativo permite expandir os controles na direção vertical; não é deslocamen
 
 A imagem compara reprodução com progresso de demonstração, pausa com borda estática e estado desconhecido sem progresso/borda decorativa. Painéis azuis são o fundo de exemplo; o widget permanece transparente. Renderização Android/Skia, sem captura de host Samsung real.
 
-Instale o APK phone como atualização. Mesmo applicationId/certificado, preferências anteriores preservadas. Companion Wear 0.8 e protocolo de comandos não mudaram. O fallback Spotify da 0.11 continua igual.
+Instale o APK phone como atualização. Mesmo applicationId/certificado, preferências anteriores preservadas. Companion Wear 0.8 e protocolo de comandos não mudaram. O fallback Spotify sem sessão foi atualizado na 0.15; veja [fluxo e diagnóstico](SPOTIFY_FALLBACK.md).

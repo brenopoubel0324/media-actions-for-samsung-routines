@@ -18,7 +18,7 @@
     <string name="test_next">Test Next</string>
     <string name="test_previous">Test Previous</string>
     <string name="test_toggle">Test Play / Pause</string>
-    <string name="ready">Start local playback in Spotify, then test an action.</string>
+    <string name="ready">Test a media action. With no eligible session, Play/Pause will try to resume Spotify.</string>
     <string name="sent">Command sent to %1$s. Check the player for the result.</string>
     <string name="missing_access">Grant Notification access in Android settings, then retry.</string>
     <string name="no_session">No eligible player. Start local music playback first.</string>
@@ -120,4 +120,17 @@
     <string name="widget_center_border_only">Border only around Play/Pause</string>
     <string name="widget_progress_ring">Track progress around Play/Pause</string>
     <string name="widget_progress_help">White progress arc and dark position marker, visible only during confirmed playback. Hidden when paused, buffering or unavailable. Updates every 5 seconds while the screen is on. Unknown duration shows only the track during playback; not a seek control.</string>
+    <string name="spotify_resume_last">Last Spotify resume: %1$s</string>
+    <string name="action_pending">Sending playback request…</string>
+    <string name="spotify_resume_idle">Spotify fallback has not been used yet.</string>
+    <string name="spotify_resume_connecting">Spotify: connecting to resume playback…</string>
+    <string name="spotify_resume_playing">Spotify: playback confirmed.</string>
+    <string name="spotify_resume_unavailable">Spotify: no accessible media service found. Check that Spotify is installed and enabled.</string>
+    <string name="spotify_resume_rejected">Spotify: media connection refused or disconnected.</string>
+    <string name="spotify_resume_timeout">Spotify: media service did not connect within 6 seconds.</string>
+    <string name="spotify_resume_unconfirmed">Spotify connected, but did not confirm playback. Open Spotify and check your login and last queue.</string>
+    <string name="spotify_resume_changed">Spotify resume cancelled because the selected player changed.</string>
+    <string name="spotify_resume_no_access">Spotify resume cancelled: notification access was revoked.</string>
+    <string name="spotify_resume_failed">Spotify: could not resume through the media service.</string>
+    <string name="spotify_resume_busy">Spotify resume is already in progress.</string>
 </resources>

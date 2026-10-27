@@ -1,0 +1,45 @@
+{
+  "version": "0.15-experimental",
+  "phone_version_code": 15,
+  "application_id": "dev.local.mediaactions",
+  "wear_companion": "0.8-experimental unchanged",
+  "apk": {
+    "filename": "media-actions-phone-0.15-experimental-debug.apk",
+    "bytes": 5469101,
+    "sha256": "4db558e7af1ba2822ec950711a46bf8b19ffcb549ac0becdfc1f5b3f0f36704d",
+    "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+  },
+  "tests": {
+    "app": {
+      "tests": 313,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 344,
+  "lint": "No issues found in all modules",
+  "physical_host_tested": false,
+  "physical_player_tested": false,
+  "performance_benchmark": false,
+  "reported_previous_spotify_fallback_failure": true,
+  "physical_fix_confirmed": false,
+  "resume": "explicit discovered Spotify MediaBrowserService, EXTRA_RECENT, prepare/play, wait for PLAYING; old MEDIA_BUTTON broadcast removed",
+  "deadline_ms": 6000,
+  "deadline_clock": "elapsedRealtime plus Handler cleanup",
+  "diagnostic_storage": "last completed status enum only; no titles, account, queue, tokens or metadata",
+  "review": "APROVADO, 3 rounds; 2 medium and 1 low findings fixed; no open findings",
+  "preview": "native Android/Skia settings with simulated unavailable-service result; not a physical Samsung screenshot"
+}

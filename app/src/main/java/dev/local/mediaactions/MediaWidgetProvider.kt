@@ -40,9 +40,18 @@ class MediaWidgetProvider : AppWidgetProvider() {
         val action = MediaAction.entries.firstOrNull { intent.data == commandUri(id, it) } ?: return
         // A removed widget's old PendingIntent must not keep controlling playback.
         if (!isOwnWidget(context, id)) return
-        val result = PhoneMediaActions(context).execute(action)
-        Log.i(ActionActivity.LOG_TAG, "Widget ${action.name}: ${result.javaClass.simpleName}")
-        refreshWidget(context, id)
+        val pending = goAsync()
+        var finished = false
+        fun finishOnce() { if (!finished) { finished = true; pending?.finish() } }
+        val app = context.applicationContext
+        try {
+            PhoneMediaActions(app).execute(action) { result ->
+                try {
+                    Log.i(ActionActivity.LOG_TAG, "Widget ${action.name}: ${result.javaClass.simpleName}")
+                    refreshWidget(app, id)
+                } finally { finishOnce() }
+            }
+        } catch (_: RuntimeException) { finishOnce() }
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {

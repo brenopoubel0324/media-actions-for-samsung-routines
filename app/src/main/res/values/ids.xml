@@ -40,4 +40,5 @@
     <item type="id" name="widget_effective_spacing" />
     <item type="id" name="widget_center_border_only" />
     <item type="id" name="widget_progress_ring" />
+    <item type="id" name="spotify_resume_status" />
 </resources>
