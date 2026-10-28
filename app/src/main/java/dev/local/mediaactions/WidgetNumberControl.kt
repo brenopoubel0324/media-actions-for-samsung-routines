@@ -38,7 +38,10 @@ class WidgetNumberControl(
 
     init {
         orientation = VERTICAL
+        setPadding(0, dp(2), 0, dp(10))
         slider.apply {
+            progressTintList = android.content.res.ColorStateList.valueOf(context.getColor(R.color.settings_accent))
+            thumbTintList = progressTintList
             id = sliderId
             max = maximum - minimum
             progress = value - minimum
@@ -55,12 +58,14 @@ class WidgetNumberControl(
         decrease.apply {
             id = decreaseId
             text = "−"
+            styleStep(this)
             contentDescription = context.getString(R.string.widget_decrease, title)
             setOnClickListener { setValue((value - 1).coerceAtLeast(minimum)) }
         }
         increase.apply {
             id = increaseId
             text = "+"
+            styleStep(this)
             contentDescription = context.getString(R.string.widget_increase, title)
             setOnClickListener { setValue((value + 1).coerceAtMost(maximum)) }
         }
@@ -73,6 +78,8 @@ class WidgetNumberControl(
             setSingleLine()
             gravity = Gravity.CENTER
             minHeight = dp(48)
+            setTextColor(context.getColor(R.color.settings_text))
+            textSize = 18f
             contentDescription = context.getString(R.string.widget_exact_value, title, minimum, maximum)
             setText(context.getString(R.string.widget_integer_value, value))
             setOnEditorActionListener { _, action, _ ->
@@ -97,13 +104,13 @@ class WidgetNumberControl(
                 }
             })
         }
-        row.addView(decrease, LayoutParams(dp(56), dp(48)))
+        row.addView(decrease, LayoutParams(dp(48), dp(48)))
         row.addView(input, LayoutParams(0, dp(48), 1f))
         row.addView(TextView(context).apply { text = unit; gravity = Gravity.CENTER },
-            LayoutParams(dp(40), dp(48)))
-        row.addView(increase, LayoutParams(dp(56), dp(48)))
+            LayoutParams(dp(32), dp(48)))
+        row.addView(increase, LayoutParams(dp(48), dp(48)))
         addView(row)
-        addView(slider, LayoutParams(LayoutParams.MATCH_PARENT, dp(40)))
+        addView(slider, LayoutParams(LayoutParams.MATCH_PARENT, dp(32)))
         updateButtons()
     }
 
@@ -134,9 +141,18 @@ class WidgetNumberControl(
         changed(value)
     }
 
+    private fun styleStep(button: Button) {
+        button.isAllCaps = false; button.textSize = 22f
+        button.backgroundTintList = null; button.background = SettingsUi.surface(context, radius = 12)
+        button.setTextColor(context.getColor(R.color.settings_accent)); button.minWidth = 0
+        button.setPadding(0, 0, 0, 0)
+    }
+
     private fun updateButtons() {
         decrease.isEnabled = isEnabled && value > minimum
         increase.isEnabled = isEnabled && value < maximum
+        decrease.alpha = if (decrease.isEnabled) 1f else 0.35f
+        increase.alpha = if (increase.isEnabled) 1f else 0.35f
     }
 
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()

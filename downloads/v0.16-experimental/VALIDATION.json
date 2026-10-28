@@ -1,0 +1,51 @@
+{
+  "version": "0.16-experimental",
+  "phone_version_code": 16,
+  "application_id": "dev.local.mediaactions",
+  "wear_companion": "0.8-experimental unchanged",
+  "apk": {
+    "filename": "media-actions-phone-0.16-experimental-debug.apk",
+    "bytes": 5530521,
+    "sha256": "862ef06e16beeb45522ecc049c9426ce003adef4d6c26e9433e3f5b9ef1bebb8",
+    "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+  },
+  "tests": {
+    "app": {
+      "tests": 327,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 358,
+  "lint": "No issues found in all modules",
+  "physical_host_tested": false,
+  "physical_player_tested": false,
+  "performance_benchmark": false,
+  "settings_ux": [
+    "separate private defaults editor and validated host editor",
+    "four collapsible groups with one expanded at a time",
+    "pinned preview with three demonstration playback states",
+    "conditional border and manual-gap controls",
+    "independent on/off progress Switch; existing progressRing preference retained",
+    "pt-BR localization and system light/dark themes",
+    "flexible footer heights and invalid-field group reveal"
+  ],
+  "transport_changes": false,
+  "progress_interval_seconds": 5,
+  "requested_permissions": 0,
+  "review": "APROVADO, 3 rounds; no open findings",
+  "previews": "native Android/Skia Activities and controls; pt-BR; not physical Samsung screenshots"
+}

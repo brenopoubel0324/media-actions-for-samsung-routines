@@ -18,9 +18,7 @@ class WidgetPaddingSection(
 
     fun create(): View {
         val body = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-        fun text(resource: Int) = TextView(context).apply {
-            setText(resource); textSize = 14f; body.addView(this)
-        }
+        fun text(resource: Int) = SettingsUi.label(context, body, context.getString(resource), 13f)
         text(R.string.widget_padding_heading).isAccessibilityHeading = true
         text(R.string.widget_padding_help)
         text(R.string.widget_padding_horizontal).labelFor = R.id.widget_padding_horizontal_value

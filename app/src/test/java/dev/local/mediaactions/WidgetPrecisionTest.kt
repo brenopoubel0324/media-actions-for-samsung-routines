@@ -13,7 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.widget.Button
-import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.TextView
@@ -94,7 +94,7 @@ class WidgetPrecisionTest {
         val view = editor.create()
         val input = view.findViewById<EditText>(R.id.widget_spacing_value)
         input.setText("37")
-        val automatic = view.findViewById<CheckBox>(R.id.widget_fill_width)
+        val automatic = view.findViewById<CompoundButton>(R.id.widget_fill_width)
         automatic.performClick()
         for (id in listOf(R.id.widget_spacing_value, R.id.widget_spacing_slider,
             R.id.widget_spacing_decrease, R.id.widget_spacing_increase)) {
@@ -143,7 +143,7 @@ class WidgetPrecisionTest {
         val editor = WidgetAppearanceSection(app, id)
         val view = editor.create()
         assertFalse(WidgetStyleStore.load(app, id).iconShadow)
-        view.findViewById<CheckBox>(R.id.widget_icon_shadow).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_icon_shadow).performClick()
         assertFalse(WidgetStyleStore.load(app, id).iconShadow)
         assertTrue(editor.applyChanges())
         assertTrue(WidgetStyleStore.load(app, id).iconShadow)

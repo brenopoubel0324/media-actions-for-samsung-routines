@@ -20,68 +20,76 @@ class MainActivity : Activity() {
     private lateinit var access: TextView
     private lateinit var player: TextView
     private lateinit var spotifyStatus: TextView
+    private lateinit var help: SettingsSection
+    private lateinit var diagnostics: Button
     private lateinit var result: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dispatcher = PhoneMediaActions(this)
-        val body = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(24), dp(16), dp(24), dp(24))
+        val body = SettingsUi.column(this).apply { setPadding(dp(20), dp(16), dp(20), dp(24)) }
+        val scroll = ScrollView(this).apply {
+            setBackgroundColor(getColor(R.color.settings_background)); isFillViewport = true; addView(body)
         }
-        val scroll = ScrollView(this).apply { addView(body) }
-        // targetSdk 36 is edge-to-edge: apply system insets to every screen orientation.
         scroll.setOnApplyWindowInsetsListener { view, insets ->
-            val bars = insets.getInsets(android.view.WindowInsets.Type.systemBars() or
-                android.view.WindowInsets.Type.displayCutout())
-            view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
-            insets
+            val bars = insets.getInsets(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout())
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom); insets
         }
-        fun label(resource: Int, size: Float = 16f): TextView = TextView(this).apply {
-            setText(resource)
-            textSize = size
-            setPadding(0, dp(10), 0, dp(10))
-            body.addView(this)
-        }
-        fun button(resource: Int, action: () -> Unit): Button = Button(this).apply {
-            setText(resource)
-            setOnClickListener { action() }
-            body.addView(this, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT))
-        }
-        label(R.string.heading, 26f).isAccessibilityHeading = true
-        label(R.string.app_version, 14f).text = getString(R.string.app_version,
+        fun label(parent: LinearLayout, resource: Int, size: Float = 14f, heading: Boolean = false) =
+            SettingsUi.label(this, parent, getString(resource), size, heading)
+        fun button(parent: LinearLayout, resource: Int, primary: Boolean = false, action: () -> Unit): Button =
+            SettingsUi.button(this, getString(resource), primary, action).also {
+                parent.addView(it, LinearLayout.LayoutParams(-1, LinearLayout.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(6) })
+            }
+        label(body, R.string.app_name, 28f, true)
+        label(body, R.string.settings_home_subtitle, 14f)
+        label(body, R.string.app_version, 12f).text = getString(R.string.app_version,
             packageManager.getPackageInfo(packageName, 0).versionName)
-        button(R.string.widget_edit_existing, ::editExistingWidget).id = R.id.widget_edit_existing
-        label(R.string.experimental, 14f)
-        access = label(R.string.access_denied)
-        label(R.string.access_reason, 14f)
-        button(R.string.grant_access, ::openNotificationSettings)
-        player = label(R.string.player_none)
-        spotifyStatus = label(R.string.spotify_resume_idle, 14f).apply {
-            id = R.id.spotify_resume_status
-            accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+        val connection = SettingsUi.card(this, body)
+        label(connection, R.string.settings_connection, 18f, true)
+        access = label(connection, R.string.access_denied)
+        button(connection, R.string.grant_access, action = ::openNotificationSettings)
+        val widget = SettingsUi.card(this, body)
+        label(widget, R.string.settings_widget, 18f, true)
+        label(widget, R.string.settings_widget_help, 13f)
+        button(widget, R.string.widget_edit_existing, true, ::editExistingWidget).id = R.id.widget_edit_existing
+        button(widget, R.string.settings_defaults) { startActivity(Intent(this, WidgetDefaultsActivity::class.java)) }.id = R.id.widget_defaults
+        val controls = SettingsUi.card(this, body)
+        label(controls, R.string.settings_controls, 18f, true)
+        player = label(controls, R.string.player_none, 13f)
+        val buttons = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        for ((id, title, action) in listOf(Triple(R.id.control_previous, R.string.settings_control_previous, MediaAction.PREVIOUS),
+            Triple(R.id.control_toggle, R.string.settings_control_toggle, MediaAction.PLAY_PAUSE),
+            Triple(R.id.control_next, R.string.settings_control_next, MediaAction.NEXT))) {
+            buttons.addView(SettingsUi.button(this, getString(title), action == MediaAction.PLAY_PAUSE) { execute(action) }.apply { this.id = id },
+                LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = if (action == MediaAction.NEXT) 0 else dp(6) })
         }
-        button(R.string.refresh, ::refreshStatus)
-        button(R.string.test_next) { execute(MediaAction.NEXT) }
-        button(R.string.test_previous) { execute(MediaAction.PREVIOUS) }
-        button(R.string.test_toggle) { execute(MediaAction.PLAY_PAUSE) }
-        result = label(R.string.ready).apply {
-            accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
-            isSaveEnabled = false
+        controls.addView(buttons)
+        result = label(controls, R.string.ready, 13f).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE; isSaveEnabled = false }
+        diagnostics = button(controls, R.string.settings_diagnostics) {
+            help.setExpanded(true); help.root.requestRectangleOnScreen(android.graphics.Rect(0, 0, help.root.width, help.root.height), false)
+        }.apply { id = R.id.spotify_diagnostics }
+        help = SettingsSection(this, R.string.settings_help, R.string.settings_help_summary, R.id.settings_help) { help.setExpanded(it) }
+        body.addView(help.root, LinearLayout.LayoutParams(-1, -2))
+        spotifyStatus = label(help.content, R.string.spotify_resume_idle, 14f).apply {
+            id = R.id.spotify_resume_status; accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
         }
-        body.addView(WidgetAppearanceSection(this).create())
-        label(R.string.setup_heading, 20f).isAccessibilityHeading = true
-        label(R.string.setup_steps, 15f)
-        label(R.string.widget_setup_heading, 20f).isAccessibilityHeading = true
-        label(R.string.widget_setup_steps, 15f)
-        button(R.string.icon_licenses) {
+        button(help.content, R.string.refresh, action = ::refreshStatus)
+        label(help.content, R.string.access_reason, 13f)
+        label(help.content, R.string.setup_heading, 17f, true); label(help.content, R.string.setup_steps, 13f)
+        label(help.content, R.string.widget_setup_heading, 17f, true); label(help.content, R.string.widget_setup_steps, 13f)
+        label(help.content, R.string.experimental, 12f)
+        button(help.content, R.string.icon_licenses) {
             val notices = resources.openRawResource(R.raw.icon_licenses).bufferedReader().use { it.readText() }
-            AlertDialog.Builder(this).setTitle(R.string.icon_licenses)
-                .setMessage(notices).setPositiveButton(android.R.string.ok, null).show()
+            AlertDialog.Builder(this).setTitle(R.string.icon_licenses).setMessage(notices).setPositiveButton(android.R.string.ok, null).show()
         }
-        setContentView(scroll)
-        scroll.requestApplyInsets()
+        help.setExpanded(savedInstanceState?.getBoolean("help_open") ?: false)
+        setContentView(scroll); scroll.requestApplyInsets()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (::help.isInitialized) outState.putBoolean("help_open", help.expanded)
     }
 
     override fun onResume() {
@@ -93,6 +101,7 @@ class MainActivity : Activity() {
         val spotify = SpotifyPlaybackResumer.lastStatus(this)
         spotifyStatus.text = getString(R.string.spotify_resume_last, getString(spotify.message))
         spotifyStatus.visibility = if (spotify == SpotifyPlaybackResumer.Status.IDLE) View.GONE else View.VISIBLE
+        diagnostics.visibility = spotifyStatus.visibility
         val status = dispatcher.playerStatus()
         access.setText(when (status) {
             PlayerStatus.MissingNotificationAccess -> R.string.access_denied

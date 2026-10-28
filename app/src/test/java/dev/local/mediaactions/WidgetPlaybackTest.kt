@@ -15,7 +15,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.SizeF
 import android.view.View
-import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import org.junit.Assert.*
@@ -187,13 +187,13 @@ class WidgetPlaybackTest {
         val intent = Intent(app, WidgetConfigureActivity::class.java)
             .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
         val first = Robolectric.buildActivity(WidgetConfigureActivity::class.java, intent).setup()
-        first.get().findViewById<CheckBox>(R.id.widget_touch_feedback).performClick()
+        first.get().findViewById<CompoundButton>(R.id.widget_touch_feedback).performClick()
         val saved = Bundle()
         first.pause().saveInstanceState(saved).stop().destroy()
         assertTrue(WidgetStyleStore.load(app, id).touchFeedback)
         Robolectric.buildActivity(WidgetConfigureActivity::class.java, intent).use {
             val activity = it.create(saved).start().resume().visible().get()
-            assertFalse(activity.findViewById<CheckBox>(R.id.widget_touch_feedback).isChecked)
+            assertFalse(activity.findViewById<CompoundButton>(R.id.widget_touch_feedback).isChecked)
             activity.findViewById<android.widget.Button>(R.id.widget_configuration_save).performClick()
             assertFalse(WidgetStyleStore.load(app, id).touchFeedback)
         }
@@ -265,7 +265,7 @@ class WidgetPlaybackTest {
         val id = widget()
         val editor = WidgetAppearanceSection(app, id)
         val page = editor.create()
-        val toggle = page.findViewById<CheckBox>(R.id.widget_touch_feedback)
+        val toggle = page.findViewById<CompoundButton>(R.id.widget_touch_feedback)
         assertTrue(toggle.isChecked)
         toggle.performClick()
         assertTrue(WidgetStyleStore.load(app, id).touchFeedback)

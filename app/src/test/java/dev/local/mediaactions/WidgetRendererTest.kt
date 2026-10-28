@@ -8,7 +8,7 @@ import android.widget.FrameLayout
 import android.widget.Button
 import android.widget.RadioButton
 import android.widget.Spinner
-import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.SeekBar
 import android.os.Looper
 import android.view.ViewGroup
@@ -123,7 +123,7 @@ class WidgetRendererTest {
         section.layout(0, 0, 360, section.measuredHeight)
         shadowOf(Looper.getMainLooper()).idle()
         val views = children(section)
-        section.findViewById<CheckBox>(R.id.widget_fill_width).performClick()
+        section.findViewById<CompoundButton>(R.id.widget_fill_width).performClick()
         assertFalse(section.findViewById<SeekBar>(R.id.widget_spacing_slider).isEnabled)
         assertFalse(WidgetStyleStore.load(app).fillWidth)
         views.filterIsInstance<Button>().first { it.text == app.getString(R.string.widget_apply_style) }.performClick()

@@ -1,13 +1,11 @@
-# Validação — 0.15 experimental
+# Validação — 0.16 experimental
 
-Comando: `./gradlew :app:assembleDebug testDebugUnitTest lintDebug --console=plain`. **BUILD SUCCESSFUL: 344 testes** (app 313, wear 9, shared 22), zero falhas/erros/pulos. Lint dos três módulos sem apontamentos. Integridade: [VALIDATION.json](downloads/v0.15-experimental/VALIDATION.json).
+Comando: `./gradlew :app:assembleDebug testDebugUnitTest lintDebug --console=plain`. **BUILD SUCCESSFUL: 358 testes** (app 327, wear 9, shared 22), sem falhas/erros/pulos. Lint dos três módulos sem apontamentos. Integridade: [VALIDATION.json](downloads/v0.16-experimental/VALIDATION.json).
 
-A suíte nova substitui os testes que verificavam somente envio de broadcast. Verifica descoberta restrita do serviço público do Spotify, EXTRA_RECENT, conexão mantida até PLAYING, retorno sem falsa confirmação, prepare/play e ausência de Activity/tecla global. Abrange serviço ausente/privado/desabilitado/protegido/ambíguo, pacote incorreto no token, recusa/suspensão, timeout, erro de reprodução, callbacks atrasados/duplicados, tentativa concorrente e exceção no callback do host.
+A nova cobertura valida navegação para editor privado de padrões, ausência do editor completo na tela inicial, progresso ligado/desligado sem bordas, isolamento por widget, salvar/cancelar, herança de padrão com preservação de overrides, rascunho e seção aberta após recriação, erro em grupo recolhido, uma seção aberta por vez, prévia sem comando de mídia e rodapé acessível com 320 dp/fonte ampliada/teclado.
 
-Também verifica o caminho PhoneMediaActions sem sessão até confirmação, prioridade dos players existentes, revogação de acesso/troca de player durante a conexão, limpeza de browser/callback/timer, PendingResult do widget pendente até o encerramento e atalho NoDisplay que encerra imediatamente enquanto a conexão pertence ao aplicativo. Um teste nativo exporta a mensagem real do último resultado concluído. O deadline absoluto é verificado avançando relógio sem processar a fila e entregando callback atrasado.
+Prévias nativas Android/Skia usam pt-BR, com tela inicial, editor, controle de progresso ligado/desligado e modo escuro. Testes antigos usam CompoundButton (contrato de checked/click) para continuar validando a mesma lógica com os novos Switches nativos. A suíte existente de preferências, configuração externa, geometria, estado, mídia, Spotify assíncrono e Wear permanece incluída.
 
-Os testes de conexão usam um shadow explícito de MediaBrowser e controlador de sessão simulado. Eles comprovam a máquina de estados/lifecycle do app, não autorização do Spotify instalado nem reprodução física. A falha relatada pelo usuário na implementação 0.11–0.14 não é apresentada como resolvida em hardware sem novo teste.
+Phone 0.16, código 16, mesmo applicationId/certificado e zero uses-permission. Activity de padrões não exportada; Activity externa continua validando instância do host. Não houve alteração do mecanismo Spotify, protocolo Wear, transporte de mídia, intervalo ou regras de visibilidade do progresso. Sem teste físico de One UI/LockStar/Spotify/Watch 8 ou benchmark de bateria/FPS.
 
-Phone 0.15, código 15, assinatura/applicationId preservados, zero uses-permission. Armazena localmente apenas o enum do último resultado concluído, sem conta/fila/título. Wear 0.8 e protocolo, controles de sessão existentes, aparência e intervalo do widget inalterados. Sem teste físico Samsung/Spotify/Wear ou benchmark de bateria/FPS.
-
-[Review](docs/reviews/spotify-browser-0.15.md) · [Fontes e comportamento](docs/SPOTIFY_FALLBACK.md).
+[Review](docs/reviews/settings-ux-0.16.md) · [UX e navegação](docs/SETTINGS_UX.md).

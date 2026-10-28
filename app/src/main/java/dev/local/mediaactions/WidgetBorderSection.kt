@@ -9,7 +9,6 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Spinner
@@ -38,26 +37,26 @@ class WidgetBorderSection(
     private var enabled = if (buttonTarget) initial.buttonBorder else initial.widgetBorder
     private var width = if (buttonTarget) initial.buttonBorderWidthDp else initial.borderWidthDp
     private var color = if (buttonTarget) initial.buttonBorderColor else initial.borderColor
+    private lateinit var details: LinearLayout
     private lateinit var thickness: WidgetNumberControl
     private lateinit var colorInput: EditText
     private lateinit var presets: Spinner
     private val colors = listOf(Color.WHITE, Color.rgb(26, 29, 34), 0xFFA6EBC9.toInt(), 0xFF62CFF4.toInt(), 0xFFFFD166.toInt())
 
-    fun create(): View {
+    fun create(extraOptions: View? = null): View {
         val body = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-        fun text(resource: Int) = TextView(context).apply {
-            setText(resource); textSize = 14f; body.addView(this)
-        }
-        val toggle = CheckBox(context).apply {
-            id = ids.toggle; setText(if (buttonTarget) R.string.widget_button_border else R.string.widget_border); minHeight = dp(48); isChecked = enabled
-        }
+        details = SettingsUi.column(context)
+        fun text(resource: Int) = SettingsUi.label(context, details, context.getString(resource), 13f)
+        val toggle = SettingsUi.toggle(context, if (buttonTarget) R.string.widget_button_border else R.string.widget_border, enabled, ids.toggle) { }
         body.addView(toggle)
+        if (extraOptions != null) body.addView(extraOptions)
+        body.addView(details)
         text(if (buttonTarget) R.string.widget_button_border_help else R.string.widget_border_help)
         text(widthLabel).labelFor = ids.width
         thickness = WidgetNumberControl(context, context.getString(widthLabel),
             1, WidgetAppearance.MAX_BORDER_DP, width, ids.width,
             ids.slider, ids.decrease, ids.increase, "dp") { width = it; emit() }
-        body.addView(thickness)
+        details.addView(thickness)
         text(colorLabel).labelFor = ids.color
         colorInput = EditText(context).apply {
             id = ids.color
@@ -66,6 +65,7 @@ class WidgetBorderSection(
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             filters = arrayOf(InputFilter.LengthFilter(9))
             contentDescription = context.getString(colorLabel)
+            setTextColor(context.getColor(R.color.settings_text))
             setText(String.format(Locale.ROOT, "#%08X", color))
         }
         val labels = listOf(R.string.widget_border_white, R.string.widget_border_dark, R.string.widget_border_mint,
@@ -87,8 +87,8 @@ class WidgetBorderSection(
                 override fun onNothingSelected(parent: AdapterView<*>?) = Unit
             }
         }
-        body.addView(presets)
-        body.addView(colorInput)
+        details.addView(presets)
+        details.addView(colorInput)
         text(R.string.widget_border_color_help)
         colorInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
@@ -117,6 +117,7 @@ class WidgetBorderSection(
         return thickness.validate() && valid
     }
     private fun updateEnabled() {
+        details.visibility = if (enabled) View.VISIBLE else View.GONE
         thickness.isEnabled = enabled; presets.isEnabled = enabled; colorInput.isEnabled = enabled
         if (!enabled) colorInput.error = null
     }

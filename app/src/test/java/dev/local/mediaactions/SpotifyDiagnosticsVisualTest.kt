@@ -25,9 +25,11 @@ class SpotifyDiagnosticsVisualTest {
             val label = activity.get().findViewById<TextView>(R.id.spotify_resume_status)
             assertEquals(View.VISIBLE, label.visibility)
             assertEquals(app.getString(R.string.spotify_resume_last, app.getString(R.string.spotify_resume_unavailable)), label.text.toString())
+            activity.get().findViewById<View>(R.id.spotify_diagnostics).performClick()
             val root = activity.get().window.decorView
             root.measure(View.MeasureSpec.makeMeasureSpec(480, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(960, View.MeasureSpec.EXACTLY))
             root.layout(0, 0, 480, 960)
+            label.requestRectangleOnScreen(android.graphics.Rect(0, 0, label.width, label.height), true)
             val image = Bitmap.createBitmap(480, 960, Bitmap.Config.ARGB_8888)
             root.draw(Canvas(image))
             val out = File("build/outputs/widget-previews/spotify-diagnostico.png")

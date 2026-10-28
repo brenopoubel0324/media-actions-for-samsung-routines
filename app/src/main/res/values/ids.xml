@@ -41,4 +41,18 @@
     <item type="id" name="widget_center_border_only" />
     <item type="id" name="widget_progress_ring" />
     <item type="id" name="spotify_resume_status" />
+    <item type="id" name="settings_icons" />
+    <item type="id" name="settings_spacing" />
+    <item type="id" name="settings_borders" />
+    <item type="id" name="settings_playback" />
+    <item type="id" name="settings_help" />
+    <item type="id" name="widget_defaults" />
+    <item type="id" name="widget_preview_details" />
+    <item type="id" name="widget_preview_playing" />
+    <item type="id" name="widget_preview_paused" />
+    <item type="id" name="widget_preview_unknown" />
+    <item type="id" name="control_previous" />
+    <item type="id" name="control_toggle" />
+    <item type="id" name="control_next" />
+    <item type="id" name="spotify_diagnostics" />
 </resources>

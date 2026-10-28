@@ -1,0 +1,10 @@
+<resources>
+    <color name="settings_background">#101619</color>
+    <color name="settings_surface">#1A242A</color>
+    <color name="settings_text">#EFF5F7</color>
+    <color name="settings_secondary">#ACBDC6</color>
+    <color name="settings_accent">#80DCC4</color>
+    <color name="settings_on_accent">#07372D</color>
+    <color name="settings_outline">#33434B</color>
+    <color name="settings_ripple">#2280DCC4</color>
+</resources>

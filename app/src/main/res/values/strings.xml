@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Media Actions</string>
-    <string name="heading">Media Actions for Routines</string>
     <string name="experimental">Experimental • Samsung locked-button operation needs testing on your phone.</string>
     <string name="listener_name">Media Actions — media session access</string>
     <string name="access_granted">Notification access granted</string>
@@ -15,9 +14,6 @@
     <string name="player_ambiguous">Automatic player: multiple idle players; start the intended player</string>
     <string name="player_failure">Automatic player: session lookup failed</string>
     <string name="refresh">Refresh player</string>
-    <string name="test_next">Test Next</string>
-    <string name="test_previous">Test Previous</string>
-    <string name="test_toggle">Test Play / Pause</string>
     <string name="ready">Test a media action. With no eligible session, Play/Pause will try to resume Spotify.</string>
     <string name="sent">Command sent to %1$s. Check the player for the result.</string>
     <string name="missing_access">Grant Notification access in Android settings, then retry.</string>
@@ -36,9 +32,6 @@
     <string name="shortcut_toggle_long">Play or pause current media</string>
     <string name="widget_name">Media controls</string>
     <string name="widget_description">Transparent, resizable media controls with adjustable icon size and spacing.</string>
-    <string name="widget_appearance_heading">Widget appearance</string>
-    <string name="widget_appearance_help">The widget background is fully transparent. Resize it in LockStar, then fine-tune the icons here.</string>
-    <string name="widget_preview_caption">Sample wallpaper and demonstration progress. Tap the preview to try touch feedback.</string>
     <string name="widget_preview_action">Appearance preview: %1$s</string>
     <string name="widget_icons_white">White icons</string>
     <string name="widget_icons_dark">Dark icons</string>
@@ -54,8 +47,6 @@
     <string name="widget_style_chevrons">Minimal chevrons</string>
     <string name="widget_style_double">Double triangles</string>
     <string name="widget_style_square">Rounded square outlines</string>
-    <string name="widget_icon_size_help">Reduce icons to 20% while keeping large touch targets. Size and button spacing can be adjusted separately.</string>
-    <string name="widget_center_action_help">The widget shows Pause while playing and Play while paused. This appearance preview shows the paused state.</string>
     <string name="widget_play_action">Play</string>
     <string name="widget_pause_action">Pause</string>
     <string name="widget_transitioning">Playback is changing. Please wait.</string>
@@ -110,16 +101,14 @@
     <string name="widget_style_scope">Default appearance for new widgets. Widgets edited individually keep their own settings.</string>
     <string name="widget_style_scope_single">Changes apply only to this widget.</string>
     <string name="widget_configuration_title">Widget settings</string>
-    <string name="widget_configuration_help">Adjust this widget without opening the main app screen.</string>
-    <string name="widget_configuration_save">Save widget</string>
     <string name="widget_configuration_missing">This widget is no longer available. Close this page and add it again.</string>
     <string name="widget_apply_style">Save default appearance</string>
     <string name="widget_style_applied">Widget appearance saved and applied.</string>
     <string name="widget_setup_heading">LockStar widget</string>
     <string name="widget_setup_steps">In Good Lock → LockStar, enable lock-screen editing and open the widget area or Add widget control, if available. Choose Media Actions → Media controls, place it, and drag its resize handles. Menu names and sizing depend on your LockStar version.\n\nThe three buttons work directly without opening this app. Grant Notification access here first to synchronize Play/Pause with the player. The widget has no song title. Touch feedback is a temporary ripple; the background remains transparent. Locked interaction and LockStar compatibility need testing on your phone.</string>
     <string name="widget_center_border_only">Border only around Play/Pause</string>
-    <string name="widget_progress_ring">Track progress around Play/Pause</string>
-    <string name="widget_progress_help">White progress arc and dark position marker, visible only during confirmed playback. Hidden when paused, buffering or unavailable. Updates every 5 seconds while the screen is on. Unknown duration shows only the track during playback; not a seek control.</string>
+    <string name="widget_progress_ring">Show track progress</string>
+    <string name="widget_progress_help">Optional. The circle appears only during confirmed playback and updates every 5 seconds with the screen on. It is hidden when paused or unavailable. This indicator does not seek.</string>
     <string name="spotify_resume_last">Last Spotify resume: %1$s</string>
     <string name="action_pending">Sending playback request…</string>
     <string name="spotify_resume_idle">Spotify fallback has not been used yet.</string>
@@ -133,4 +122,36 @@
     <string name="spotify_resume_no_access">Spotify resume cancelled: notification access was revoked.</string>
     <string name="spotify_resume_failed">Spotify: could not resume through the media service.</string>
     <string name="spotify_resume_busy">Spotify resume is already in progress.</string>
+    <string name="settings_expanded">Expanded</string>
+    <string name="settings_collapsed">Collapsed</string>
+    <string name="settings_icons">Icons</string>
+    <string name="settings_icons_summary">Style, color and size</string>
+    <string name="settings_spacing">Spacing</string>
+    <string name="settings_spacing_summary">Button gaps and inner space</string>
+    <string name="settings_borders">Borders</string>
+    <string name="settings_borders_summary">Button outlines and widget frame</string>
+    <string name="settings_playback">Playback and touch</string>
+    <string name="settings_playback_summary">Progress indicator and tap feedback</string>
+    <string name="settings_help">Help and diagnostics</string>
+    <string name="settings_help_summary">Spotify results and setup guides</string>
+    <string name="settings_connection">Connection</string>
+    <string name="settings_widget">Your widget</string>
+    <string name="settings_controls">Try the controls</string>
+    <string name="settings_home_subtitle">Media shortcuts and a widget that fits your screen.</string>
+    <string name="settings_widget_help">Edit one installed widget, or set the appearance for new ones.</string>
+    <string name="settings_defaults">Default appearance</string>
+    <string name="settings_defaults_help">For new widgets and those without individual settings.</string>
+    <string name="settings_widget_scope">Only this widget</string>
+    <string name="settings_preview">Preview</string>
+    <string name="settings_measurements">Measurements</string>
+    <string name="settings_preview_help">Sample wallpaper and progress. These controls do not play music.</string>
+    <string name="settings_playing">Playing</string>
+    <string name="settings_paused">Paused</string>
+    <string name="settings_unknown">No session</string>
+    <string name="settings_diagnostics">See Spotify result</string>
+    <string name="settings_control_previous">Previous</string>
+    <string name="settings_control_toggle">Play / Pause</string>
+    <string name="settings_control_next">Next</string>
+    <string name="settings_icon_color">Icon color</string>
+    <string name="settings_save">Save changes</string>
 </resources>

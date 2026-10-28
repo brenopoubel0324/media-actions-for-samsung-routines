@@ -18,7 +18,7 @@ Usar esse fluxo não dá ao nosso app os privilégios do SystemUI. Spotify pode 
 
 ## Resultado visível no app
 
-A linha **Last Spotify resume** mostra o último resultado concluído, inclusive quando a tentativa veio do widget/Rotinas: reprodução confirmada, serviço indisponível, conexão recusada, timeout de conexão, conexão sem confirmação de reprodução, acesso revogado, troca de player ou falha. Apenas o enum desse último resultado é salvo localmente. Não é um indicador do estado atual da música, não guarda título/conta/fila e tentativas em andamento não sobrescrevem o último resultado concluído.
+Na interface 0.16, toque em **Ver diagnóstico do Spotify** na tela inicial (quando houver um resultado), ou abra **Ajuda e diagnóstico**. A linha **Última tentativa no Spotify** (**Last Spotify resume** em inglês) mostra o último resultado concluído, inclusive quando a tentativa veio do widget/Rotinas: reprodução confirmada, serviço indisponível, conexão recusada, timeout de conexão, conexão sem confirmação de reprodução, acesso revogado, troca de player ou falha. Apenas o enum desse último resultado é salvo localmente. Não é um indicador do estado atual da música, não guarda título/conta/fila e tentativas em andamento não sobrescrevem o último resultado concluído.
 
 O atalho NoDisplay encerra imediatamente e a tentativa pertence ao contexto do aplicativo; o widget usa `goAsync()` com prazo de seis segundos para completar o broadcast. Não cria serviço próprio novo, não abre Spotify/loja, não usa teclas globais, OAuth nem retries em segundo plano. Uma tentativa em andamento bloqueia outra, sem duplicar Play.
 

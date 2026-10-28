@@ -13,7 +13,8 @@ import android.widget.ScrollView
 import android.widget.TextView
 
 /** The widget host opens this editor directly; it never routes through MainActivity. */
-class WidgetConfigureActivity : Activity() {
+open class WidgetConfigureActivity : Activity() {
+    protected open val editsDefaults = false
     private var widgetId = AppWidgetManager.INVALID_APPWIDGET_ID
     private lateinit var editor: WidgetAppearanceSection
 
@@ -22,7 +23,7 @@ class WidgetConfigureActivity : Activity() {
         setResult(RESULT_CANCELED)
         widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID)
-        if (!MediaWidgetProvider.isOwnWidget(this, widgetId)) {
+        if (!editsDefaults && !MediaWidgetProvider.isOwnWidget(this, widgetId)) {
             finish()
             return
         }
@@ -34,14 +35,16 @@ class WidgetConfigureActivity : Activity() {
             setPadding(dp(20), dp(16), dp(20), dp(12))
         }
         val title = TextView(this).apply {
-            setText(R.string.widget_configuration_title)
+            setText(if (editsDefaults) R.string.settings_defaults else R.string.widget_configuration_title)
+            setTextColor(getColor(R.color.settings_text))
             textSize = 25f
             isAccessibilityHeading = true
             setPadding(0, 0, 0, dp(8))
         }
         root.addView(title)
         val status = TextView(this).apply {
-            setText(R.string.widget_configuration_help)
+            setText(if (editsDefaults) R.string.settings_defaults_help else R.string.settings_widget_scope)
+            setTextColor(getColor(R.color.settings_secondary))
             textSize = 14f
             setPadding(0, 0, 0, dp(8))
             accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
@@ -50,7 +53,7 @@ class WidgetConfigureActivity : Activity() {
         val previewContainer = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         root.addView(previewContainer)
 
-        editor = WidgetAppearanceSection(this, widgetId, restoreDraft(savedInstanceState)) {
+        editor = WidgetAppearanceSection(this, if (editsDefaults) null else widgetId, restoreDraft(savedInstanceState)) {
             setResult(RESULT_OK, result)
             finish()
         }
@@ -60,20 +63,16 @@ class WidgetConfigureActivity : Activity() {
         },
             LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
 
-        val actions = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        actions.addView(Button(this).apply {
+        editor.restoreUiState(savedInstanceState)
+        root.setBackgroundColor(getColor(R.color.settings_background))
+        val actions = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setPadding(0, dp(10), 0, 0) }
+        actions.addView(SettingsUi.button(this, getString(android.R.string.cancel)) { finish() }.apply {
             id = R.id.widget_configuration_cancel
-            setText(android.R.string.cancel)
-            setOnClickListener { finish() }
-        }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
-        actions.addView(Button(this).apply {
-            id = R.id.widget_configuration_save
-            setText(R.string.widget_configuration_save)
-            setOnClickListener {
-                if (!editor.applyChanges()) status.setText(if (MediaWidgetProvider.isOwnWidget(this@WidgetConfigureActivity, widgetId))
-                    R.string.widget_invalid_values else R.string.widget_configuration_missing)
-            }
-        }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = dp(10) })
+        actions.addView(SettingsUi.button(this, getString(R.string.settings_save), true) {
+            if (!editor.applyChanges()) status.setText(if (editsDefaults || MediaWidgetProvider.isOwnWidget(this, widgetId))
+                R.string.widget_invalid_values else R.string.widget_configuration_missing)
+        }.apply { id = R.id.widget_configuration_save }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
         root.addView(actions)
 
         root.setOnApplyWindowInsetsListener { view, insets ->
@@ -95,6 +94,7 @@ class WidgetConfigureActivity : Activity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         if (!::editor.isInitialized) return
+        editor.saveUiState(outState)
         val draft = editor.currentAppearance()
         outState.putBundle(DRAFT, Bundle().apply {
             putInt("scale", draft.iconScalePercent)

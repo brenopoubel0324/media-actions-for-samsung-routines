@@ -5,7 +5,7 @@ import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Color
-import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.Spinner
 import android.view.View
@@ -43,7 +43,7 @@ class WidgetBorderTest {
         val first = widget(); val other = widget()
         val editor = WidgetAppearanceSection(app, first)
         val view = editor.create()
-        view.findViewById<CheckBox>(R.id.widget_border).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_border).performClick()
         view.findViewById<EditText>(R.id.widget_border_width_value).setText("3")
         view.findViewById<EditText>(R.id.widget_border_color_value).setText("#8062CFF4")
         assertFalse(WidgetStyleStore.load(app, first).widgetBorder)
@@ -57,7 +57,7 @@ class WidgetBorderTest {
     }
     @Test fun invalidColorOrWidthBlocksSavingInsteadOfReplacingWithADefault() {
         val id = widget(); val editor = WidgetAppearanceSection(app, id); val view = editor.create()
-        view.findViewById<CheckBox>(R.id.widget_border).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_border).performClick()
         val color = view.findViewById<EditText>(R.id.widget_border_color_value)
         color.setText("#NOPE")
         assertFalse(editor.applyChanges()); assertNotNull(color.error)
@@ -77,7 +77,7 @@ class WidgetBorderTest {
             shadowOf(Looper.getMainLooper()).idle()
         }
         layout()
-        view.findViewById<CheckBox>(R.id.widget_border).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_border).performClick()
         val color = view.findViewById<EditText>(R.id.widget_border_color_value)
         val preset = view.findViewById<Spinner>(R.id.widget_border_color_preset)
         color.setText("#NOPE"); layout()
@@ -92,7 +92,7 @@ class WidgetBorderTest {
         val id = widget()
         WidgetStyleStore.save(app, WidgetAppearance(widgetBorder = true, borderWidthDp = 4, borderColor = Color.CYAN), id)
         val editor = WidgetAppearanceSection(app, id); val view = editor.create()
-        view.findViewById<CheckBox>(R.id.widget_border).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_border).performClick()
         assertFalse(view.findViewById<EditText>(R.id.widget_border_color_value).isEnabled)
         assertTrue(editor.applyChanges())
         assertEquals(WidgetAppearance(widgetBorder = false, borderWidthDp = 4, borderColor = Color.CYAN), WidgetStyleStore.load(app, id))
@@ -102,12 +102,12 @@ class WidgetBorderTest {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
         Robolectric.buildActivity(WidgetConfigureActivity::class.java, intent).setup().use { controller ->
             val activity = controller.get()
-            activity.findViewById<CheckBox>(R.id.widget_border).performClick()
+            activity.findViewById<CompoundButton>(R.id.widget_border).performClick()
             activity.findViewById<EditText>(R.id.widget_border_width_value).setText("5")
             activity.findViewById<EditText>(R.id.widget_border_color_value).setText("#FF12AB34")
             controller.recreate()
             val recreated = controller.get()
-            assertTrue(recreated.findViewById<CheckBox>(R.id.widget_border).isChecked)
+            assertTrue(recreated.findViewById<CompoundButton>(R.id.widget_border).isChecked)
             assertEquals("5", recreated.findViewById<EditText>(R.id.widget_border_width_value).text.toString())
             assertEquals("#FF12AB34", recreated.findViewById<EditText>(R.id.widget_border_color_value).text.toString())
             assertFalse(WidgetStyleStore.load(app, id).widgetBorder)

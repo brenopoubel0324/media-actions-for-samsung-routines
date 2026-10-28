@@ -7,7 +7,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Looper
 import android.view.View
-import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.Spinner
 import org.junit.Assert.*
@@ -42,10 +42,10 @@ class IndependentBordersTest {
     @Test fun eachSectionSavesItsOwnThicknessAndColorWithoutChangingOtherWidgets() {
         val id = widget(); val other = widget()
         val editor = WidgetAppearanceSection(app, id); val view = editor.create()
-        view.findViewById<CheckBox>(R.id.widget_button_border).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_button_border).performClick()
         view.findViewById<EditText>(R.id.widget_button_border_width_value).setText("2")
         view.findViewById<EditText>(R.id.widget_button_border_color_value).setText("#80FFD166")
-        view.findViewById<CheckBox>(R.id.widget_border).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_border).performClick()
         view.findViewById<EditText>(R.id.widget_border_width_value).setText("5")
         view.findViewById<EditText>(R.id.widget_border_color_value).setText("#FF62CFF4")
         assertFalse(WidgetStyleStore.load(app, id).buttonBorder)
@@ -62,14 +62,14 @@ class IndependentBordersTest {
             buttonBorder = true, buttonBorderWidthDp = 2, buttonBorderColor = Color.YELLOW)
         val id = widget(); WidgetStyleStore.save(app, original, id)
         var editor = WidgetAppearanceSection(app, id); var view = editor.create()
-        view.findViewById<CheckBox>(R.id.widget_button_border).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_button_border).performClick()
         assertTrue(view.findViewById<EditText>(R.id.widget_border_color_value).isEnabled)
         assertFalse(view.findViewById<EditText>(R.id.widget_button_border_color_value).isEnabled)
         assertTrue(editor.applyChanges())
         assertEquals(original.copy(buttonBorder = false), WidgetStyleStore.load(app, id))
         editor = WidgetAppearanceSection(app, id); view = editor.create()
-        view.findViewById<CheckBox>(R.id.widget_button_border).performClick()
-        view.findViewById<CheckBox>(R.id.widget_border).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_button_border).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_border).performClick()
         assertTrue(editor.applyChanges())
         assertEquals(original.copy(widgetBorder = false), WidgetStyleStore.load(app, id))
     }
@@ -77,12 +77,12 @@ class IndependentBordersTest {
         for ((toggleId, valueId) in listOf(R.id.widget_button_border to R.id.widget_button_border_color_value,
             R.id.widget_border to R.id.widget_border_color_value)) {
             val id = widget(); val editor = WidgetAppearanceSection(app, id); val view = editor.create()
-            view.findViewById<CheckBox>(R.id.widget_button_border).performClick()
-            view.findViewById<CheckBox>(R.id.widget_border).performClick()
+            view.findViewById<CompoundButton>(R.id.widget_button_border).performClick()
+            view.findViewById<CompoundButton>(R.id.widget_border).performClick()
             view.findViewById<EditText>(valueId).setText("#NOPE")
             assertFalse(editor.applyChanges())
             assertFalse(WidgetStyleStore.load(app, id).buttonBorder || WidgetStyleStore.load(app, id).widgetBorder)
-            view.findViewById<CheckBox>(toggleId).performClick()
+            view.findViewById<CompoundButton>(toggleId).performClick()
             assertTrue(editor.applyChanges())
         }
     }
@@ -90,10 +90,10 @@ class IndependentBordersTest {
         val id = widget()
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
         Robolectric.buildActivity(WidgetConfigureActivity::class.java, intent).setup().use { c ->
-            c.get().findViewById<CheckBox>(R.id.widget_button_border).performClick()
+            c.get().findViewById<CompoundButton>(R.id.widget_button_border).performClick()
             c.get().findViewById<EditText>(R.id.widget_button_border_width_value).setText("2")
             c.get().findViewById<EditText>(R.id.widget_button_border_color_value).setText("#FFFFD166")
-            c.get().findViewById<CheckBox>(R.id.widget_border).performClick()
+            c.get().findViewById<CompoundButton>(R.id.widget_border).performClick()
             c.get().findViewById<EditText>(R.id.widget_border_width_value).setText("5")
             c.get().findViewById<EditText>(R.id.widget_border_color_value).setText("#FF62CFF4")
             c.recreate()
@@ -113,8 +113,8 @@ class IndependentBordersTest {
             view.measure(View.MeasureSpec.makeMeasureSpec(360, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
             view.layout(0, 0, 360, view.measuredHeight); shadowOf(Looper.getMainLooper()).idle()
         }
-        view.findViewById<CheckBox>(R.id.widget_button_border).performClick()
-        view.findViewById<CheckBox>(R.id.widget_border).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_button_border).performClick()
+        view.findViewById<CompoundButton>(R.id.widget_border).performClick()
         view.findViewById<EditText>(R.id.widget_border_color_value).setText("#FF62CFF4")
         layout()
         view.findViewById<EditText>(R.id.widget_button_border_color_value).setText("#NOPE"); layout()

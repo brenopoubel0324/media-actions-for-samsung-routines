@@ -18,6 +18,7 @@
             </intent-filter>
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity>
+        <activity android:name=".WidgetDefaultsActivity" android:exported="false" />
         <!-- Host-invoked editor. Validates that the requested widget belongs to this app. -->
         <activity
             android:name=".WidgetConfigureActivity"
