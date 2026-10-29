@@ -17,7 +17,8 @@ class WidgetAppearanceSection(
     initialAppearance: WidgetAppearance? = null,
     private val onApplied: (() -> Unit)? = null,
 ) {
-    private var draft = (initialAppearance ?: WidgetStyleStore.load(context, widgetId)).normalized()
+    private var originalAppearance = WidgetStyleStore.load(context, widgetId)
+    private var draft = (initialAppearance ?: originalAppearance).normalized()
     private var confirmation: TextView? = null
     private var scaleControl: WidgetNumberControl? = null
     private var spacingControl: WidgetNumberControl? = null
@@ -30,6 +31,7 @@ class WidgetAppearanceSection(
     private var previewStates: RadioGroup? = null
     private var location = widgetId?.let { WidgetLocationStore.load(context, it) } ?: WidgetLocation.AUTOMATIC
     private var locationChoice: Spinner? = null
+    private val textFields = linkedMapOf<String, EditText>()
     fun currentAppearance() = draft.normalized()
     fun openSection(id: Int) {
         expanded = if (sections.containsKey(id)) id else 0
@@ -38,9 +40,24 @@ class WidgetAppearanceSection(
     fun saveUiState(out: Bundle) {
         out.putInt("settings_section", expanded); out.putString("preview_state", previewState.name)
         out.putString("widget_location_draft", location.name)
+        out.putBundle("widget_original_appearance", WidgetAppearanceState.write(originalAppearance))
+        out.putBundle("widget_text_draft", Bundle().apply {
+            textFields.forEach { (key, field) -> putBundle(key, Bundle().apply {
+                putString("text", field.text.toString())
+                putInt("start", field.selectionStart); putInt("end", field.selectionEnd)
+            }) }
+        })
     }
     fun restoreUiState(state: Bundle?) {
         openSection(state?.getInt("settings_section") ?: 0)
+        originalAppearance = WidgetAppearanceState.read(state?.getBundle("widget_original_appearance")) ?: originalAppearance
+        state?.getBundle("widget_text_draft")?.let { saved -> textFields.forEach { (key, field) ->
+            saved.getBundle(key)?.let { raw -> raw.getString("text")?.let { text ->
+                field.setText(text)
+                field.setSelection(raw.getInt("start", field.length()).coerceIn(0, field.length()),
+                    raw.getInt("end", field.length()).coerceIn(0, field.length()))
+            } }
+        } }
         WidgetLocation.entries.firstOrNull { it.name == state?.getString("widget_location_draft") }?.let {
             location = it; locationChoice?.setSelection(it.ordinal)
             if (widgetId != null) sections[R.id.settings_location]?.summary(WidgetLocationStore.description(context, widgetId, it))
@@ -73,12 +90,13 @@ class WidgetAppearanceSection(
             confirmation?.setText(R.string.widget_configuration_missing); return false
         }
         // Labelling an inherited instance must not freeze its current default appearance.
-        if (widgetId == null || draft.normalized() != WidgetStyleStore.load(context, widgetId)) {
+        if (widgetId == null || draft.normalized() != originalAppearance) {
             WidgetStyleStore.save(context, draft, widgetId)
         }
         if (widgetId != null) WidgetLocationStore.save(context, widgetId, location)
         if (widgetId == null) MediaWidgetProvider.refreshAll(context) else MediaWidgetProvider.refreshWidget(context, widgetId)
         WidgetPlaybackObserver.settingsChanged(context)
+        originalAppearance = draft.normalized()
         confirmation?.setText(R.string.widget_style_applied); onApplied?.invoke(); return true
     }
 
@@ -250,6 +268,12 @@ class WidgetAppearanceSection(
         playback.addView(SettingsUi.toggle(context, R.string.widget_touch_feedback, draft.touchFeedback, R.id.widget_touch_feedback) { draft = draft.copy(touchFeedback = it); updatePreview() })
         confirmation = label(body, if (widgetId == null) R.string.widget_style_scope else R.string.widget_style_scope_single, 12f).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
         if (showApplyButton) body.addView(SettingsUi.button(context, context.getString(R.string.widget_apply_style), true) { applyChanges() }, LinearLayout.LayoutParams(-1, dp(52)))
+        // Raw text is temporary Activity state; only validated numeric/color values reach preferences.
+        fun collectFields(view: View) {
+            if (view is EditText && view.id != View.NO_ID) textFields[context.resources.getResourceEntryName(view.id)] = view
+            if (view is ViewGroup) for (index in 0 until view.childCount) collectFields(view.getChildAt(index))
+        }
+        collectFields(body)
         updatePreview(); return body
     }
     private fun dp(value: Int) = SettingsUi.dp(context, value)

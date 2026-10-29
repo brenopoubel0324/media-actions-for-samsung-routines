@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -98,41 +97,10 @@ open class WidgetConfigureActivity : Activity() {
         super.onSaveInstanceState(outState)
         if (!::editor.isInitialized) return
         editor.saveUiState(outState)
-        val draft = editor.currentAppearance()
-        outState.putBundle(DRAFT, Bundle().apply {
-            putInt("scale", draft.iconScalePercent)
-            putInt("gap", draft.spacingDp)
-            putBoolean("dark", draft.darkIcons)
-            putString("style", draft.iconStyle.name)
-            putBoolean("width", draft.fillWidth)
-            putBoolean("shadow", draft.iconShadow)
-            putBoolean("feedback", draft.touchFeedback)
-            putBoolean("border", draft.widgetBorder)
-            putInt("border_width", draft.borderWidthDp)
-            putInt("border_color", draft.borderColor)
-            putBoolean("center_border_only", draft.centerBorderOnly)
-            putBoolean("progress_ring", draft.progressRing)
-            putBoolean("button_border", draft.buttonBorder)
-            putInt("button_border_width", draft.buttonBorderWidthDp)
-            putInt("button_border_color", draft.buttonBorderColor)
-            putInt("widget_padding_horizontal", draft.widgetPaddingHorizontalDp)
-            putInt("widget_padding_vertical", draft.widgetPaddingVerticalDp)
-        })
+        outState.putBundle(DRAFT, WidgetAppearanceState.write(editor.currentAppearance()))
     }
 
-    private fun restoreDraft(state: Bundle?): WidgetAppearance? {
-        val draft = state?.getBundle(DRAFT) ?: return null
-        return WidgetAppearance(draft.getInt("scale", 100), draft.getInt("gap", 0),
-            draft.getBoolean("dark", false), WidgetIconStyle.entries.firstOrNull {
-                it.name == draft.getString("style")
-            } ?: WidgetIconStyle.OUTLINE, draft.getBoolean("width", false),
-            draft.getBoolean("shadow", false), draft.getBoolean("feedback", true),
-            draft.getBoolean("border", false), draft.getInt("border_width", 1),
-            draft.getInt("border_color", android.graphics.Color.WHITE), draft.getBoolean("button_border", false),
-            draft.getInt("button_border_width", 1), draft.getInt("button_border_color", android.graphics.Color.WHITE),
-            draft.getInt("widget_padding_horizontal", 0), draft.getInt("widget_padding_vertical", 0), draft.getBoolean("center_border_only", false),
-            draft.getBoolean("progress_ring", false)).normalized()
-    }
+    private fun restoreDraft(state: Bundle?) = WidgetAppearanceState.read(state?.getBundle(DRAFT))
 
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
 

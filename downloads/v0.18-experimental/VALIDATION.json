@@ -1,0 +1,64 @@
+{
+  "version": "0.18-experimental",
+  "phone_version_code": 18,
+  "application_id": "dev.local.mediaactions",
+  "wear_companion": "0.8-experimental unchanged; assembleDebug verified",
+  "apk": {
+    "filename": "media-actions-phone-0.18-experimental-debug.apk",
+    "bytes": 5303667,
+    "sha256": "8c1db24b9399f6651a1d07e67d0cd67fc51a2e95152cfc733635abe93ae698c6",
+    "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+  },
+  "tests": {
+    "app": {
+      "tests": 363,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 394,
+  "lint": "No issues found in all modules",
+  "audit": {
+    "base_commit": "4c7cc3c71a53fcb144b1242bc6783621fb653002",
+    "rounds": 3,
+    "verdict": "APROVADO",
+    "blocking_or_high_found": 0,
+    "medium_fixed": 3,
+    "low_fixed": 1,
+    "open_confirmed_bugs": 0,
+    "fixes": [
+      "preserve raw number/color draft and cursor across Activity recreation; validate before preferences",
+      "latest control tap owns result; old Spotify completion still updates historical diagnosis",
+      "compare widget appearance to original edit state to preserve concurrent defaults or overrides",
+      "parse disabled numeric draft safely; centralized compatible Activity state serialization"
+    ],
+    "improvement_proposals_not_implemented": [
+      "physical integration validation",
+      "restore default appearance per widget",
+      "selectable progress interval",
+      "timestamped Spotify diagnosis and specific Wear outcomes",
+      "measure repeated player reads across widgets"
+    ]
+  },
+  "physical_host_tested": false,
+  "physical_player_tested": false,
+  "physical_wear_tested": false,
+  "performance_benchmark": false,
+  "transport_changes": false,
+  "progress_interval_seconds": 5,
+  "requested_permissions": 0,
+  "previews": "native Android/Skia settings with invalid draft and correction; not physical Samsung screenshots"
+}

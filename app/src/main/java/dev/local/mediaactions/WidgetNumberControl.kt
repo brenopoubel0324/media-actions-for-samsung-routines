@@ -96,8 +96,10 @@ class WidgetNumberControl(
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
                 override fun afterTextChanged(s: Editable?) {
                     if (synchronizing) return
-                    if (!validate()) return
-                    value = s.toString().toInt()
+                    val parsed = s.toString().toIntOrNull()?.takeIf { it in minimum..maximum }
+                    validate()
+                    if (parsed == null) return
+                    value = parsed
                     slider.progress = value - minimum
                     updateButtons()
                     changed(value)

@@ -7,6 +7,8 @@ A tela inicial reúne Conexão, Seu widget e Testar controles. Ajuda/diagnóstic
 - **Editar widget instalado:** mantém a seleção por instância, incluindo escolha quando há vários. O host externo continua abrindo diretamente a Activity de configuração validada.
 - **Visual padrão:** nova tela privada para novos widgets e os que não têm ajuste individual. Salvar o padrão não sobrescreve instâncias com configuração própria.
 
+Atualização 0.18: texto/cursor dos campos, inclusive valores inválidos, são preservados em recriação sem salvar nas preferências. Salvar somente o local não sobrescreve o visual se outro editor tiver mudado o padrão/override durante a edição. [Review geral](reviews/app-audit-0.18.md).
+
 ## Editor
 
 Prévia fixa no topo, com estados Tocando, Pausado e Sem sessão. Esses controles são demonstrações; não enviam comandos de mídia. Medidas mostra os valores efetivos e limitações do tamanho sem ocupar espaço o tempo todo. A prévia recolhe em janela curta/com teclado, mantendo Salvar acessível.

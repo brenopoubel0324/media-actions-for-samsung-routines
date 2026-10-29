@@ -23,6 +23,7 @@ class MainActivity : Activity() {
     private lateinit var help: SettingsSection
     private lateinit var diagnostics: Button
     private lateinit var result: TextView
+    private var latestInvocation = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,11 +119,14 @@ class MainActivity : Activity() {
     }
 
     private fun execute(action: MediaAction) {
+        val invocation = ++latestInvocation
         result.setText(R.string.action_pending)
         dispatcher.execute(action) { outcome ->
             MediaWidgetProvider.refreshAll(applicationContext)
             if (isDestroyed) return@execute
             Log.i(ActionActivity.LOG_TAG, "${action.name}: ${outcome.javaClass.simpleName}")
+            refreshStatus()
+            if (invocation != latestInvocation) return@execute
             result.text = when (outcome) {
                 is ActionResult.CommandSent -> getString(R.string.sent, outcome.packageName)
                 ActionResult.MissingNotificationAccess -> getString(R.string.missing_access)
@@ -131,7 +135,6 @@ class MainActivity : Activity() {
                 ActionResult.UnsupportedAction -> getString(R.string.unsupported)
                 ActionResult.Failure -> getString(R.string.failure)
             }
-            refreshStatus()
         }
         refreshStatus()
     }
