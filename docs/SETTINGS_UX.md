@@ -1,5 +1,7 @@
 # Configurações organizadas — 0.16 experimental
 
+Atualização 0.17: o editor de uma instância inclui **Local deste widget**, além dos quatro grupos de aparência abaixo. A lista de widgets e o editor mostram número/dimensões e identificação automática ou manual de local. [Identificação e limites do LockStar](WIDGET_LOCATIONS.md).
+
 A tela inicial reúne Conexão, Seu widget e Testar controles. Ajuda/diagnóstico ficam recolhidos. O editor completo não fica mais misturado aos testes de mídia.
 
 - **Editar widget instalado:** mantém a seleção por instância, incluindo escolha quando há vários. O host externo continua abrindo diretamente a Activity de configuração validada.

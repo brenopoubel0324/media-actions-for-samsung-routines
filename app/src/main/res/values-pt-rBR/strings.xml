@@ -157,4 +157,15 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
   <string name="widget_description">Controles de mídia transparentes e redimensionáveis, com ajuste de ícones e espaçamento.</string>
   <string name="widget_integer_value">%1$d</string>
   <string name="widget_size_value">%1$d × %2$d dp</string>
+    <string name="widget_location_title">Local deste widget</string>
+    <string name="widget_identity_lines">%1$s\n%2$s</string>
+    <string name="widget_location_choice">Identificar este widget como</string>
+    <string name="widget_location_automatic">Detectar automaticamente</string>
+    <string name="widget_location_lock_screen">Tela de bloqueio</string>
+    <string name="widget_location_home_screen">Tela inicial</string>
+    <string name="widget_location_other">Outro local</string>
+    <string name="widget_location_manual">%1$s · definido por você</string>
+    <string name="widget_location_reported">%1$s · informado pelo sistema</string>
+    <string name="widget_location_unknown">Local não informado</string>
+    <string name="widget_location_help">O launcher ou LockStar pode omitir ou informar o local incorretamente. Selecione aqui para reconhecer esta instância. Essa identificação não move o widget nem muda o visual. Salve para manter; cancele para descartar.</string>
 </resources>

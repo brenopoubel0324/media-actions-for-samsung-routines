@@ -154,4 +154,15 @@
     <string name="settings_control_next">Next</string>
     <string name="settings_icon_color">Icon color</string>
     <string name="settings_save">Save changes</string>
+    <string name="widget_location_title">Widget location</string>
+    <string name="widget_identity_lines">%1$s\n%2$s</string>
+    <string name="widget_location_choice">Identify this widget as</string>
+    <string name="widget_location_automatic">Detect automatically</string>
+    <string name="widget_location_lock_screen">Lock screen</string>
+    <string name="widget_location_home_screen">Home screen</string>
+    <string name="widget_location_other">Other location</string>
+    <string name="widget_location_manual">%1$s · set by you</string>
+    <string name="widget_location_reported">%1$s · reported by system</string>
+    <string name="widget_location_unknown">Location not reported</string>
+    <string name="widget_location_help">The launcher or LockStar may omit or misreport its location. Select it here to recognize this instance. This label does not move the widget or change its appearance. Save to keep it; cancel to discard.</string>
 </resources>

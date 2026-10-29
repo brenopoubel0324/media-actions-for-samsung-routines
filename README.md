@@ -1,8 +1,12 @@
-# Media Actions for Routines — 0.16 experimental
+# Media Actions for Routines — 0.17 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.16](downloads/v0.16-experimental/media-actions-phone-0.16-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções 0.16](downloads/v0.16-experimental/README.md).
+**APKs:** [Celular 0.17](downloads/v0.17-experimental/media-actions-phone-0.17-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções 0.17](downloads/v0.17-experimental/README.md).
+
+Novidade 0.17: cada widget mostra seu **local, número e dimensões** na seleção para edição. Use a indicação do sistema ou marque **Tela de bloqueio / Tela inicial / Outro local** em **Local deste widget**. A identificação manual é individual e não muda o visual nem interrompe a herança do padrão. [Funcionamento e limites](docs/WIDGET_LOCATIONS.md).
+
+![Identificação dos widgets por local](downloads/v0.17-experimental/widgets-por-local.png)
 
 Novidade 0.16: configurações separadas em grupos, tela própria de edição com prévia fixa, modo claro/escuro e português brasileiro. A chave **Mostrar progresso da faixa** pode ser ligada/desligada independentemente das bordas. [Navegação e escopo de salvamento](docs/SETTINGS_UX.md).
 
@@ -86,4 +90,4 @@ JDK 21 para executar Gradle; bytecode Java/Kotlin 17. AGP 8.13.2, Kotlin 2.2.21,
 
 Os APKs debug fornecidos usam o mesmo certificado dos APKs anteriores para preservar atualização. Não há chave privada no repositório; para distribuição futura, manter sua chave fora do projeto e preservar a identidade das instalações. Celular e relógio precisam compartilhar applicationId/certificado para Data Layer.
 
-Resultados da versão: [self-audit UX 0.16](docs/reviews/settings-ux-0.16.md), [self-audit 0.15](docs/reviews/spotify-browser-0.15.md), [self-audit 0.14](docs/reviews/playing-only-0.14.md), [review pós-publicação](docs/reviews/post-release-0.12-audit.md), [self-audit 0.12](docs/reviews/progress-ring-0.12.md), [self-audit 0.11](docs/reviews/spotify-fallback-0.11.md), [self-audit do widget 0.10](docs/reviews/independent-borders-0.10.md), [revisão Wear](docs/reviews/wear-button-remapper-implementation.md), [plano Wear](docs/planos/wear-os-galaxy-watch-8.md), [relatório de testes](TEST_REPORT.md), [créditos de ícones](THIRD_PARTY_NOTICES.md). Nenhum teste de host substitui as verificações físicas pendentes.
+Resultados da versão: [self-audit 0.17](docs/reviews/widget-locations-0.17.md), [self-audit UX 0.16](docs/reviews/settings-ux-0.16.md), [self-audit 0.15](docs/reviews/spotify-browser-0.15.md), [self-audit 0.14](docs/reviews/playing-only-0.14.md), [review pós-publicação](docs/reviews/post-release-0.12-audit.md), [self-audit 0.12](docs/reviews/progress-ring-0.12.md), [self-audit 0.11](docs/reviews/spotify-fallback-0.11.md), [self-audit do widget 0.10](docs/reviews/independent-borders-0.10.md), [revisão Wear](docs/reviews/wear-button-remapper-implementation.md), [plano Wear](docs/planos/wear-os-galaxy-watch-8.md), [relatório de testes](TEST_REPORT.md), [créditos de ícones](THIRD_PARTY_NOTICES.md). Nenhum teste de host substitui as verificações físicas pendentes.

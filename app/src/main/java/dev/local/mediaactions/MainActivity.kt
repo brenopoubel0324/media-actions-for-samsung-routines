@@ -161,10 +161,7 @@ class MainActivity : Activity() {
             1 -> edit(ids.single())
             else -> {
                 val labels = ids.map { id ->
-                    val size = WidgetRenderer.reportedSizes(manager.getAppWidgetOptions(id)).firstOrNull()
-                    getString(R.string.widget_existing_item, id, if (size == null)
-                        getString(R.string.widget_size_unknown) else getString(R.string.widget_size_value,
-                        size.width.toInt(), size.height.toInt()))
+                    getString(R.string.widget_identity_lines, WidgetLocationStore.description(this, id), WidgetLocationStore.instanceLabel(this, id))
                 }.toTypedArray()
                 AlertDialog.Builder(this).setTitle(R.string.widget_choose_existing)
                     .setItems(labels) { _, index -> edit(ids[index]) }

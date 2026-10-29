@@ -42,8 +42,11 @@ open class WidgetConfigureActivity : Activity() {
             setPadding(0, 0, 0, dp(8))
         }
         root.addView(title)
+        fun statusText(message: Int): String = if (editsDefaults) getString(message) else
+            getString(R.string.widget_identity_lines, WidgetLocationStore.instanceLabel(this, widgetId), getString(message))
         val status = TextView(this).apply {
-            setText(if (editsDefaults) R.string.settings_defaults_help else R.string.settings_widget_scope)
+            text = statusText(if (editsDefaults) R.string.settings_defaults_help else R.string.settings_widget_scope)
+            id = R.id.widget_configuration_identity
             setTextColor(getColor(R.color.settings_secondary))
             textSize = 14f
             setPadding(0, 0, 0, dp(8))
@@ -70,7 +73,7 @@ open class WidgetConfigureActivity : Activity() {
             id = R.id.widget_configuration_cancel
         }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = dp(10) })
         actions.addView(SettingsUi.button(this, getString(R.string.settings_save), true) {
-            if (!editor.applyChanges()) status.setText(if (editsDefaults || MediaWidgetProvider.isOwnWidget(this, widgetId))
+            if (!editor.applyChanges()) status.text = statusText(if (editsDefaults || MediaWidgetProvider.isOwnWidget(this, widgetId))
                 R.string.widget_invalid_values else R.string.widget_configuration_missing)
         }.apply { id = R.id.widget_configuration_save }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
         root.addView(actions)

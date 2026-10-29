@@ -1,0 +1,51 @@
+{
+  "version": "0.17-experimental",
+  "phone_version_code": 17,
+  "application_id": "dev.local.mediaactions",
+  "wear_companion": "0.8-experimental unchanged",
+  "apk": {
+    "filename": "media-actions-phone-0.17-experimental-debug.apk",
+    "bytes": 5513969,
+    "sha256": "754a2d57d8cc7a41b0322712d6d1cff176397fc00a91d518bd1f42175c7bf467",
+    "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+  },
+  "tests": {
+    "app": {
+      "tests": 342,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 373,
+  "lint": "No issues found in all modules",
+  "widget_locations": [
+    "host category hint with explicit system attribution; missing or invalid category remains unknown",
+    "manual per-instance lock screen, home screen or other label with user attribution",
+    "chooser location, widget number and reported dimensions",
+    "save/cancel and recreation; invalid or removed instance does not save",
+    "location-only save preserves default inheritance and existing overrides",
+    "deletion clears only the removed label; defaults do not label instances",
+    "instance number and dimensions remain visible after validation error"
+  ],
+  "physical_host_tested": false,
+  "physical_player_tested": false,
+  "performance_benchmark": false,
+  "transport_changes": false,
+  "progress_interval_seconds": 5,
+  "requested_permissions": 0,
+  "review": "APROVADO, 3 rounds; no open findings",
+  "previews": "native Android/Skia controls; simulated host category and dimensions; not physical Samsung screenshots"
+}

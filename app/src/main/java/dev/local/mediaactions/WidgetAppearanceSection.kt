@@ -28,14 +28,23 @@ class WidgetAppearanceSection(
     private var expanded = 0
     private var previewState = if (draft.progressRing) WidgetPlaybackState.PLAYING else WidgetPlaybackState.PAUSED
     private var previewStates: RadioGroup? = null
+    private var location = widgetId?.let { WidgetLocationStore.load(context, it) } ?: WidgetLocation.AUTOMATIC
+    private var locationChoice: Spinner? = null
     fun currentAppearance() = draft.normalized()
     fun openSection(id: Int) {
         expanded = if (sections.containsKey(id)) id else 0
         sections.forEach { (key, section) -> section.setExpanded(key == expanded) }
     }
-    fun saveUiState(out: Bundle) { out.putInt("settings_section", expanded); out.putString("preview_state", previewState.name) }
+    fun saveUiState(out: Bundle) {
+        out.putInt("settings_section", expanded); out.putString("preview_state", previewState.name)
+        out.putString("widget_location_draft", location.name)
+    }
     fun restoreUiState(state: Bundle?) {
         openSection(state?.getInt("settings_section") ?: 0)
+        WidgetLocation.entries.firstOrNull { it.name == state?.getString("widget_location_draft") }?.let {
+            location = it; locationChoice?.setSelection(it.ordinal)
+            if (widgetId != null) sections[R.id.settings_location]?.summary(WidgetLocationStore.description(context, widgetId, it))
+        }
         val restored = WidgetPlaybackState.entries.firstOrNull { it.name == state?.getString("preview_state") } ?: return
         previewStates?.check(when (restored) {
             WidgetPlaybackState.PLAYING -> R.id.widget_preview_playing
@@ -63,7 +72,11 @@ class WidgetAppearanceSection(
         if (widgetId != null && !MediaWidgetProvider.isOwnWidget(context, widgetId)) {
             confirmation?.setText(R.string.widget_configuration_missing); return false
         }
-        WidgetStyleStore.save(context, draft, widgetId)
+        // Labelling an inherited instance must not freeze its current default appearance.
+        if (widgetId == null || draft.normalized() != WidgetStyleStore.load(context, widgetId)) {
+            WidgetStyleStore.save(context, draft, widgetId)
+        }
+        if (widgetId != null) WidgetLocationStore.save(context, widgetId, location)
         if (widgetId == null) MediaWidgetProvider.refreshAll(context) else MediaWidgetProvider.refreshWidget(context, widgetId)
         WidgetPlaybackObserver.settingsChanged(context)
         confirmation?.setText(R.string.widget_style_applied); onApplied?.invoke(); return true
@@ -152,6 +165,26 @@ class WidgetAppearanceSection(
             sections[id] = group
             body.addView(group.root, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(10) })
             return group.content
+        }
+        if (widgetId != null) {
+            val identity = section(R.id.settings_location, R.string.widget_location_title, R.string.widget_location_automatic)
+            sections[R.id.settings_location]?.summary(WidgetLocationStore.description(context, widgetId, location))
+            label(identity, R.string.widget_location_choice).labelFor = R.id.widget_location_choice
+            locationChoice = Spinner(context).apply {
+                id = R.id.widget_location_choice; minimumHeight = dp(48)
+                contentDescription = context.getString(R.string.widget_location_choice)
+                adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, WidgetLocation.entries.map { context.getString(it.label) })
+                    .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+                setSelection(location.ordinal)
+                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        location = WidgetLocation.entries[position]
+                        sections[R.id.settings_location]?.summary(WidgetLocationStore.description(context, widgetId, location))
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+                }
+            }.also { identity.addView(it) }
+            label(identity, R.string.widget_location_help, 13f)
         }
         val icons = section(R.id.settings_icons, R.string.settings_icons, R.string.settings_icons_summary)
         label(icons, R.string.widget_icon_style)

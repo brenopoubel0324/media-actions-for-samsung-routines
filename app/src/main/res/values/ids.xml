@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item type="id" name="settings_location" />
+    <item type="id" name="widget_location_choice" />
+    <item type="id" name="widget_configuration_identity" />
     <item type="id" name="widget_configuration_save" />
     <item type="id" name="widget_configuration_cancel" />
     <item type="id" name="widget_configuration_scroll" />

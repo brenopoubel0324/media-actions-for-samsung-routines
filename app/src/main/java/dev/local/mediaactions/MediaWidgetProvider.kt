@@ -57,6 +57,7 @@ class MediaWidgetProvider : AppWidgetProvider() {
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         for (id in appWidgetIds) {
             WidgetStyleStore.remove(context, id)
+            WidgetLocationStore.remove(context, id)
             for (action in MediaAction.entries) {
                 PendingIntent.getBroadcast(context, id, commandIntent(context, id, action),
                     PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)?.cancel()
