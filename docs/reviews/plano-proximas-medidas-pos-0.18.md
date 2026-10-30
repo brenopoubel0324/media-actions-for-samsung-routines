@@ -1,4 +1,6 @@
-# Review do plano de próximas medidas após a 0.18
+# Histórico de reviews do plano de próximas medidas após a 0.18
+
+A [revisão atual](revisao-plano-energia-pos-0.18.md) audita a versão com prioridade energética e substitui os vereditos históricos abaixo para a execução futura.
 
 Skill utilizada: breno-review-audit:execution-plan-review. Plano: [proximas-medidas-pos-review-0.18.md](../planos/proximas-medidas-pos-review-0.18.md). Base de código: `dd2a0367a29790a337dab42cf4fc9bd043feef84`, phone 0.18/Wear 0.8. Revisão do plano contra o código e contratos atuais; não é uma validação física das integrações.
 

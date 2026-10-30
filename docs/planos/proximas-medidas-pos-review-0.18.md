@@ -60,6 +60,20 @@ Separar os testes de relógio simulado, que verificam lógica/contagens, da medi
 
 Na comparação física, manter aparelho, player, áudio, rota Bluetooth/alto-falante, rede, brilho, tela, duração, quantidade de widgets e estado de carregamento/temperatura comparáveis. Repetir cada comparação pelo menos três vezes, alternando a ordem das configurações. Registrar ferramenta, unidade, duração e variação entre repetições; ampliar a coleta ou marcar INCONCLUSIVO se a resolução/variação não permitir distinguir os resultados.
 
+### Comparação equivalente e rastreabilidade
+
+Para cada execução, registrar commit/patch, SHA-256 do APK, variante (debug/release), instrumentação/flags ativas, ferramenta/configuração de coleta, cenário e duração. A coleta precisa ter custo comparável nos grupos; se instrumentar a base, identificar esse artefato separadamente do APK histórico 0.18 e usar o mesmo mecanismo no candidato. Registrar resultados em `docs/medicoes/energia-progresso-<versao>.md` quando a etapa for executada, sem preencher dados físicos por simulação.
+
+| Controle | Comparação | O que permite verificar |
+| --- | --- | --- |
+| Repouso equivalente | Base com indicador desligado × candidato desligado | Custo novo fora do progresso |
+| Mesma cadência | Base em 5 s × candidato em 5 s, com a mesma configuração | Regressão introduzida pela mudança de código |
+| Cadência no candidato | 5 × 15 × 30 s no mesmo build e com coleta equivalente | Efeito de mudar o intervalo, separado da mudança de versão |
+
+Contadores mínimos de teste/debug: `periodic_ticks`, `event_refreshes`, `session_reads`, `progress_reads`, `widget_updates` e `bitmap_builds`, distinguindo widgets com/sem indicador sem dados de mídia. No observer, `forceRefresh=true` é usado por eventos e por ticks: classificar a origem no ponto de entrada, sem inferir que todo refresh forçado foi periódico.
+
+Reduzir a cadência não pode mascarar regressão no controle equivalente de 5 s ou desligado. Se a comparação mostrar aumento reproduzível além da variação, corrigir a entrega afetada antes de publicá-la. Sem medição física, publicar somente o que passar nos critérios lógicos/técnicos independentes, mantendo energia como NÃO MEDIDO. Resultado inconclusivo não passa a ser positivo por haver menos ticks.
+
 Incluir reprodução com widget visível, outro app em primeiro plano, pausa, tela apagada/AOD, ausência de duração e indicador desligado. Não atribuir aos nossos controles a energia do player, da tela ou do transporte de áudio. Sem isolamento suficiente, relatar apenas as métricas observadas, sem percentual de economia de bateria.
 
 **Aceite:** contagens e condições de elegibilidade documentadas; protocolo reproduzível; resultados por cenário como MEDIDO, NÃO MEDIDO ou INCONCLUSIVO. A medição física permanece pendente enquanto não houver aparelho e dados suficientes. Criar regressões para o orçamento de ticks antes de alterar o agendamento; comparar novamente após as etapas 2 e 3.
@@ -82,15 +96,25 @@ Cadência nominal enquanto elegível: 5/15/30 s correspondem a aproximadamente 1
 
 **Aceite:** 5/15/30 s produzem a cadência escolhida no relógio simulado; trocar durante reprodução deixa um único tick; pausa/tela apagada/AOD/opção desligada/duração perdida interrompem ticks; retorno das condições reativa o agendamento; atualizações só de progresso não redesenham widgets simples. Cancelar ou recriar a tela não altera o intervalo gravado; recriar preserva a seleção ainda não salva. Salvar aparência ou local não reseta o intervalo global. Não adicionar wake lock, alarme ou serviço permanente.
 
+Testar também persistência do intervalo após recriação do processo, ausência/tipo/valor inválido na preferência com fallback seguro para 5 s, fechamento/reinício do observer e reconexão do listener. Nenhum runnable do observer antigo pode reagendar trabalho após close; callbacks de estado continuam imediatos e contados como eventos.
+
 **Arquivos principais:** novo store global pequeno, `WidgetPlaybackObserver.kt`, `MainActivity.kt`, strings e testes em `WidgetProgressObserverTest`/`WidgetProgressReviewTest`; preservar `MediaWidgetProvider.refreshAll(progressOnly)`.
 
 ## Etapa 3 — reduzir trabalho repetido com evidência
 
-Se consultas repetidas tiverem custo relevante, compartilhar um snapshot efêmero e coerente de sessão/estado/posição dentro de uma chamada de `MediaWidgetProvider.refreshAll`, com leitura de progresso só quando necessária. Ler posição e estado do mesmo player. Não persistir cache, reaproveitar snapshot entre comandos nem deixar o despacho de mídia depender desse cache.
+Se a etapa 1 demonstrar consultas redundantes, compartilhar um snapshot efêmero e coerente de sessão/estado/posição dentro de um lote. O alvo inicial é o caminho periódico de `MediaWidgetProvider.refreshAll`; mapear também `onUpdate`, `refreshWidget` e `onAppWidgetOptionsChanged`, que chamam o renderer. `WidgetRenderer.render` e `WidgetTrackProgress.read` fazem parte da alteração potencial, não apenas o loop do provider.
 
-**Aceite:** comparar com a linha de base da etapa 1 e demonstrar redução de consultas/custo no cenário medido, mantendo imagens/estados, atualização de widgets simples apenas quando necessária e limites dos bitmaps. Troca de sessão e revogação de acesso não podem usar dados antigos em ações. Se não houver ganho relevante, documentar a medição e manter a implementação atual.
+**Precedência do estado explícito:** `MediaNotificationListener.stopPlayback` chama `refreshAll(..., UNKNOWN)` após desconectar. Esse UNKNOWN deve prevalecer mesmo com acesso ainda concedido e uma sessão PLAYING consultável. A atualização deve ocultar progresso/bordas decorativas dos botões e não consultar progresso nem recalcular PLAYING para substituir a solicitação. Manter a mesma semântica de acesso revogado/indisponível.
 
-Reexecutar as contagens e comparações energéticas após a mudança, incluindo widgets simples e o Wear em repouso. Diminuição de consultas pode ser comprovada por teste; afirmar redução de consumo energético exige a medição física correspondente. Ganho dentro da variação da coleta permanece INCONCLUSIVO. Sem benefício demonstrado, manter a implementação atual e registrar a evidência.
+O snapshot é somente do lote: identificar a sessão selecionada uma vez quando necessário e ler estado/posição dessa mesma sessão. Não buscar novamente outro player dentro do renderer. Distinguir snapshot não fornecido de progresso consultado mas indisponível: receber progresso nulo explicitamente não pode disparar uma leitura de fallback por widget. Ao alterar assinaturas, atualizar todos os callers do observer, listener, provider e refresh por UI/ação. A prévia do editor continua usando demonstração e sem comandos/consultas reais de mídia.
+
+**Orçamento verificável por lote:** zero seleção quando não houver IDs elegíveis ou quando a atualização for UNKNOWN explícito; nos demais casos, até uma seleção compartilhada. Consultar progresso até uma vez, somente se houver indicador ativo e estado PLAYING elegível; sem necessidade de progresso, zero leitura de posição/duração. Para 1/3/6 widgets mistos, a passagem pelo renderer não pode multiplicar consultas de mídia. Leituras adicionais do observer para elegibilidade devem aparecer separadamente na medição do ciclo completo, sem anunciar que o lote representa todo o custo.
+
+Compartilhar dados de mídia não significa compartilhar arte entre estilos diferentes. Preservar as cores, tamanhos, sombras, bordas e bitmaps limitados de cada instância e a reutilização já existente entre tamanhos responsivos. Não persistir cache, reaproveitar snapshot entre comandos nem deixar o despacho de mídia depender desse cache.
+
+**Aceite:** comparar as contagens com a linha de base e cumprir o orçamento, mantendo imagens/estados, widgets simples sem redraw periódico e limites de bitmap. Acrescentar testes de UNKNOWN explícito com sessão ainda PLAYING/acesso concedido, revogação de acesso, troca de sessão durante a coleta, progresso indisponível, lote sem indicadores e lote vazio. Estado de um player nunca deve ser combinado com posição de outro. Preservar `listenerReconnectDoesNotAccumulateObserversAndDisconnectMarksUnknown` e as regressões de leitura/estado existentes.
+
+Reexecutar as contagens e comparações energéticas após a mudança, incluindo o ciclo completo de observer/provider e o Wear em repouso. Menos consultas comprova somente esse ganho técnico; consumo exige medição física equivalente. Sem redução mensurável do trabalho ou com regressão funcional/medida reproduzível, manter a implementação atual e registrar a evidência. Energia dentro da variação da coleta permanece INCONCLUSIVO.
 
 ## Etapa 4 — diagnóstico útil antes de mudar a integração
 
@@ -134,11 +158,21 @@ No editor de um widget instalado, oferecer **Usar visual padrão** e indicar se 
 
 A ação prepara a mudança no rascunho e atualiza a prévia; nada é persistido até **Salvar alterações**. Cancelar preserva o override anterior. Ao salvar a herança, validar novamente que o widget pertence ao provedor e usar `WidgetStyleStore.remove(context, id)` somente para a aparência da instância. Não remover `WidgetLocationStore`, padrões globais ou preferências de outros widgets.
 
-Guardar uma intenção temporária de herança separada do modelo `WidgetAppearance`, preservada em recriação. Ao seguir o padrão, textos inválidos do visual customizado descartado não bloqueiam Salvar. Editar novamente uma opção visual cancela a intenção de herança e cria um rascunho próprio a partir do padrão. Não adicionar o comando de restaurar instância à tela global de Visual padrão.
+Guardar o modo original **HERDADO/PRÓPRIO** a partir de `has_override`, além do original/rascunho já existente. Não deduzir modo por igualdade de valores: um visual próprio pode ser igual ao padrão atual. Acrescentar uma consulta do modo no store, sem renomear chaves nem migrar automaticamente overrides existentes.
 
-Se o padrão mudar durante a edição, o Save em modo de herança deve continuar usando o padrão atual, sem gravar um snapshot antigo como override. Ao retomar o editor, atualizar a prévia herdada. Preservar a comparação original/rascunho da 0.18 para edição customizada e edição somente de local.
+A intenção temporária do editor será **MANTER**, **HERDAR** ou **PERSONALIZAR**, separada de `WidgetAppearance` e preservada junto ao modo/original/rascunho na recriação:
 
-**Aceite:** após restaurar/salvar, mudar o padrão altera essa instância; outros widgets customizados permanecem iguais; local manual permanece; Cancelar/recriar não apagam preferências; widget removido não é salvo; editar um campo após restaurar volta ao modo customizado. Testar também mudança externa de padrão/override e rascunho inválido anterior à restauração.
+| Intenção | Ao salvar |
+| --- | --- |
+| MANTER, ao abrir o editor | Conservar a regra da 0.18: sem diferença visual líquida, não regravar aparência nem forçar o modo original sobre mudanças externas; com edição visual efetiva, salvar o visual próprio |
+| HERDAR, após Usar visual padrão | Remover somente o override desta instância e usar o padrão vigente no momento de salvar |
+| PERSONALIZAR, ao editar visual após escolher herança | Salvar override explícito, mesmo se os valores coincidirem com o padrão ou com o original; não confundir a escolha de modo com diferença numérica |
+
+Ao seguir o padrão, descartar o texto inválido do visual customizado para esse rascunho; ele não deve bloquear Salvar. Editar novamente uma opção visual cancela a intenção de herança e parte do padrão atual, sem restaurar campos antigos descartados. Montagem/restauração programática dos controles e atualização da prévia não expressam intenção do usuário. Cancelar preserva os dados persistidos anteriores à edição. O comando de restaurar instância não aparece no editor global de Visual padrão.
+
+Se o padrão mudar durante a edição, HERDAR deve continuar usando o padrão atual, sem gravar um snapshot antigo como override. Ao retomar o editor, atualizar a prévia herdada. Após aplicar num editor reutilizável, atualizar os originais de valor e modo. Preservar a proteção de concorrência da 0.18 para edição somente de local e para edição visual revertida no fluxo normal.
+
+**Aceite:** restaurar/salvar faz a instância acompanhar mudanças futuras do padrão; outros widgets customizados e o local manual permanecem iguais. Testar override igual ao padrão, restore → editar → voltar aos mesmos valores, modo após recriação, callbacks de montagem sem personalização implícita, mudança externa de padrão/override, rascunho inválido descartado, Cancelar e ID removido. Verificar o modo persistido, não apenas a aparência renderizada. Edição normal revertida e edição somente de local mantêm a semântica da 0.18.
 
 **Arquivos principais:** `WidgetAppearanceSection.kt`, `WidgetConfigureActivity.kt`, `WidgetAppearanceState.kt` se necessário ao estado temporário e `WidgetStyleStore` em `WidgetAppearance.kt`; regressões `WidgetLocationTest`, `WidgetConfigurationTest` e `AppAuditRegressionTest`.
 
@@ -160,4 +194,4 @@ Reversão: descartar mudanças não salvas com Cancelar; manter opção de desli
 
 Fora de escopo: ajuste automático de frequência sem evidência de visibilidade, monitoramento energético permanente, novas famílias de ícones, redesign adicional amplo, SDK/login Spotify, fallback Wear para iniciar Spotify sem ofertas de sessão, captura global de teclas e alteração das políticas Samsung. Esses itens exigem plano próprio se forem solicitados.
 
-[Review deste plano](../reviews/plano-proximas-medidas-pos-0.18.md) · [Review que originou as prioridades](../reviews/app-audit-0.18.md)
+[Review atual deste plano](../reviews/revisao-plano-energia-pos-0.18.md) · [Histórico de revisões](../reviews/plano-proximas-medidas-pos-0.18.md) · [Review que originou as prioridades](../reviews/app-audit-0.18.md)
