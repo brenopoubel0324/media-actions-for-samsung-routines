@@ -18,6 +18,13 @@ class WidgetAppearanceSection(
     private val onApplied: (() -> Unit)? = null,
 ) {
     private var originalAppearance = WidgetStyleStore.load(context, widgetId)
+    private enum class AppearanceIntent { KEEP, INHERIT, CUSTOM }
+    private var originalHasOverride = widgetId?.let { WidgetStyleStore.hasOverride(context, it) } ?: false
+    private var appearanceIntent = AppearanceIntent.KEEP
+    private var restoring = false
+    private var generation = 0
+    private var rebuild: (() -> Unit)? = null
+    private var modeLabel: TextView? = null
     private var draft = (initialAppearance ?: originalAppearance).normalized()
     private var confirmation: TextView? = null
     private var scaleControl: WidgetNumberControl? = null
@@ -40,6 +47,8 @@ class WidgetAppearanceSection(
     fun saveUiState(out: Bundle) {
         out.putInt("settings_section", expanded); out.putString("preview_state", previewState.name)
         out.putString("widget_location_draft", location.name)
+        out.putBoolean("widget_original_override", originalHasOverride)
+        out.putString("widget_appearance_intent", appearanceIntent.name)
         out.putBundle("widget_original_appearance", WidgetAppearanceState.write(originalAppearance))
         out.putBundle("widget_text_draft", Bundle().apply {
             textFields.forEach { (key, field) -> putBundle(key, Bundle().apply {
@@ -49,25 +58,55 @@ class WidgetAppearanceSection(
         })
     }
     fun restoreUiState(state: Bundle?) {
-        openSection(state?.getInt("settings_section") ?: 0)
-        originalAppearance = WidgetAppearanceState.read(state?.getBundle("widget_original_appearance")) ?: originalAppearance
-        state?.getBundle("widget_text_draft")?.let { saved -> textFields.forEach { (key, field) ->
-            saved.getBundle(key)?.let { raw -> raw.getString("text")?.let { text ->
-                field.setText(text)
-                field.setSelection(raw.getInt("start", field.length()).coerceIn(0, field.length()),
-                    raw.getInt("end", field.length()).coerceIn(0, field.length()))
+        restoring = true
+        try {
+            openSection(state?.getInt("settings_section") ?: 0)
+            originalAppearance = WidgetAppearanceState.read(state?.getBundle("widget_original_appearance")) ?: originalAppearance
+            originalHasOverride = state?.getBoolean("widget_original_override", originalHasOverride) ?: originalHasOverride
+            appearanceIntent = AppearanceIntent.entries.firstOrNull { it.name == state?.getString("widget_appearance_intent") } ?: AppearanceIntent.KEEP
+            if (appearanceIntent != AppearanceIntent.INHERIT) state?.getBundle("widget_text_draft")?.let { saved -> textFields.forEach { (key, field) ->
+                saved.getBundle(key)?.let { raw -> raw.getString("text")?.let { text ->
+                    field.setText(text)
+                    field.setSelection(raw.getInt("start", field.length()).coerceIn(0, field.length()),
+                        raw.getInt("end", field.length()).coerceIn(0, field.length()))
+                } }
             } }
-        } }
-        WidgetLocation.entries.firstOrNull { it.name == state?.getString("widget_location_draft") }?.let {
-            location = it; locationChoice?.setSelection(it.ordinal)
-            if (widgetId != null) sections[R.id.settings_location]?.summary(WidgetLocationStore.description(context, widgetId, it))
+            WidgetLocation.entries.firstOrNull { it.name == state?.getString("widget_location_draft") }?.let {
+                location = it; locationChoice?.setSelection(it.ordinal)
+                if (widgetId != null) sections[R.id.settings_location]?.summary(WidgetLocationStore.description(context, widgetId, it))
+            }
+            WidgetPlaybackState.entries.firstOrNull { it.name == state?.getString("preview_state") }?.let { restored ->
+                previewStates?.check(when (restored) {
+                    WidgetPlaybackState.PLAYING -> R.id.widget_preview_playing
+                    WidgetPlaybackState.PAUSED -> R.id.widget_preview_paused
+                    else -> R.id.widget_preview_unknown
+                })
+            }
+        } finally { restoring = false }
+        if (appearanceIntent == AppearanceIntent.INHERIT) {
+            draft = WidgetStyleStore.load(context); rebuild?.invoke()
         }
-        val restored = WidgetPlaybackState.entries.firstOrNull { it.name == state?.getString("preview_state") } ?: return
-        previewStates?.check(when (restored) {
-            WidgetPlaybackState.PLAYING -> R.id.widget_preview_playing
-            WidgetPlaybackState.PAUSED -> R.id.widget_preview_paused
-            else -> R.id.widget_preview_unknown
-        })
+        updateModeLabel()
+    }
+    private fun updateModeLabel() {
+        val own = when (appearanceIntent) {
+            AppearanceIntent.KEEP -> originalHasOverride || draft.normalized() != originalAppearance
+            AppearanceIntent.INHERIT -> false
+            AppearanceIntent.CUSTOM -> true
+        }
+        modeLabel?.setText(if (own) R.string.widget_visual_own else R.string.widget_visual_inherited)
+    }
+    private fun changeAppearance(value: WidgetAppearance) {
+        if (value.normalized() == draft.normalized()) return
+        draft = value.normalized()
+        if (!restoring && widgetId != null && appearanceIntent == AppearanceIntent.INHERIT)
+            appearanceIntent = AppearanceIntent.CUSTOM
+        updateModeLabel()
+    }
+    fun refreshInheritedPreview() {
+        if (appearanceIntent != AppearanceIntent.INHERIT) return
+        val current = WidgetStyleStore.load(context)
+        if (current != draft) { draft = current; rebuild?.invoke() }
     }
     private fun invalid(sectionId: Int): Boolean {
         openSection(sectionId)
@@ -83,24 +122,50 @@ class WidgetAppearanceSection(
         return false
     }
     fun applyChanges(): Boolean {
-        if (scaleControl?.validate() == false) return invalid(R.id.settings_icons)
-        if (spacingControl?.validate() == false || paddingControls?.validate() == false) return invalid(R.id.settings_spacing)
-        if (borderControls?.validate() == false || buttonBorderControls?.validate() == false) return invalid(R.id.settings_borders)
+        if (appearanceIntent != AppearanceIntent.INHERIT) {
+            if (scaleControl?.validate() == false) return invalid(R.id.settings_icons)
+            if (spacingControl?.validate() == false || paddingControls?.validate() == false) return invalid(R.id.settings_spacing)
+            if (borderControls?.validate() == false || buttonBorderControls?.validate() == false) return invalid(R.id.settings_borders)
+        }
         if (widgetId != null && !MediaWidgetProvider.isOwnWidget(context, widgetId)) {
             confirmation?.setText(R.string.widget_configuration_missing); return false
         }
         // Labelling an inherited instance must not freeze its current default appearance.
-        if (widgetId == null || draft.normalized() != originalAppearance) {
-            WidgetStyleStore.save(context, draft, widgetId)
+        if (widgetId == null) WidgetStyleStore.save(context, draft)
+        else when (appearanceIntent) {
+            AppearanceIntent.INHERIT -> WidgetStyleStore.remove(context, widgetId)
+            AppearanceIntent.CUSTOM -> WidgetStyleStore.save(context, draft, widgetId)
+            AppearanceIntent.KEEP -> if (draft.normalized() != originalAppearance) WidgetStyleStore.save(context, draft, widgetId)
         }
         if (widgetId != null) WidgetLocationStore.save(context, widgetId, location)
         if (widgetId == null) MediaWidgetProvider.refreshAll(context) else MediaWidgetProvider.refreshWidget(context, widgetId)
         WidgetPlaybackObserver.settingsChanged(context)
-        originalAppearance = draft.normalized()
+        originalAppearance = WidgetStyleStore.load(context, widgetId)
+        draft = originalAppearance
+        originalHasOverride = widgetId?.let { WidgetStyleStore.hasOverride(context, it) } ?: false
+        appearanceIntent = AppearanceIntent.KEEP
+        rebuild?.invoke()
         confirmation?.setText(R.string.widget_style_applied); onApplied?.invoke(); return true
     }
 
     fun create(showApplyButton: Boolean = true, previewContainer: LinearLayout? = null): View {
+        val container = SettingsUi.column(context)
+        rebuild = {
+            val reopen = expanded
+            generation++
+            sections.clear(); textFields.clear()
+            previewContainer?.removeAllViews()
+            container.removeAllViews()
+            container.addView(createContent(showApplyButton, previewContainer))
+            openSection(reopen)
+        }
+        rebuild?.invoke()
+        return container
+    }
+
+    private fun createContent(showApplyButton: Boolean, previewContainer: LinearLayout?): View {
+        val epoch = generation
+        fun edit(value: WidgetAppearance) { if (epoch == generation) changeAppearance(value) }
         val body = SettingsUi.column(context)
         fun label(parent: LinearLayout, resource: Int, size: Float = 14f) = SettingsUi.label(context, parent, context.getString(resource), size)
         val previewGroup = previewContainer ?: SettingsUi.card(context, body)
@@ -124,7 +189,11 @@ class WidgetAppearanceSection(
             }, RadioGroup.LayoutParams(0, -2, 1f))
         }
         previewStates = states
-        states.check(if (previewState == WidgetPlaybackState.PLAYING) R.id.widget_preview_playing else R.id.widget_preview_paused)
+        states.check(when (previewState) {
+            WidgetPlaybackState.PLAYING -> R.id.widget_preview_playing
+            WidgetPlaybackState.PAUSED -> R.id.widget_preview_paused
+            else -> R.id.widget_preview_unknown
+        })
         previewGroup.addView(states)
         label(previewGroup, R.string.settings_preview_help, 12f)
         previewGroup.addView(details)
@@ -136,6 +205,7 @@ class WidgetAppearanceSection(
         } catch (_: RuntimeException) { emptyList() }
         var previewSize = hostSizes.firstOrNull()
         fun updatePreview() {
+            if (epoch != generation) return
             val available = if (preview.width > 0) min(360f, (preview.width / context.resources.displayMetrics.density - 16).coerceAtLeast(1f)) else 280f
             val size = previewSize ?: SizeF(available, 56f)
             preview.background = GradientDrawable(GradientDrawable.Orientation.TL_BR,
@@ -185,6 +255,17 @@ class WidgetAppearanceSection(
             return group.content
         }
         if (widgetId != null) {
+            val visualMode = SettingsUi.card(context, body)
+            modeLabel = label(visualMode, R.string.widget_visual_inherited, 15f).apply {
+                id = R.id.widget_visual_mode; accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+            }
+            updateModeLabel()
+            label(visualMode, R.string.widget_visual_default_help, 13f)
+            visualMode.addView(SettingsUi.button(context, context.getString(R.string.widget_use_default_visual)) {
+                draft = WidgetStyleStore.load(context)
+                appearanceIntent = AppearanceIntent.INHERIT
+                rebuild?.invoke()
+            }.apply { id = R.id.widget_use_default_visual }, LinearLayout.LayoutParams(-1, -2))
             val identity = section(R.id.settings_location, R.string.widget_location_title, R.string.widget_location_automatic)
             sections[R.id.settings_location]?.summary(WidgetLocationStore.description(context, widgetId, location))
             label(identity, R.string.widget_location_choice).labelFor = R.id.widget_location_choice
@@ -216,7 +297,7 @@ class WidgetAppearanceSection(
             setSelection(styles.indexOf(draft.iconStyle))
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    if (draft.iconStyle != styles[position]) { draft = draft.copy(iconStyle = styles[position]); updatePreview() }
+                    if (draft.iconStyle != styles[position]) { edit(draft.copy(iconStyle = styles[position])); updatePreview() }
                 }
                 override fun onNothingSelected(parent: AdapterView<*>?) = Unit
             }
@@ -226,51 +307,63 @@ class WidgetAppearanceSection(
         val light = RadioButton(context).apply { id = View.generateViewId(); setText(R.string.widget_icons_white) }
         val dark = RadioButton(context).apply { id = View.generateViewId(); setText(R.string.widget_icons_dark) }
         colors.addView(light); colors.addView(dark); colors.check(if (draft.darkIcons) dark.id else light.id)
-        colors.setOnCheckedChangeListener { _, id -> draft = draft.copy(darkIcons = id == dark.id); updatePreview() }
+        colors.setOnCheckedChangeListener { _, id -> edit(draft.copy(darkIcons = id == dark.id)); updatePreview() }
         icons.addView(colors)
         label(icons, R.string.widget_icon_size).labelFor = R.id.widget_scale_value
         scaleControl = WidgetNumberControl(context, context.getString(R.string.widget_icon_size), 20, 150, draft.iconScalePercent,
             R.id.widget_scale_value, R.id.widget_scale_slider, R.id.widget_scale_decrease, R.id.widget_scale_increase, "%") {
-            draft = draft.copy(iconScalePercent = it); updatePreview()
+            edit(draft.copy(iconScalePercent = it)); updatePreview()
         }.also { icons.addView(it) }
-        icons.addView(SettingsUi.toggle(context, R.string.widget_icon_shadow, draft.iconShadow, R.id.widget_icon_shadow) { draft = draft.copy(iconShadow = it); updatePreview() })
+        icons.addView(SettingsUi.toggle(context, R.string.widget_icon_shadow, draft.iconShadow, R.id.widget_icon_shadow) { edit(draft.copy(iconShadow = it)); updatePreview() })
         val spacing = section(R.id.settings_spacing, R.string.settings_spacing, R.string.settings_spacing_summary)
         val manualSpacing = SettingsUi.column(context).apply { visibility = if (draft.fillWidth) View.GONE else View.VISIBLE }
         spacing.addView(SettingsUi.toggle(context, R.string.widget_fill_width, draft.fillWidth, R.id.widget_fill_width) {
-            draft = draft.copy(fillWidth = it); spacingControl?.isEnabled = !it
+            edit(draft.copy(fillWidth = it)); spacingControl?.isEnabled = !it
             manualSpacing.visibility = if (it) View.GONE else View.VISIBLE; updatePreview()
         })
         spacing.addView(manualSpacing)
         label(manualSpacing, R.string.widget_button_spacing).labelFor = R.id.widget_spacing_value
         spacingControl = WidgetNumberControl(context, context.getString(R.string.widget_button_spacing), 0, WidgetAppearance.MAX_SPACING_DP,
             draft.spacingDp, R.id.widget_spacing_value, R.id.widget_spacing_slider, R.id.widget_spacing_decrease, R.id.widget_spacing_increase, "dp") {
-            draft = draft.copy(spacingDp = it); updatePreview()
+            edit(draft.copy(spacingDp = it)); updatePreview()
         }.also { manualSpacing.addView(it); it.isEnabled = !draft.fillWidth }
-        paddingControls = WidgetPaddingSection(context, draft) { h, v -> draft = draft.copy(widgetPaddingHorizontalDp = h, widgetPaddingVerticalDp = v); updatePreview() }
+        paddingControls = WidgetPaddingSection(context, draft) { h, v -> edit(draft.copy(widgetPaddingHorizontalDp = h, widgetPaddingVerticalDp = v)); updatePreview() }
             .also { spacing.addView(it.create()) }
         val borders = section(R.id.settings_borders, R.string.settings_borders, R.string.settings_borders_summary)
         val centerOnly = SettingsUi.toggle(context, R.string.widget_center_border_only, draft.centerBorderOnly, R.id.widget_center_border_only) {
-            draft = draft.copy(centerBorderOnly = it); updatePreview()
+            edit(draft.copy(centerBorderOnly = it)); updatePreview()
         }.apply { visibility = if (draft.buttonBorder) View.VISIBLE else View.GONE }
         buttonBorderControls = WidgetBorderSection(context, draft, WidgetBorderSection.Target.BUTTONS) { enabled, width, color ->
-            draft = draft.copy(buttonBorder = enabled, buttonBorderWidthDp = width, buttonBorderColor = color)
+            edit(draft.copy(buttonBorder = enabled, buttonBorderWidthDp = width, buttonBorderColor = color))
             centerOnly.visibility = if (enabled) View.VISIBLE else View.GONE; updatePreview()
         }.also { borders.addView(it.create(centerOnly)) }
-        borderControls = WidgetBorderSection(context, draft) { enabled, width, color -> draft = draft.copy(widgetBorder = enabled, borderWidthDp = width, borderColor = color); updatePreview() }
+        borderControls = WidgetBorderSection(context, draft) { enabled, width, color -> edit(draft.copy(widgetBorder = enabled, borderWidthDp = width, borderColor = color)); updatePreview() }
             .also { borders.addView(it.create()) }
         val playback = section(R.id.settings_playback, R.string.settings_playback, R.string.settings_playback_summary)
         playback.addView(SettingsUi.toggle(context, R.string.widget_progress_ring, draft.progressRing, R.id.widget_progress_ring) {
-            draft = draft.copy(progressRing = it)
+            edit(draft.copy(progressRing = it))
             if (it) states.check(R.id.widget_preview_playing)
             updatePreview()
         })
         label(playback, R.string.widget_progress_help, 13f)
-        playback.addView(SettingsUi.toggle(context, R.string.widget_touch_feedback, draft.touchFeedback, R.id.widget_touch_feedback) { draft = draft.copy(touchFeedback = it); updatePreview() })
+        playback.addView(SettingsUi.toggle(context, R.string.widget_touch_feedback, draft.touchFeedback, R.id.widget_touch_feedback) { edit(draft.copy(touchFeedback = it)); updatePreview() })
         confirmation = label(body, if (widgetId == null) R.string.widget_style_scope else R.string.widget_style_scope_single, 12f).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
         if (showApplyButton) body.addView(SettingsUi.button(context, context.getString(R.string.widget_apply_style), true) { applyChanges() }, LinearLayout.LayoutParams(-1, dp(52)))
         // Raw text is temporary Activity state; only validated numeric/color values reach preferences.
         fun collectFields(view: View) {
-            if (view is EditText && view.id != View.NO_ID) textFields[context.resources.getResourceEntryName(view.id)] = view
+            if (view is EditText && view.id != View.NO_ID) {
+                textFields[context.resources.getResourceEntryName(view.id)] = view
+                view.addTextChangedListener(object : android.text.TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+                    override fun afterTextChanged(s: android.text.Editable?) {
+                        if (epoch == generation && !restoring && appearanceIntent == AppearanceIntent.INHERIT) {
+                            appearanceIntent = AppearanceIntent.CUSTOM
+                            updateModeLabel()
+                        }
+                    }
+                })
+            }
             if (view is ViewGroup) for (index in 0 until view.childCount) collectFields(view.getChildAt(index))
         }
         collectFields(body)

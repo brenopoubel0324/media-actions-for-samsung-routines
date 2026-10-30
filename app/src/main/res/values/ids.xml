@@ -65,4 +65,6 @@
     <item type="id" name="control_next" />
     <item type="id" name="spotify_diagnostics" />
     <item type="id" name="diagnostic_copy" />
+    <item type="id" name="widget_visual_mode" />
+    <item type="id" name="widget_use_default_visual" />
 </resources>

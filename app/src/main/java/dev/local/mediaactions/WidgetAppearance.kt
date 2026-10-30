@@ -49,6 +49,9 @@ object WidgetStyleStore {
 
     private fun name(widgetId: Int?) = if (widgetId == null) PREFERENCES else "${PREFERENCES}_$widgetId"
 
+    fun hasOverride(context: Context, widgetId: Int): Boolean =
+        context.getSharedPreferences(name(widgetId), Context.MODE_PRIVATE).getBoolean("has_override", false)
+
     fun load(context: Context, widgetId: Int? = null): WidgetAppearance {
         val prefs = context.getSharedPreferences(name(widgetId), Context.MODE_PRIVATE)
         if (widgetId != null && !prefs.getBoolean("has_override", false)) return load(context)

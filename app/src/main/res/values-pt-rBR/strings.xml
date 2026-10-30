@@ -176,4 +176,8 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="diagnostic_copy">Copiar diagnóstico</string>
     <string name="diagnostic_copied">Diagnóstico copiado</string>
     <string name="diagnostic_versions_manual">Anote manualmente as versões instaladas de One UI, LockStar e WBR.</string>
+    <string name="widget_use_default_visual">Usar visual padrão</string>
+    <string name="widget_visual_own">Visual próprio</string>
+    <string name="widget_visual_inherited">Segue o visual padrão</string>
+    <string name="widget_visual_default_help">Ao usar o padrão, este widget acompanha o visual definido no app. A mudança só é aplicada ao salvar.</string>
 </resources>

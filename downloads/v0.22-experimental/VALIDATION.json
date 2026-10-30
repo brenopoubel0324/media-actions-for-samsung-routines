@@ -1,0 +1,45 @@
+{
+  "version": "0.22-experimental",
+  "application_id": "dev.local.mediaactions",
+  "apks": [
+    {
+      "kind": "phone",
+      "filename": "media-actions-phone-0.22-experimental-debug.apk",
+      "sha256": "1096bd82d85cd4ecf1d83d6e782c2978613d2a34bed1f4a778be50064c9bb0b6",
+      "bytes": 5346471,
+      "version_name": "0.22-experimental",
+      "version_code": 22,
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+    }
+  ],
+  "wear_companion": "0.9-experimental",
+  "tests": {
+    "app": {
+      "tests": 416,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 453,
+  "lint": "No issues found in all modules",
+  "review": "execucao-heranca-0.22.md",
+  "physical_host_tested": false,
+  "physical_wear_tested": false,
+  "physical_battery_measured": false,
+  "progress_default_seconds": 5,
+  "features": "Usar visual padrão por widget, com modo explícito, prévia e Salvar/Cancelar. Mantém local e preferências das outras instâncias; reúne intervalo 5/15/30 s, leituras por lote e diagnóstico local. Wear 0.9 permanece disponível; energia física não medida.",
+  "requested_permissions": 0
+}

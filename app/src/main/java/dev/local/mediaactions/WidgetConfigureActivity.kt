@@ -93,6 +93,11 @@ open class WidgetConfigureActivity : Activity() {
         root.requestApplyInsets()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::editor.isInitialized) editor.refreshInheritedPreview()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         if (!::editor.isInitialized) return

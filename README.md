@@ -1,12 +1,14 @@
-# Media Actions for Routines — 0.21 experimental
+# Media Actions for Routines — 0.22 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.21](downloads/v0.21-experimental/media-actions-phone-0.21-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.21-experimental/README.md).
+**APKs:** [Celular 0.22](downloads/v0.22-experimental/media-actions-phone-0.22-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.22-experimental/README.md).
 
-Atualização 0.21: Conclusão do Spotify com horário opcional e diagnóstico copiável localmente. Wear 0.9 mostra motivos de falha e destino conhecido, preservando três atalhos e protocolo v1; roteiro físico preparado, energia ainda não medida. [Review](docs/reviews/execucao-diagnostico-0.21.md).
+Atualização 0.22: Usar visual padrão por widget, com modo explícito, prévia e Salvar/Cancelar. Mantém local e preferências das outras instâncias; reúne intervalo 5/15/30 s, leituras por lote e diagnóstico local. Wear 0.9 permanece disponível; energia física não medida. [Review](docs/reviews/execucao-heranca-0.22.md).
 
-[Plano das próximas medidas](docs/planos/proximas-medidas-pos-review-0.18.md): **consumo energético como prioridade**, com linha de base, intervalo de progresso, redução de consultas repetidas, diagnóstico, testes físicos e restauração do visual por widget.
+Em **Seu widget → Atualização do progresso**, escolha 5/15/30 s para todos os indicadores (padrão 5 s). O liga/desliga continua por widget. No editor da instância, **Usar visual padrão** prepara a herança; confirme em **Salvar alterações** ou descarte com **Cancelar**. A identificação/local permanece independente. [Configurações atuais](docs/SETTINGS_UX.md).
+
+[Plano executado com validação física pendente](docs/planos/proximas-medidas-pos-review-0.18.md): **consumo energético como prioridade**, com linha de base, intervalo de progresso, redução de consultas repetidas, diagnóstico, testes físicos e restauração do visual por widget.
 
 Novidade 0.17: cada widget mostra seu **local, número e dimensões** na seleção para edição. Use a indicação do sistema ou marque **Tela de bloqueio / Tela inicial / Outro local** em **Local deste widget**. A identificação manual é individual e não muda o visual nem interrompe a herança do padrão. [Funcionamento e limites](docs/WIDGET_LOCATIONS.md).
 
@@ -26,7 +28,7 @@ Inicie um player no celular e use os botões de teste. Em Modos e Rotinas, procu
 
 As chamadas por atalho executam a ação e encerram sem tela de player. O Android/Routines+ ainda pode alterar foco ou mostrar transições; a compatibilidade exata depende do sistema. O problema de restauração de gestos em rotinas por evento não foi resolvido por remapeamento próprio: veja [ROUTINES_BUTTON_RESTORE.md](docs/ROUTINES_BUTTON_RESTORE.md).
 
-Correção 0.15: Play/Pause sem sessão conecta ao serviço de mídia do **Spotify**, solicita retomada e aguarda confirmação de PLAYING por até seis segundos. O broadcast da 0.11–0.14 não funcionou no aparelho do usuário e foi removido. A linha **Last Spotify resume** no app mostra o último resultado concluído, com motivo de falha. Não abre interface nem interfere na prioridade de uma sessão existente. [Fluxo, fontes e teste no aparelho](docs/SPOTIFY_FALLBACK.md). Testes simulam a conexão; Spotify ainda pode rejeitar o cliente ou não ter fila reproduzível. O protocolo Wear permanece igual.
+Correção 0.15: Play/Pause sem sessão conecta ao serviço de mídia do **Spotify**, solicita retomada e aguarda confirmação de PLAYING por até seis segundos. O broadcast da 0.11–0.14 não funcionou no aparelho do usuário e foi removido. A Ajuda mostra a **Última tentativa concluída no Spotify**, com motivo e horário opcional; **Copiar diagnóstico** prepara informações locais de suporte. Não abre interface nem interfere na prioridade de uma sessão existente. [Fluxo, fontes e teste no aparelho](docs/SPOTIFY_FALLBACK.md). Testes simulam a conexão; Spotify ainda pode rejeitar o cliente ou não ter fila reproduzível. O protocolo Wear permanece igual.
 
 URIs existentes preservadas:
 
@@ -40,13 +42,13 @@ Novidade 0.14: progresso circular **somente em reprodução confirmada**. Pausa 
 
 ![Progresso só em Play](downloads/v0.14-experimental/progresso-so-em-play.png)
 
-Correção 0.13 após review: o progresso periódico só é agendado quando há posição/duração calculáveis, e suas atualizações alcançam apenas widgets com indicador ativado. Mudanças reais de Play/Pause continuam atualizando todos. O intervalo permanece em 5 s. [Achados, reprodução e correções](docs/reviews/post-release-0.12-audit.md).
+Correção 0.13 após review: o progresso periódico só é agendado quando há posição/duração calculáveis, e suas atualizações alcançam apenas widgets com indicador ativado. Mudanças reais de Play/Pause continuam atualizando todos. Naquela entrega o intervalo era fixo em 5 s; desde a 0.19, pode ser escolhido em 5/15/30 s. [Achados, reprodução e correções](docs/reviews/post-release-0.12-audit.md).
 
 Novidade 0.12: **borda só no Play/Pause**, opção de **progresso circular branco com marcador escuro** e **padding negativo somente vertical**, de −24 a 144 dp. [Configuração e limites](docs/CIRCULAR_PROGRESS.md).
 
 ![Prévia do centro com progresso](downloads/v0.12-experimental/progresso-circular.png)
 
-Novidade 0.10: **bordas dos botões e moldura do widget independentes**, cada grupo com ativação, espessura de 1–8 dp e cor/opacidade próprias. É possível usar as duas, uma ou nenhuma, mantendo os centros transparentes. **Padding horizontal e vertical somente do widget inteiro**, com campo numérico, slider e passos de 1 dp. [Configuração, limites e renderização](docs/INDEPENDENT_BORDERS.md). O companion Wear permanece na versão 0.8 e não precisa ser atualizado para estas funções.
+Novidade 0.10: **bordas dos botões e moldura do widget independentes**, cada grupo com ativação, espessura de 1–8 dp e cor/opacidade próprias. É possível usar as duas, uma ou nenhuma, mantendo os centros transparentes. **Padding horizontal e vertical somente do widget inteiro**, com campo numérico, slider e passos de 1 dp. [Configuração, limites e renderização](docs/INDEPENDENT_BORDERS.md). A entrega 0.10 manteve o Wear 0.8; a versão atual Wear 0.9 acrescenta diagnóstico sem mudar os controles.
 
 ![Comparação das bordas independentes](downloads/v0.10-experimental/bordas-independentes.png)
 
@@ -54,7 +56,7 @@ Novidade 0.10: **bordas dos botões e moldura do widget independentes**, cada gr
 
 O widget Media controls tem fundo transparente e três áreas de toque de pelo menos 48 dp. A aparência permite famílias de ícones distintas, tamanho, cor, sombra opcional, espaçamento com ajuste numérico preciso e feedback de toque. As configurações são por instância; valores legados continuam compatíveis.
 
-Play/Pause acompanha o estado informado pelo player: Pausa durante reprodução, Play em pausa/parada e símbolo neutro quando o estado é desconhecido/transitório. Mudanças externas atualizam por callbacks, sem persistência do estado de reprodução. Com progresso circular ativado, a posição também é atualizada aproximadamente a cada 5 segundos enquanto toca e a tela está interativa. Um clique não é tratado como confirmação de mudança.
+Play/Pause acompanha o estado informado pelo player: Pausa durante reprodução, Play em pausa/parada e símbolo neutro quando o estado é desconhecido/transitório. Mudanças externas atualizam por callbacks, sem persistência do estado de reprodução. Com progresso circular ativado, a posição também é atualizada no intervalo global de 5, 15 ou 30 segundos (padrão 5 s), enquanto toca, a tela está interativa e há posição/duração calculáveis. Um clique não é tratado como confirmação de mudança.
 
 Para editar, use a configuração externa oferecida pelo host, quando disponível. O app declara suporte Android a reconfiguração e tem uma tela dedicada à instância escolhida. O menu do LockStar é controlado pela Samsung; declarar suporte não garante a presença de “Editar” em todo firmware. O botão **Edit existing widget** no app oferece acesso alternativo à configuração. Não há botão extra de edição dentro do widget. Veja [a pesquisa LockStar](docs/LOCKSTAR_WIDGET_EDITING.md).
 
@@ -94,6 +96,6 @@ JDK 21 para executar Gradle; bytecode Java/Kotlin 17. AGP 8.13.2, Kotlin 2.2.21,
 
 Os APKs debug fornecidos usam o mesmo certificado dos APKs anteriores para preservar atualização. Não há chave privada no repositório; para distribuição futura, manter sua chave fora do projeto e preservar a identidade das instalações. Celular e relógio precisam compartilhar applicationId/certificado para Data Layer.
 
-Resultados da versão: [review geral 0.18](docs/reviews/app-audit-0.18.md), [self-audit 0.17](docs/reviews/widget-locations-0.17.md), [self-audit UX 0.16](docs/reviews/settings-ux-0.16.md), [self-audit 0.15](docs/reviews/spotify-browser-0.15.md), [self-audit 0.14](docs/reviews/playing-only-0.14.md), [review pós-publicação](docs/reviews/post-release-0.12-audit.md), [self-audit 0.12](docs/reviews/progress-ring-0.12.md), [self-audit 0.11](docs/reviews/spotify-fallback-0.11.md), [self-audit do widget 0.10](docs/reviews/independent-borders-0.10.md), [revisão Wear](docs/reviews/wear-button-remapper-implementation.md), [plano Wear](docs/planos/wear-os-galaxy-watch-8.md), [relatório de testes](TEST_REPORT.md), [créditos de ícones](THIRD_PARTY_NOTICES.md). Nenhum teste de host substitui as verificações físicas pendentes.
+Histórico de revisões: [execução do plano 0.19–0.22](docs/execucao-plano-pos-0.18.md), [review geral 0.18](docs/reviews/app-audit-0.18.md), [self-audit 0.17](docs/reviews/widget-locations-0.17.md), [self-audit UX 0.16](docs/reviews/settings-ux-0.16.md), [self-audit 0.15](docs/reviews/spotify-browser-0.15.md), [self-audit 0.14](docs/reviews/playing-only-0.14.md), [review pós-publicação](docs/reviews/post-release-0.12-audit.md), [self-audit 0.12](docs/reviews/progress-ring-0.12.md), [self-audit 0.11](docs/reviews/spotify-fallback-0.11.md), [self-audit do widget 0.10](docs/reviews/independent-borders-0.10.md), [revisão Wear](docs/reviews/wear-button-remapper-implementation.md), [plano Wear](docs/planos/wear-os-galaxy-watch-8.md), [relatório de testes](TEST_REPORT.md), [créditos de ícones](THIRD_PARTY_NOTICES.md). Nenhum teste de host substitui as verificações físicas pendentes.
 
 Roteiro físico ainda pendente: [Galaxy S25 / Watch 8, Spotify, LockStar, WBR e energia](docs/testes/validacao-galaxy-watch.md).

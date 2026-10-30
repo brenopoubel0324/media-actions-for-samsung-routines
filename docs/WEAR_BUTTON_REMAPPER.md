@@ -1,4 +1,4 @@
-# Wear Button Remapper — Media Actions 0.8-experimental
+# Wear Button Remapper — Media Actions 0.9-experimental
 
 ## Entradas independentes em um APK
 
@@ -27,7 +27,7 @@ A integração foi conferida estaticamente no APK público **WBR 1.06** do autor
 
 As entradas usam seleção automática: apenas um tocando → esse aparelho; ambos tocando → celular; ambos pausados → último aparelho controlado, com celular como padrão inicial. Ausência de permissão/conexão não significa pausado. Quando nenhum está tocando e o destino preferido está indisponível, não retomar outro aparelho silenciosamente.
 
-O celular precisa da versão companion 0.8. A ponte usa Google Play services Data Layer, por Bluetooth ou infraestrutura de nuvem conforme a conectividade. Não há servidor próprio, envio de áudio, título/artista ou conteúdo de notificações. O manifesto dos dois APKs não solicita permissões comuns. Os atalhos e widget do celular continuam executando localmente.
+Use o APK phone indicado no README junto do Wear 0.9; o protocolo v1 permanece compatível. A ponte usa Google Play services Data Layer, por Bluetooth ou infraestrutura de nuvem conforme a conectividade. Não há servidor próprio, envio de áudio, título/artista ou conteúdo de notificações. O manifesto dos dois APKs não solicita permissões comuns. Os atalhos e widget do celular continuam executando localmente.
 
 Para controlar players instalados no relógio, o **próprio relógio** precisa permitir acesso às sessões de mídia pelo listener de notificações. A autorização do telefone não concede esse acesso. Se o firmware oferecer “Configurações adicionais” na informação do app, essa opção abre a tela de autorização do sistema. Essa entrada não cria um quarto ícone no launcher.
 
@@ -43,7 +43,7 @@ Esse comando só abre configurações do sistema. Não usa root, não contorna p
 
 Uma invocação fixa o aparelho/player e não é repetida automaticamente. O protocolo usa consultas recentes, tickets curtos vinculados ao peer, deduplicação e comandos explícitos. Troca de sessão, prazo vencido e ação não anunciada impedem o envio. ACK indica envio ao player, não comprova mudança de reprodução.
 
-Timeout após enviar informa “sem confirmação”: não reenviar ao outro aparelho. Ações não ficam em fila para reconexão. Erros podem gerar um aviso curto no relógio; sucesso não abre tela. Execução usa receiver privado com goAsync, limite de tempo e watchdog, sem serviço permanente/polling.
+Timeout após enviar informa “sem confirmação”: não reenviar ao outro aparelho. Ações não ficam em fila para reconexão. Wear 0.9 mostra motivos breves de acesso negado, nenhuma sessão, ocupado, falha, prazo ou comando sem confirmação. Quando o destino foi escolhido, o aviso indica Celular/Relógio; sem destino, não inventa o aparelho que falhou. Probe sem resposta informa conexão/consulta indisponível, sem afirmar que um comando foi enviado. Sucesso não abre tela. Execução usa receiver privado com goAsync, limite de tempo e watchdog, sem serviço permanente/polling.
 
 O Android ou o WBR ainda podem exibir transições do sistema ou a interface do app que o WBR esteja substituindo. A ausência de tela própria não garante zero animação do sistema nem preservação de foco em todo firmware.
 

@@ -1,6 +1,6 @@
 # Próximas medidas após a review 0.18
 
-Status: plano de execução proposto, revisado contra o código atual. Base: phone 0.18, código 18; Wear 0.8, código 8; commit `dd2a0367a29790a337dab42cf4fc9bd043feef84`. A validação anterior teve 394 testes aprovados; nenhum teste físico é considerado concluído neste plano.
+Status: etapas técnicas implementadas nas entregas phone 0.19–0.22 / Wear 0.9; validação física/energia ainda pendentes. [Relatório de execução](../execucao-plano-pos-0.18.md). Plano revisado contra a base histórica. Base: phone 0.18, código 18; Wear 0.8, código 8; commit `dd2a0367a29790a337dab42cf4fc9bd043feef84`. A validação anterior teve 394 testes aprovados; nenhum teste físico é considerado concluído neste plano.
 
 Objetivo: priorizar o consumo energético do celular e do relógio, preservando a confiabilidade dos controles. Medir o custo atual, permitir escolher a cadência do progresso e reduzir trabalho repetido antes de ampliar as configurações visuais. A implementação será dividida em entregas pequenas, com imagens antes de publicar mudanças visuais e review ao final de cada entrega.
 

@@ -1,4 +1,4 @@
-# Retomar Spotify sem sessão — 0.15 experimental
+# Retomar Spotify sem sessão — 0.21 experimental
 
 O usuário informou que o fallback 0.11–0.14 não iniciou Spotify sem sessão ativa. Esse caminho apenas enviava MEDIA_BUTTON ao receiver, o que não garante reativar o player. A 0.15 substitui esse caminho por **conexão ao MediaBrowserService do Spotify**, sem abrir Activity.
 
@@ -18,7 +18,7 @@ Usar esse fluxo não dá ao nosso app os privilégios do SystemUI. Spotify pode 
 
 ## Resultado visível no app
 
-Na interface 0.16, toque em **Ver diagnóstico do Spotify** na tela inicial (quando houver um resultado), ou abra **Ajuda e diagnóstico**. A linha **Última tentativa no Spotify** (**Last Spotify resume** em inglês) mostra o último resultado concluído, inclusive quando a tentativa veio do widget/Rotinas: reprodução confirmada, serviço indisponível, conexão recusada, timeout de conexão, conexão sem confirmação de reprodução, acesso revogado, troca de player ou falha. Apenas o enum desse último resultado é salvo localmente. Não é um indicador do estado atual da música, não guarda título/conta/fila e tentativas em andamento não sobrescrevem o último resultado concluído.
+Na interface 0.16, toque em **Ver diagnóstico do Spotify** na tela inicial (quando houver um resultado), ou abra **Ajuda e diagnóstico**. A linha **Última tentativa concluída no Spotify** (**Last completed Spotify attempt** em inglês) mostra o último resultado concluído, inclusive quando a tentativa veio do widget/Rotinas: reprodução confirmada, serviço indisponível, conexão recusada, timeout de conexão, conexão sem confirmação de reprodução, acesso revogado, troca de player ou falha. Desde a 0.21, o enum e o horário de conclusão são salvos juntos localmente; registros antigos sem horário continuam legíveis. A formatação usa idioma/fuso do aparelho; os prazos continuam monotônicos. **Copiar diagnóstico** copia sob demanda versão/Android, resultado/horário e ID/categoria/tamanhos/local dos widgets próprios, sem dados de mídia, tokens ou IDs de nós. One UI/LockStar/WBR são anotados manualmente. Não é um indicador do estado atual da música, não guarda título/conta/fila e tentativas em andamento não sobrescrevem o último resultado concluído.
 
 O atalho NoDisplay encerra imediatamente e a tentativa pertence ao contexto do aplicativo; o widget usa `goAsync()` com prazo de seis segundos para completar o broadcast. Não cria serviço próprio novo, não abre Spotify/loja, não usa teclas globais, OAuth nem retries em segundo plano. Uma tentativa em andamento bloqueia outra, sem duplicar Play.
 
@@ -29,7 +29,7 @@ Anterior/Próxima, falta inicial de Notification access, ambiguidade, estado tra
 1. Atualize o APK phone sem desinstalar. Mantenha **Notification access** concedido.
 2. Spotify precisa estar instalado/habilitado, com login e uma fila reproduzível estabelecida anteriormente. Um Spotify recém-instalado sem histórico não tem conteúdo definido para retomar.
 3. Deixe a sessão anterior encerrar normalmente e use Play/Pause do widget/Rotinas. Aguarde até seis segundos.
-4. Se não tocar, abra Media Actions e leia **Last Spotify resume**. O resultado permite distinguir falta de serviço, recusa e ausência de confirmação. Test Play/Pause no app usa o mesmo caminho.
+4. Se não tocar, abra Media Actions e leia **Última tentativa concluída no Spotify**. O resultado permite distinguir falta de serviço, recusa e ausência de confirmação. Test Play/Pause no app usa o mesmo caminho.
 5. Com outro player em sessão pausada, Play/Pause deve retomar esse player. Anterior/Próxima sem sessão não devem iniciar Spotify.
 
 O widget continua dependendo do estado real da sessão: sem confirmação não inventa reprodução, indicador ou borda. Restrições Android, Spotify forçado a parar, autorização do cliente, login, fila e Spotify Connect podem afetar a retomada. A linha de diagnóstico registra confirmação do player, não uma medição do áudio emitido.

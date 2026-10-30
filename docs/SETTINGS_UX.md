@@ -1,4 +1,4 @@
-# Configurações organizadas — 0.16 experimental
+# Configurações organizadas — 0.22 experimental
 
 Atualização 0.17: o editor de uma instância inclui **Local deste widget**, além dos quatro grupos de aparência abaixo. A lista de widgets e o editor mostram número/dimensões e identificação automática ou manual de local. [Identificação e limites do LockStar](WIDGET_LOCATIONS.md).
 
@@ -8,6 +8,12 @@ A tela inicial reúne Conexão, Seu widget e Testar controles. Ajuda/diagnóstic
 - **Visual padrão:** nova tela privada para novos widgets e os que não têm ajuste individual. Salvar o padrão não sobrescreve instâncias com configuração própria.
 
 Atualização 0.18: texto/cursor dos campos, inclusive valores inválidos, são preservados em recriação sem salvar nas preferências. Salvar somente o local não sobrescreve o visual se outro editor tiver mudado o padrão/override durante a edição. [Review geral](reviews/app-audit-0.18.md).
+
+Atualizações 0.19–0.22:
+
+- **Atualização do progresso** abre seletor global 5/15/30 s (padrão 5), com Salvar/Cancelar; cada widget mantém seu liga/desliga individual. Cadência menor não é uma medição de economia de bateria.
+- **Usar visual padrão** aparece somente no editor de uma instância. Mostra Visual próprio/Segue o visual padrão e prepara a herança no rascunho. Salvar remove apenas a aparência própria; Cancelar preserva os dados anteriores e o local permanece separado. Ao editar visual depois de restaurar, a intenção vira personalização explícita, mesmo se os valores voltarem aos originais. O padrão vigente é usado ao salvar/retomar a prévia herdada.
+- **Ajuda e diagnóstico** mostra a última conclusão Spotify com horário opcional e oferece cópia local sob demanda. Não há timer de diagnóstico.
 
 ## Editor
 

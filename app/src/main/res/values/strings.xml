@@ -173,4 +173,8 @@
     <string name="diagnostic_copy">Copy diagnostics</string>
     <string name="diagnostic_copied">Diagnostics copied</string>
     <string name="diagnostic_versions_manual">Add the installed One UI, LockStar and WBR versions manually.</string>
+    <string name="widget_use_default_visual">Use default appearance</string>
+    <string name="widget_visual_own">Custom appearance</string>
+    <string name="widget_visual_inherited">Follows default appearance</string>
+    <string name="widget_visual_default_help">When using defaults, this widget follows the appearance defined in the app. Changes apply only after saving.</string>
 </resources>
