@@ -34,17 +34,19 @@ object WidgetRenderer {
         R.drawable.button_border_touch_dark_7, R.drawable.button_border_touch_dark_8)
 
     fun render(context: Context, id: Int, options: Bundle,
-        playback: WidgetPlaybackState = WidgetPlaybackState.read(AndroidSessionGateway(context))): RemoteViews {
+        snapshot: WidgetUpdateSnapshot? = null): RemoteViews {
         val style = WidgetStyleStore.load(context, id)
-        val showProgress = shouldShowProgress(style, playback)
-        val progress = if (showProgress) WidgetTrackProgress.read(context) else null
+        val data = snapshot ?: WidgetUpdateSnapshot.capture(AndroidSessionGateway(context), style.progressRing)
+        val state = data.state
+        val showProgress = shouldShowProgress(style, state)
+        val progress = if (showProgress) data.progress else null
         val progressBitmap = if (showProgress) WidgetProgressArtwork.draw(context,
-            WidgetPlaybackIcons.center(style.iconStyle, playback),
+            WidgetPlaybackIcons.center(style.iconStyle, state),
             if (style.darkIcons) Color.rgb(26, 29, 34) else Color.WHITE, style, progress) else null
         val sizes = reportedSizes(options)
-        if (sizes.isEmpty()) return build(context, id, style, null, playback = playback, progress = progress, progressBitmap = progressBitmap)
-        if (sizes.size == 1) return build(context, id, style, sizes.single(), playback = playback, progress = progress, progressBitmap = progressBitmap)
-        return RemoteViews(sizes.associateWith { build(context, id, style, it, playback = playback, progress = progress, progressBitmap = progressBitmap) })
+        if (sizes.isEmpty()) return build(context, id, style, null, playback = state, progress = progress, progressBitmap = progressBitmap)
+        if (sizes.size == 1) return build(context, id, style, sizes.single(), playback = state, progress = progress, progressBitmap = progressBitmap)
+        return RemoteViews(sizes.associateWith { build(context, id, style, it, playback = state, progress = progress, progressBitmap = progressBitmap) })
     }
 
     private fun shouldShowProgress(style: WidgetAppearance, playback: WidgetPlaybackState) =

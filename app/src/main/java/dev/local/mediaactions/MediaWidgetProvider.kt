@@ -16,9 +16,7 @@ class MediaWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, appWidgetIds: IntArray) {
         if (appWidgetIds.isEmpty()) return
         WidgetPlaybackObserver.settingsChanged(context)
-        val playback = WidgetPlaybackState.read(AndroidSessionGateway(context))
-        for (id in appWidgetIds) manager.updateAppWidget(id,
-            WidgetRenderer.render(context, id, manager.getAppWidgetOptions(id), playback))
+        updateBatch(context, manager, appWidgetIds.toList())
     }
 
     override fun onAppWidgetOptionsChanged(
@@ -105,14 +103,21 @@ class MediaWidgetProvider : AppWidgetProvider() {
             MediaWidgetProvider().onUpdate(context.applicationContext, manager, intArrayOf(id))
         }
 
+        private fun updateBatch(context: Context, manager: AppWidgetManager, ids: List<Int>,
+            playback: WidgetPlaybackState? = null) {
+            if (ids.isEmpty()) return
+            val needProgress = ids.any { WidgetStyleStore.load(context, it).progressRing }
+            val snapshot = WidgetUpdateSnapshot.capture(AndroidSessionGateway(context), needProgress, playback)
+            for (id in ids) manager.updateAppWidget(id,
+                WidgetRenderer.render(context, id, manager.getAppWidgetOptions(id), snapshot = snapshot))
+        }
+
         fun refreshAll(context: Context, playback: WidgetPlaybackState? = null, progressOnly: Boolean = false) {
             val manager = AppWidgetManager.getInstance(context.applicationContext)
             val ids = manager.getAppWidgetIds(ComponentName(context, MediaWidgetProvider::class.java))
                 .filter { !progressOnly || WidgetStyleStore.load(context, it).progressRing }
             if (ids.isEmpty()) return
-            val state = playback ?: WidgetPlaybackState.read(AndroidSessionGateway(context))
-            for (id in ids) manager.updateAppWidget(id,
-                WidgetRenderer.render(context, id, manager.getAppWidgetOptions(id), state))
+            updateBatch(context, manager, ids, playback)
         }
     }
 }

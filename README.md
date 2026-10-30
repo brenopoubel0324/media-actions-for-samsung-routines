@@ -1,10 +1,10 @@
-# Media Actions for Routines — 0.19 experimental
+# Media Actions for Routines — 0.20 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.19](downloads/v0.19-experimental/media-actions-phone-0.19-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções](downloads/v0.19-experimental/README.md).
+**APKs:** [Celular 0.20](downloads/v0.20-experimental/media-actions-phone-0.20-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções](downloads/v0.20-experimental/README.md).
 
-Atualização 0.19: Intervalo global de progresso em 5, 15 ou 30 segundos, com Salvar/Cancelar e escolha individual de ligar/desligar preservada. Contagens controladas registradas; sem economia de bateria medida. [Review](docs/reviews/execucao-intervalo-0.19.md).
+Atualização 0.20: Snapshot efêmero por lote reduz leituras repetidas entre widgets. Em seis widgets/5 s, 96→36 consultas de sessão e 84→24 de progresso por minuto simulado; bateria ainda não medida. [Review](docs/reviews/execucao-snapshot-0.20.md).
 
 [Plano das próximas medidas](docs/planos/proximas-medidas-pos-review-0.18.md): **consumo energético como prioridade**, com linha de base, intervalo de progresso, redução de consultas repetidas, diagnóstico, testes físicos e restauração do visual por widget.
 

@@ -3,6 +3,7 @@ package dev.local.mediaactions
 import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
+import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
@@ -28,10 +29,15 @@ class AndroidSessionGateway(context: Context) : SessionGateway {
     }
 
     companion object {
+        /** Position belongs to the exact selected, captured session; never performs another selection. */
+        fun position(session: PlayerSession): SessionPosition? = (session as? AndroidPlayerSession)?.position()
+
         fun listenerComponent(context: Context) =
             ComponentName(context.packageName, "${context.packageName}.MediaNotificationListener")
     }
 }
+
+data class SessionPosition(val position: Long, val duration: Long, val updated: Long, val speed: Float, val advancing: Boolean)
 
 private class AndroidPlayerSession(private val controller: MediaController) : PlayerSession {
     // Snapshot state once; do not choose a command from two inconsistent state reads.
@@ -57,6 +63,13 @@ private class AndroidPlayerSession(private val controller: MediaController) : Pl
         if (actions and PlaybackState.ACTION_SKIP_TO_PREVIOUS != 0L) add(TransportCommand.PREVIOUS)
         if (actions and PlaybackState.ACTION_PLAY != 0L) add(TransportCommand.PLAY)
         if (actions and PlaybackState.ACTION_PAUSE != 0L) add(TransportCommand.PAUSE)
+    }
+
+    fun position(): SessionPosition? {
+        val state = playback ?: return null
+        if (state.state == PlaybackState.STATE_NONE || state.state == PlaybackState.STATE_ERROR) return null
+        return SessionPosition(state.position, controller.metadata?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0,
+            state.lastPositionUpdateTime, state.playbackSpeed, state.state == PlaybackState.STATE_PLAYING)
     }
 
     override fun send(command: TransportCommand) {

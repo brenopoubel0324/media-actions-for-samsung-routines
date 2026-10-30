@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="20"
+    android:versionName="0.20-experimental"
+    android:compileSdkVersion="36"
+    android:compileSdkVersionCodename="16"
+    package="dev.local.mediaactions"
+    platformBuildVersionCode="36"
+    platformBuildVersionName="16">
+
+    <uses-sdk
+        android:minSdkVersion="33"
+        android:targetSdkVersion="36" />
+
+    <queries>
+
+        <package
+            android:name="com.spotify.music" />
+    </queries>
+
+    <application
+        android:theme="@ref/0x7f0c0000"
+        android:label="@ref/0x7f0b0006"
+        android:icon="@ref/0x7f05002d"
+        android:debuggable="true"
+        android:allowBackup="false"
+        android:supportsRtl="true"
+        android:extractNativeLibs="false"
+        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+        android:dataExtractionRules="@ref/0x7f0e0000">
+
+        <activity
+            android:name="dev.local.mediaactions.MainActivity"
+            android:exported="true">
+
+            <intent-filter>
+
+                <action
+                    android:name="android.intent.action.MAIN" />
+
+                <category
+                    android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@ref/0x7f0e0002" />
+        </activity>
+
+        <activity
+            android:name="dev.local.mediaactions.WidgetDefaultsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="dev.local.mediaactions.ProgressSettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:label="@ref/0x7f0b0078"
+            android:name="dev.local.mediaactions.WidgetConfigureActivity"
+            android:exported="true"
+            android:excludeFromRecents="true">
+
+            <intent-filter>
+
+                <action
+                    android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:theme="@ref/0x1030055"
+            android:name="dev.local.mediaactions.ActionActivity"
+            android:exported="true"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:noHistory="true" />
+
+        <receiver
+            android:label="@ref/0x7f0b0094"
+            android:name="dev.local.mediaactions.MediaWidgetProvider"
+            android:exported="false">
+
+            <intent-filter>
+
+                <action
+                    android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@ref/0x7f0e0001" />
+        </receiver>
+
+        <service
+            android:name="dev.local.mediaactions.PhoneWearService"
+            android:exported="true">
+
+            <intent-filter>
+
+                <action
+                    android:name="com.google.android.gms.wearable.REQUEST_RECEIVED" />
+
+                <data
+                    android:scheme="wear"
+                    android:host="*"
+                    android:pathPrefix="/mediaactions/v1/" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:label="@ref/0x7f0b001e"
+            android:name="dev.local.mediaactions.MediaNotificationListener"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="false">
+
+            <intent-filter>
+
+                <action
+                    android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.notification.default_filter_types"
+                android:value="" />
+        </service>
+
+        <activity
+            android:theme="@ref/0x1030010"
+            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@ref/0x7f070000" />
+    </application>
+</manifest>

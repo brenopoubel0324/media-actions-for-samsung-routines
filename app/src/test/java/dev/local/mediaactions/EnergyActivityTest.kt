@@ -93,6 +93,8 @@ class EnergyActivityTest {
                         shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(60))
                         assertEquals(if(progress)60/seconds else 0,EnergyCounters.ticks)
                         assertEquals(0,EnergyCounters.events)
+                        assertEquals(if(progress)(60/seconds)*3 else 0,EnergyCounters.sessions)
+                        assertEquals(if(progress)(60/seconds)*2 else 0,EnergyCounters.progress)
                         assertEquals(if(progress)(60/seconds)*count else 0,EnergyCounters.updates)
                         rows+="{\"widgets\":$count,\"enabled\":$progress,\"interval_seconds\":$seconds,\"periodic_ticks\":${EnergyCounters.ticks},\"event_refreshes\":${EnergyCounters.events},\"session_reads\":${EnergyCounters.sessions},\"progress_reads\":${EnergyCounters.progress},\"widget_updates\":${EnergyCounters.updates},\"bitmap_builds\":${EnergyCounters.bitmaps}}"
                     }

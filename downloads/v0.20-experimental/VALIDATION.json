@@ -1,0 +1,43 @@
+{
+  "version": "0.20-experimental",
+  "application_id": "dev.local.mediaactions",
+  "apks": [
+    {
+      "kind": "phone",
+      "filename": "media-actions-phone-0.20-experimental-debug.apk",
+      "sha256": "0f223fcb5f5aa93c71d24826aae2abda6da761cc32f5bd26790501f725ecda42",
+      "bytes": 5325543,
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+    }
+  ],
+  "wear_companion": "0.8-experimental",
+  "tests": {
+    "app": {
+      "tests": 382,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 413,
+  "lint": "No issues found in all modules",
+  "review": "execucao-snapshot-0.20.md",
+  "physical_host_tested": false,
+  "physical_wear_tested": false,
+  "physical_battery_measured": false,
+  "progress_default_seconds": 5,
+  "features": "Snapshot efêmero por lote reduz leituras repetidas entre widgets. Em seis widgets/5 s, 96→36 consultas de sessão e 84→24 de progresso por minuto simulado; bateria ainda não medida.",
+  "requested_permissions": 0
+}
