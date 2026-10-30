@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Media Actions</string>
+    <string name="action_previous">MA · Previous</string>
+    <string name="action_toggle">MA · Play/Pause</string>
+    <string name="action_next">MA · Next</string>
+    <string name="listener_name">Media Actions — watch sessions</string>
+    <string name="unavailable">Player unavailable. Check the phone connection and media session access.</string>
+    <string name="unconfirmed">Command unconfirmed. It was not resent.</string>
+    <string name="busy">An action is in progress. Try again.</string>
+    <string name="settings_unavailable">This firmware does not offer media session access settings.</string>
+    <string name="no_access">Media session access denied. Enable it in device settings.</string>
+    <string name="no_session">No media session available. Start playback in the player.</string>
+    <string name="ambiguous">Multiple players available. Start playback in the desired player.</string>
+    <string name="changed">The session changed before sending. Trigger again if needed.</string>
+    <string name="unsupported">This player does not support this action.</string>
+    <string name="failed">Could not execute the action.</string>
+    <string name="expired">The action deadline passed. It was not resent.</string>
+    <string name="connection_unavailable">Could not query the devices. Check the connection and media access.</string>
+    <string name="no_destination">Could not choose a player. Start playback on the desired device.</string>
+    <string name="target_feedback">%1$s: %2$s</string>
+    <string name="target_phone">Phone</string>
+    <string name="target_watch">Watch</string>
+</resources>

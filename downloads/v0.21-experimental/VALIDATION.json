@@ -1,0 +1,50 @@
+{
+  "version": "0.21-experimental",
+  "application_id": "dev.local.mediaactions",
+  "apks": [
+    {
+      "kind": "phone",
+      "filename": "media-actions-phone-0.21-experimental-debug.apk",
+      "sha256": "6c7a107a4f9bd965762b3d068c2fe5fa1ac12cebd3e42a9a71a6953486c7d550",
+      "bytes": 5335735,
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+    },
+    {
+      "kind": "wear",
+      "filename": "media-actions-wear-0.9-experimental-debug.apk",
+      "sha256": "76f32819fdce3a14312e537528772ffb0dd2332e41633418b4dab2c263b01d9a",
+      "bytes": 4967738,
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+    }
+  ],
+  "wear_companion": "0.9-experimental",
+  "tests": {
+    "app": {
+      "tests": 392,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 429,
+  "lint": "No issues found in all modules",
+  "review": "execucao-diagnostico-0.21.md",
+  "physical_host_tested": false,
+  "physical_wear_tested": false,
+  "physical_battery_measured": false,
+  "progress_default_seconds": 5,
+  "features": "Conclusão do Spotify com horário opcional e diagnóstico copiável localmente. Wear 0.9 mostra motivos de falha e destino conhecido, preservando três atalhos e protocolo v1; roteiro físico preparado, energia ainda não medida.",
+  "requested_permissions": 0
+}

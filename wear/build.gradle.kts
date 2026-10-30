@@ -2,7 +2,7 @@ plugins { id("com.android.application"); id("org.jetbrains.kotlin.android") }
 android {
     namespace = "dev.local.mediaactions"
     compileSdk = 36
-    defaultConfig { applicationId = "dev.local.mediaactions"; minSdk = 33; targetSdk = 36; versionCode = 8; versionName = "0.8-experimental" }
+    defaultConfig { applicationId = "dev.local.mediaactions"; minSdk = 33; targetSdk = 36; versionCode = 9; versionName = "0.9-experimental" }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     lint { warningsAsErrors = true }
     testOptions {

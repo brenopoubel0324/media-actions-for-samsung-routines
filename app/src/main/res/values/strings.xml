@@ -109,7 +109,7 @@
     <string name="widget_center_border_only">Border only around Play/Pause</string>
     <string name="widget_progress_ring">Show track progress</string>
     <string name="widget_progress_help">Optional. The circle appears only during confirmed playback and updates every 5 seconds with the screen on. It is hidden when paused or unavailable. This indicator does not seek.</string>
-    <string name="spotify_resume_last">Last Spotify resume: %1$s</string>
+    <string name="spotify_resume_last">Last completed Spotify attempt: %1$s\n%2$s</string>
     <string name="action_pending">Sending playback request…</string>
     <string name="spotify_resume_idle">Spotify fallback has not been used yet.</string>
     <string name="spotify_resume_connecting">Spotify: connecting to resume playback…</string>
@@ -169,4 +169,8 @@
     <string name="progress_settings_scope">Applies to every widget with track progress enabled. Turn the indicator on or off in each widget editor.</string>
     <plurals name="progress_interval_seconds"><item quantity="one">Every %1$d second</item><item quantity="other">Every %1$d seconds</item></plurals>
     <string name="progress_settings_help">Play/Pause changes still update immediately. Periodic updates stop when paused, the screen is off, duration is unavailable or all indicators are disabled. A screen being on does not guarantee the widget is visible. Longer intervals mean fewer periodic updates; battery savings have not been measured.</string>
+    <string name="diagnostic_time_unknown">Completion time unavailable</string>
+    <string name="diagnostic_copy">Copy diagnostics</string>
+    <string name="diagnostic_copied">Diagnostics copied</string>
+    <string name="diagnostic_versions_manual">Add the installed One UI, LockStar and WBR versions manually.</string>
 </resources>

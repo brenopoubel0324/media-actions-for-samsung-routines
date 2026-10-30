@@ -64,4 +64,5 @@
     <item type="id" name="control_toggle" />
     <item type="id" name="control_next" />
     <item type="id" name="spotify_diagnostics" />
+    <item type="id" name="diagnostic_copy" />
 </resources>

@@ -1,10 +1,10 @@
-# Media Actions for Routines — 0.20 experimental
+# Media Actions for Routines — 0.21 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.20](downloads/v0.20-experimental/media-actions-phone-0.20-experimental-debug.apk) · [Relógio 0.8](downloads/v0.8-experimental/media-actions-wear-0.8-experimental-debug.apk) · [Checksums e instruções](downloads/v0.20-experimental/README.md).
+**APKs:** [Celular 0.21](downloads/v0.21-experimental/media-actions-phone-0.21-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.21-experimental/README.md).
 
-Atualização 0.20: Snapshot efêmero por lote reduz leituras repetidas entre widgets. Em seis widgets/5 s, 96→36 consultas de sessão e 84→24 de progresso por minuto simulado; bateria ainda não medida. [Review](docs/reviews/execucao-snapshot-0.20.md).
+Atualização 0.21: Conclusão do Spotify com horário opcional e diagnóstico copiável localmente. Wear 0.9 mostra motivos de falha e destino conhecido, preservando três atalhos e protocolo v1; roteiro físico preparado, energia ainda não medida. [Review](docs/reviews/execucao-diagnostico-0.21.md).
 
 [Plano das próximas medidas](docs/planos/proximas-medidas-pos-review-0.18.md): **consumo energético como prioridade**, com linha de base, intervalo de progresso, redução de consultas repetidas, diagnóstico, testes físicos e restauração do visual por widget.
 
@@ -95,3 +95,5 @@ JDK 21 para executar Gradle; bytecode Java/Kotlin 17. AGP 8.13.2, Kotlin 2.2.21,
 Os APKs debug fornecidos usam o mesmo certificado dos APKs anteriores para preservar atualização. Não há chave privada no repositório; para distribuição futura, manter sua chave fora do projeto e preservar a identidade das instalações. Celular e relógio precisam compartilhar applicationId/certificado para Data Layer.
 
 Resultados da versão: [review geral 0.18](docs/reviews/app-audit-0.18.md), [self-audit 0.17](docs/reviews/widget-locations-0.17.md), [self-audit UX 0.16](docs/reviews/settings-ux-0.16.md), [self-audit 0.15](docs/reviews/spotify-browser-0.15.md), [self-audit 0.14](docs/reviews/playing-only-0.14.md), [review pós-publicação](docs/reviews/post-release-0.12-audit.md), [self-audit 0.12](docs/reviews/progress-ring-0.12.md), [self-audit 0.11](docs/reviews/spotify-fallback-0.11.md), [self-audit do widget 0.10](docs/reviews/independent-borders-0.10.md), [revisão Wear](docs/reviews/wear-button-remapper-implementation.md), [plano Wear](docs/planos/wear-os-galaxy-watch-8.md), [relatório de testes](TEST_REPORT.md), [créditos de ícones](THIRD_PARTY_NOTICES.md). Nenhum teste de host substitui as verificações físicas pendentes.
+
+Roteiro físico ainda pendente: [Galaxy S25 / Watch 8, Spotify, LockStar, WBR e energia](docs/testes/validacao-galaxy-watch.md).

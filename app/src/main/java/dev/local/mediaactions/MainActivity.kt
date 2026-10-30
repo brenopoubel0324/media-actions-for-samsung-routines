@@ -3,6 +3,9 @@ package dev.local.mediaactions
 import android.app.Activity
 import android.app.AlertDialog
 import android.appwidget.AppWidgetManager
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.widget.Toast
 import android.content.ComponentName
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -77,6 +80,10 @@ class MainActivity : Activity() {
             id = R.id.spotify_resume_status; accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
         }
         button(help.content, R.string.refresh, action = ::refreshStatus)
+        button(help.content, R.string.diagnostic_copy) {
+            getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText(getString(R.string.app_name), LocalDiagnostics.text(this)))
+            Toast.makeText(this, R.string.diagnostic_copied, Toast.LENGTH_SHORT).show()
+        }.id = R.id.diagnostic_copy
         label(help.content, R.string.access_reason, 13f)
         label(help.content, R.string.setup_heading, 17f, true); label(help.content, R.string.setup_steps, 13f)
         label(help.content, R.string.widget_setup_heading, 17f, true); label(help.content, R.string.widget_setup_steps, 13f)
@@ -100,9 +107,9 @@ class MainActivity : Activity() {
     }
 
     private fun refreshStatus() {
-        val spotify = SpotifyPlaybackResumer.lastStatus(this)
-        spotifyStatus.text = getString(R.string.spotify_resume_last, getString(spotify.message))
-        spotifyStatus.visibility = if (spotify == SpotifyPlaybackResumer.Status.IDLE) View.GONE else View.VISIBLE
+        val completion = SpotifyPlaybackResumer.lastCompletion(this)
+        spotifyStatus.text = LocalDiagnostics.spotifyLine(this, completion)
+        spotifyStatus.visibility = if (completion.status == SpotifyPlaybackResumer.Status.IDLE) View.GONE else View.VISIBLE
         diagnostics.visibility = spotifyStatus.visibility
         val status = dispatcher.playerStatus()
         access.setText(when (status) {

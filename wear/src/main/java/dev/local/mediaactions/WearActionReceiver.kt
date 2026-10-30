@@ -32,8 +32,9 @@ class WearActionReceiver : BroadcastReceiver() {
         try {
             workers.execute {
                 try {
-                    val result = runAction(context.applicationContext, action, deadline)
-                    if (result != LinkResult.SENT) message(context, if (result == LinkResult.UNCONFIRMED) R.string.unconfirmed else R.string.unavailable)
+                    runAction(context.applicationContext, action, deadline)?.let { feedback ->
+                        main.post { Toast.makeText(context.applicationContext, feedback.text(context), Toast.LENGTH_SHORT).show() }
+                    }
                 } catch (_: Exception) { message(context, R.string.unavailable) }
                 finally { main.removeCallbacks(watchdog); finish() }
             }
@@ -54,7 +55,7 @@ class WearActionReceiver : BroadcastReceiver() {
             check(remaining > 0)
             return Tasks.await(task(), remaining, TimeUnit.MILLISECONDS)
         }
-        private fun runAction(context: Context, action: MediaAction, deadline: Long): LinkResult {
+        private fun runAction(context: Context, action: MediaAction, deadline: Long): WearFeedback? {
             val client = Wearable.getMessageClient(context)
             val peer = try {
                 await(deadline, 1_000) { Wearable.getCapabilityClient(context).getCapability(LinkProtocol.PHONE_CAPABILITY,
@@ -65,20 +66,20 @@ class WearActionReceiver : BroadcastReceiver() {
             } catch (_: Exception) { MediaOffer(LinkResult.UNCONFIRMED) }
             val local = endpoint(context)
             val watch = local.probe("local")
-            if (SystemClock.elapsedRealtime() >= deadline) return LinkResult.EXPIRED
+            if (SystemClock.elapsedRealtime() >= deadline) return WearFeedback.result(LinkResult.EXPIRED)
             val prefs = context.getSharedPreferences("wear_target", Context.MODE_PRIVATE)
             val last = if (prefs.getString("last", null) == "WATCH") DeviceTarget.WATCH else DeviceTarget.PHONE
-            val target = TargetPolicy.choose(phone, watch, last) ?: return LinkResult.NO_SESSION
+            val target = TargetPolicy.choose(phone, watch, last) ?: return WearFeedback.noTarget(phone, watch)
             val offer = if (target == DeviceTarget.PHONE) phone else watch
-            val command = offer.command(action) ?: return LinkResult.UNSUPPORTED
-            val ticket = offer.ticket ?: return LinkResult.NO_SESSION
+            val command = offer.command(action) ?: return WearFeedback.result(LinkResult.UNSUPPORTED, target)
+            val ticket = offer.ticket ?: return WearFeedback.result(LinkResult.NO_SESSION, target)
             val request = MediaRequest(LinkProtocol.id(), ticket, command)
             val result = if (target == DeviceTarget.WATCH) local.execute("local", request, deadline) else try {
                 // After sendRequest is called, failure/timeout must never cause fallback or retry.
                 LinkProtocol.result(await(deadline, 1_500) { client.sendRequest(peer!!, LinkProtocol.COMMAND, LinkProtocol.encode(request)) })
             } catch (_: Exception) { LinkResult.UNCONFIRMED }
             if (result == LinkResult.SENT) prefs.edit().putString("last", target.name).apply()
-            return result
+            return WearFeedback.result(result, target)
         }
     }
 }

@@ -15,7 +15,7 @@ import org.robolectric.annotation.GraphicsMode
 import java.io.File
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [33], qualifiers = "mdpi")
+@Config(sdk = [33], qualifiers = "pt-rBR-mdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class WearLauncherVisualTest {
     @Test fun exportRealApkIconsAndLabelsWithoutPretendingToCaptureWbrOrTheSamsungLauncher() {

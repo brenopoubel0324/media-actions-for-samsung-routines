@@ -244,4 +244,28 @@ class SpotifyBrowserResumeTest {
         }
     }
 
+    @Test fun statusAndCompletionTimeAreAtomicAndBusyOrLateCallbacksCannotOverwriteThem() {
+        service(); withSession { _, resumer ->
+            val prefs=app.getSharedPreferences("spotify_resume",0)
+            prefs.edit().putString("status","PLAYING").putLong("completed_at_epoch_ms",1000L).apply()
+            val observed=mutableListOf<SpotifyPlaybackResumer.Companion.Completion>()
+            val listener=android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, _ -> observed+=SpotifyPlaybackResumer.lastCompletion(app) }
+            prefs.registerOnSharedPreferenceChangeListener(listener)
+            try {
+                resumer.resume(app,{PlayerStatus.NoActiveSession}) { }
+                val active=browser
+                resumer.resume(app,{PlayerStatus.NoActiveSession}) { assertEquals(SpotifyPlaybackResumer.Status.BUSY,it) }
+                assertEquals(1000L,SpotifyPlaybackResumer.lastCompletion(app).completedAtEpochMs)
+                active.callback.onConnectionFailed()
+                val completed=SpotifyPlaybackResumer.lastCompletion(app)
+                assertEquals(SpotifyPlaybackResumer.Status.REJECTED,completed.status)
+                assertNotNull(completed.completedAtEpochMs);assertTrue(completed.completedAtEpochMs!!>1000)
+                shadowOf(Looper.getMainLooper()).idle()
+                assertTrue(observed.isNotEmpty());assertTrue(observed.all {it==completed})
+                active.callback.onConnectionFailed();timeout()
+                assertEquals(completed,SpotifyPlaybackResumer.lastCompletion(app))
+            } finally {prefs.unregisterOnSharedPreferenceChangeListener(listener)}
+        }
+    }
+
 }

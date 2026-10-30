@@ -125,12 +125,18 @@ class SpotifyPlaybackResumer(
         const val SPOTIFY = "com.spotify.music"
         const val TIMEOUT_MS = 6_000L
         val shared by lazy { SpotifyPlaybackResumer() }
-        fun lastStatus(context: Context): Status = Status.entries.firstOrNull {
-            it.name == context.getSharedPreferences("spotify_resume", Context.MODE_PRIVATE).getString("status", null)
-        } ?: Status.IDLE
+        data class Completion(val status: Status, val completedAtEpochMs: Long?)
+        fun lastCompletion(context: Context): Completion {
+            val values = context.getSharedPreferences("spotify_resume", Context.MODE_PRIVATE).all
+            val status = Status.entries.firstOrNull { it.name == values["status"] }
+                ?.takeUnless { it == Status.CONNECTING || it == Status.BUSY } ?: Status.IDLE
+            val time = (values["completed_at_epoch_ms"] as? Long)?.takeIf { it > 0 && status != Status.IDLE }
+            return Completion(status, time)
+        }
+        fun lastStatus(context: Context): Status = lastCompletion(context).status
         private fun writeStatus(context: Context, status: Status) {
-            if (status != Status.CONNECTING) context.getSharedPreferences("spotify_resume", Context.MODE_PRIVATE)
-                .edit().putString("status", status.name).apply()
+            if (status != Status.CONNECTING && status != Status.BUSY) context.getSharedPreferences("spotify_resume", Context.MODE_PRIVATE)
+                .edit().putString("status", status.name).putLong("completed_at_epoch_ms", System.currentTimeMillis()).apply()
             Log.i(ActionActivity.LOG_TAG, "Spotify resume: ${status.name}")
         }
     }

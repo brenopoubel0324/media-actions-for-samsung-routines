@@ -24,7 +24,10 @@ class SpotifyDiagnosticsVisualTest {
         Robolectric.buildActivity(MainActivity::class.java).setup().use { activity ->
             val label = activity.get().findViewById<TextView>(R.id.spotify_resume_status)
             assertEquals(View.VISIBLE, label.visibility)
-            assertEquals(app.getString(R.string.spotify_resume_last, app.getString(R.string.spotify_resume_unavailable)), label.text.toString())
+            val completion=SpotifyPlaybackResumer.lastCompletion(app)
+            assertNotNull(completion.completedAtEpochMs)
+            assertTrue(label.text.toString().contains(app.getString(R.string.spotify_resume_unavailable)))
+            assertTrue(label.text.toString().contains(LocalDiagnostics.completionTime(app,completion.completedAtEpochMs)))
             activity.get().findViewById<View>(R.id.spotify_diagnostics).performClick()
             val root = activity.get().window.decorView
             root.measure(View.MeasureSpec.makeMeasureSpec(480, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(960, View.MeasureSpec.EXACTLY))

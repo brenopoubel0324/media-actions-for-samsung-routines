@@ -8,4 +8,16 @@
     <string name="unconfirmed">Comando sem confirmação. Não foi reenviado.</string>
     <string name="busy">Ação em andamento. Tente novamente.</string>
     <string name="settings_unavailable">Este firmware não oferece a tela de acesso às sessões de mídia.</string>
+    <string name="no_access">Acesso às sessões de mídia negado. Habilite-o nas configurações do aparelho.</string>
+    <string name="no_session">Nenhuma sessão de mídia disponível. Inicie a reprodução no player.</string>
+    <string name="ambiguous">Há mais de um player disponível. Inicie a reprodução no player desejado.</string>
+    <string name="changed">A sessão mudou antes do envio. Acione novamente se necessário.</string>
+    <string name="unsupported">Este player não oferece essa ação.</string>
+    <string name="failed">Não foi possível executar a ação.</string>
+    <string name="expired">O prazo da ação terminou. Não houve reenvio.</string>
+    <string name="connection_unavailable">Não foi possível consultar os aparelhos. Confira a conexão e o acesso à mídia.</string>
+    <string name="no_destination">Não foi possível escolher um player. Inicie a reprodução no aparelho desejado.</string>
+    <string name="target_feedback">%1$s: %2$s</string>
+    <string name="target_phone">Celular</string>
+    <string name="target_watch">Relógio</string>
 </resources>

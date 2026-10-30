@@ -105,7 +105,7 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
   <string name="widget_center_border_only">Borda só no Play/Pause</string>
   <string name="widget_progress_ring">Mostrar progresso da faixa</string>
   <string name="widget_progress_help">Opcional. O círculo aparece só com a música tocando e atualiza a cada 5 segundos com a tela acesa. Sem sessão, não aparece. É visual: não permite avançar a faixa.</string>
-  <string name="spotify_resume_last">Última tentativa no Spotify: %1$s</string>
+    <string name="spotify_resume_last">Última tentativa concluída no Spotify: %1$s\n%2$s</string>
   <string name="action_pending">Solicitando reprodução…</string>
   <string name="spotify_resume_idle">Nenhuma tentativa de retomada registrada.</string>
   <string name="spotify_resume_connecting">Conectando ao Spotify…</string>
@@ -172,4 +172,8 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="progress_settings_scope">Vale para todos os widgets com progresso da faixa ativado. Ligue ou desligue o indicador no editor de cada widget.</string>
     <plurals name="progress_interval_seconds"><item quantity="one">A cada %1$d segundo</item><item quantity="many">A cada %1$d segundos</item><item quantity="other">A cada %1$d segundos</item></plurals>
     <string name="progress_settings_help">Mudanças de Play/Pause continuam imediatas. Atualizações periódicas param em pausa, com tela apagada, duração indisponível ou todos os indicadores desligados. Tela acesa não garante que o widget esteja visível. Intervalos maiores geram menos atualizações; a economia de bateria ainda não foi medida.</string>
+    <string name="diagnostic_time_unknown">Horário de conclusão indisponível</string>
+    <string name="diagnostic_copy">Copiar diagnóstico</string>
+    <string name="diagnostic_copied">Diagnóstico copiado</string>
+    <string name="diagnostic_versions_manual">Anote manualmente as versões instaladas de One UI, LockStar e WBR.</string>
 </resources>

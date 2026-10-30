@@ -16,7 +16,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [33, 36])
+@Config(sdk = [33, 36], qualifiers = "pt-rBR")
 class WearLauncherTest {
     private val app get() = RuntimeEnvironment.getApplication()
     private val entries = mapOf<Class<out Activity>, MediaAction>(PreviousActionActivity::class.java to MediaAction.PREVIOUS,
