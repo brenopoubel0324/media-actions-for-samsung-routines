@@ -6,6 +6,8 @@ Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget tran
 
 Correções 0.18 após review: rascunhos numéricos/de cor preservados ao recriar a tela, resultado de teste protegido contra respostas antigas do Spotify e edição de local que preserva mudanças externas do visual. **394 testes aprovados**, build phone/Wear e lint. [Review e oportunidades de melhoria](docs/reviews/app-audit-0.18.md) · [Prévia da validação](downloads/v0.18-experimental/auditoria-configuracoes.png).
 
+[Plano das próximas medidas](docs/planos/proximas-medidas-pos-review-0.18.md): diagnóstico, testes físicos, restauração do visual por widget, intervalo de progresso e medição de desempenho.
+
 Novidade 0.17: cada widget mostra seu **local, número e dimensões** na seleção para edição. Use a indicação do sistema ou marque **Tela de bloqueio / Tela inicial / Outro local** em **Local deste widget**. A identificação manual é individual e não muda o visual nem interrompe a herança do padrão. [Funcionamento e limites](docs/WIDGET_LOCATIONS.md).
 
 ![Identificação dos widgets por local](downloads/v0.17-experimental/widgets-por-local.png)
