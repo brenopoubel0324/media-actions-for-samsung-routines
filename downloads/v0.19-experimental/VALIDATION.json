@@ -1,0 +1,43 @@
+{
+  "version": "0.19-experimental",
+  "application_id": "dev.local.mediaactions",
+  "apks": [
+    {
+      "kind": "phone",
+      "filename": "media-actions-phone-0.19-experimental-debug.apk",
+      "sha256": "e111789d5c1cdba14d3d405aca7f8bc24bc5ae34d179fcda9537d4b93b774426",
+      "bytes": 5572641,
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+    }
+  ],
+  "wear_companion": "0.8-experimental",
+  "tests": {
+    "app": {
+      "tests": 374,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 405,
+  "lint": "No issues found in all modules",
+  "review": "execucao-intervalo-0.19.md",
+  "physical_host_tested": false,
+  "physical_wear_tested": false,
+  "physical_battery_measured": false,
+  "progress_default_seconds": 5,
+  "features": "Intervalo global de progresso em 5, 15 ou 30 segundos, com Salvar/Cancelar e escolha individual de ligar/desligar preservada. Contagens controladas registradas; sem economia de bateria medida.",
+  "requested_permissions": 0
+}

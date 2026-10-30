@@ -165,4 +165,8 @@
     <string name="widget_location_reported">%1$s · reported by system</string>
     <string name="widget_location_unknown">Location not reported</string>
     <string name="widget_location_help">The launcher or LockStar may omit or misreport its location. Select it here to recognize this instance. This label does not move the widget or change its appearance. Save to keep it; cancel to discard.</string>
+    <string name="progress_settings_title">Progress updates</string>
+    <string name="progress_settings_scope">Applies to every widget with track progress enabled. Turn the indicator on or off in each widget editor.</string>
+    <plurals name="progress_interval_seconds"><item quantity="one">Every %1$d second</item><item quantity="other">Every %1$d seconds</item></plurals>
+    <string name="progress_settings_help">Play/Pause changes still update immediately. Periodic updates stop when paused, the screen is off, duration is unavailable or all indicators are disabled. A screen being on does not guarantee the widget is visible. Longer intervals mean fewer periodic updates; battery savings have not been measured.</string>
 </resources>

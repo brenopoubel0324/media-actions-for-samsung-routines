@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item type="id" name="progress_settings" />
+    <item type="id" name="progress_interval_5" />
+    <item type="id" name="progress_interval_15" />
+    <item type="id" name="progress_interval_30" />
+    <item type="id" name="progress_settings_save" />
+    <item type="id" name="progress_settings_cancel" />
     <item type="id" name="settings_location" />
     <item type="id" name="widget_location_choice" />
     <item type="id" name="widget_configuration_identity" />

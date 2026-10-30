@@ -31,7 +31,14 @@ class WidgetPlaybackObserver(context: Context,
     private var refreshPending = false
     private var forceRefresh = false
     private var receiverRegistered = false
-    private val pulse = Runnable { scheduleRefresh(true) }
+    /** Optional test/debug observer; no counters, storage or logging when unset. */
+    internal enum class Work { PERIODIC_TICK, EVENT_REFRESH }
+    internal var observeWork: ((Work) -> Unit)? = null
+    private var eventPending = false
+    private val pulse = Runnable {
+        observeWork?.invoke(Work.PERIODIC_TICK)
+        scheduleRefresh(true, event = false)
+    }
     private val visibilityReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             handler.removeCallbacks(pulse)
@@ -48,12 +55,15 @@ class WidgetPlaybackObserver(context: Context,
         handler.removeCallbacks(pulse)
         if (running && state == WidgetPlaybackState.PLAYING && progressWidgets() &&
             app.getSystemService(PowerManager::class.java).isInteractive && progressReader() != null)
-            handler.postDelayed(pulse, 5_000)
+            handler.postDelayed(pulse, WidgetProgressSettings.load(app) * 1_000L)
     }
     private val refresh = Runnable {
         refreshPending = false
         if (running) {
             val state = WidgetPlaybackState.read(AndroidSessionGateway(app))
+            val event = eventPending
+            eventPending = false
+            if (observeWork != null && event && (state != lastState || forceRefresh && progressWidgets())) observeWork?.invoke(Work.EVENT_REFRESH)
             if (state != lastState) emit(state)
             else if (forceRefresh && progressWidgets()) emit(state, progressOnly = true)
             forceRefresh = false
@@ -124,8 +134,9 @@ class WidgetPlaybackObserver(context: Context,
         }
     }
 
-    private fun scheduleRefresh(force: Boolean = false) {
+    private fun scheduleRefresh(force: Boolean = false, event: Boolean = true) {
         forceRefresh = forceRefresh || force
+        eventPending = eventPending || event
         if (!running || refreshPending) return
         refreshPending = true
         handler.post(refresh)
@@ -158,6 +169,7 @@ class WidgetPlaybackObserver(context: Context,
         }
         refreshPending = false
         forceRefresh = false
+        eventPending = false
         for ((controller, callback) in watched.values) {
             try { controller.unregisterCallback(callback) } catch (_: RuntimeException) { /* Already gone. */ }
         }

@@ -168,4 +168,8 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="widget_location_reported">%1$s · informado pelo sistema</string>
     <string name="widget_location_unknown">Local não informado</string>
     <string name="widget_location_help">O launcher ou LockStar pode omitir ou informar o local incorretamente. Selecione aqui para reconhecer esta instância. Essa identificação não move o widget nem muda o visual. Salve para manter; cancele para descartar.</string>
+    <string name="progress_settings_title">Atualização do progresso</string>
+    <string name="progress_settings_scope">Vale para todos os widgets com progresso da faixa ativado. Ligue ou desligue o indicador no editor de cada widget.</string>
+    <plurals name="progress_interval_seconds"><item quantity="one">A cada %1$d segundo</item><item quantity="many">A cada %1$d segundos</item><item quantity="other">A cada %1$d segundos</item></plurals>
+    <string name="progress_settings_help">Mudanças de Play/Pause continuam imediatas. Atualizações periódicas param em pausa, com tela apagada, duração indisponível ou todos os indicadores desligados. Tela acesa não garante que o widget esteja visível. Intervalos maiores geram menos atualizações; a economia de bateria ainda não foi medida.</string>
 </resources>
