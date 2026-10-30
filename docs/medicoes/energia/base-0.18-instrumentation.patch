@@ -1,9 +1,6 @@
---- a/WidgetPlaybackObserver.kt
-+++ b/WidgetPlaybackObserver.kt
-@@ -31,7 +31,14 @@
-     private var refreshPending = false
-     private var forceRefresh = false
-     private var receiverRegistered = false
+--- a/app/src/main/java/dev/local/mediaactions/WidgetPlaybackObserver.kt
++++ b/app/src/main/java/dev/local/mediaactions/WidgetPlaybackObserver.kt
+@@ -34 +34,8 @@
 -    private val pulse = Runnable { scheduleRefresh(true) }
 +    /** Optional test/debug observer; no counters, storage or logging when unset. */
 +    internal enum class Work { PERIODIC_TICK, EVENT_REFRESH }
@@ -13,35 +10,14 @@
 +        observeWork?.invoke(Work.PERIODIC_TICK)
 +        scheduleRefresh(true, event = false)
 +    }
-     private val visibilityReceiver = object : BroadcastReceiver() {
-         override fun onReceive(context: Context, intent: Intent) {
-             handler.removeCallbacks(pulse)
-@@ -54,6 +61,9 @@
-         refreshPending = false
-         if (running) {
-             val state = WidgetPlaybackState.read(AndroidSessionGateway(app))
+@@ -56,0 +64,3 @@
 +            val event = eventPending
 +            eventPending = false
 +            if (event && (state != lastState || forceRefresh && progressWidgets())) observeWork?.invoke(Work.EVENT_REFRESH)
-             if (state != lastState) emit(state)
-             else if (forceRefresh && progressWidgets()) emit(state, progressOnly = true)
-             forceRefresh = false
-@@ -124,8 +134,9 @@
-         }
-     }
- 
+@@ -127 +137 @@
 -    private fun scheduleRefresh(force: Boolean = false) {
 +    private fun scheduleRefresh(force: Boolean = false, event: Boolean = true) {
-         forceRefresh = forceRefresh || force
+@@ -128,0 +139 @@
 +        eventPending = eventPending || event
-         if (!running || refreshPending) return
-         refreshPending = true
-         handler.post(refresh)
-@@ -158,6 +169,7 @@
-         }
-         refreshPending = false
-         forceRefresh = false
+@@ -160,0 +172 @@
 +        eventPending = false
-         for ((controller, callback) in watched.values) {
-             try { controller.unregisterCallback(callback) } catch (_: RuntimeException) { /* Already gone. */ }
-         }
