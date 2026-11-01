@@ -29,8 +29,12 @@ class WidgetAppearanceSection(
     /** Message for a rejected or partially completed save, read by the host Activity. */
     internal var lastApplyFailure = R.string.widget_invalid_values
         private set
+    private fun traceSave(stage: String) {
+        WidgetSaveTrace.record(widgetId, appearanceIntent.name, stage, draft.normalized().hashCode())
+    }
     private fun rejectSave(message: Int): Boolean {
         lastApplyFailure = message
+        traceSave("FAILED_" + context.resources.getResourceEntryName(message))
         confirmation?.setText(message)
         return false
     }
@@ -117,6 +121,7 @@ class WidgetAppearanceSection(
         if (current != draft) { draft = current; rebuild?.invoke() }
     }
     private fun invalid(sectionId: Int): Boolean {
+        traceSave("INVALID_VALUES")
         openSection(sectionId)
         val content = sections[sectionId]?.content ?: return false
         fun firstError(view: View): EditText? {
@@ -131,6 +136,7 @@ class WidgetAppearanceSection(
     }
     fun applyChanges(): Boolean {
         lastApplyFailure = R.string.widget_invalid_values
+        traceSave("CLICK")
         if (appearanceIntent != AppearanceIntent.INHERIT) {
             if (scaleControl?.validate() == false) return invalid(R.id.settings_icons)
             if (spacingControl?.validate() == false || paddingControls?.validate() == false) return invalid(R.id.settings_spacing)
@@ -164,6 +170,7 @@ class WidgetAppearanceSection(
         } catch (_: RuntimeException) {
             return rejectSave(R.string.widget_save_write_failed)
         }
+        traceSave("APPEARANCE_READBACK_OK")
         try {
             if (widgetId != null) {
                 WidgetLocationStore.save(context, widgetId, location)
@@ -174,6 +181,7 @@ class WidgetAppearanceSection(
             return rejectSave(R.string.widget_save_location_failed)
         }
 
+        traceSave("LOCATION_READBACK_OK")
         val refreshRequested = if (widgetId == null) try {
             MediaWidgetProvider.refreshAll(context)
             true
@@ -186,6 +194,7 @@ class WidgetAppearanceSection(
             MediaWidgetProvider.RefreshResult.FAILED -> false
         }
         if (!refreshRequested) return rejectSave(R.string.widget_save_refresh_failed)
+        traceSave("UPDATE_REQUESTED_UNVERIFIED_IN_HOST")
         try {
             WidgetPlaybackObserver.settingsChanged(context)
         } catch (_: RuntimeException) {
