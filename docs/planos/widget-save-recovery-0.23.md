@@ -1,6 +1,6 @@
 # Recuperação de gravação e atualização do editor de widgets — investigação 0.23
 
-**Base remota inspecionada:** `main@1f09e3a2598372a7e829d25d25eed15431e67f0e` (phone 0.22).  
+**Base remota inspecionada:** `main@1f09e3a2598372a7e829d25d25eed15431e67f0e` (phone 0.22).
 **Situação:** trabalho isolado em branch; não é entrega estável nem APK validado.
 **Origem:** sintomas reais relatados no Galaxy S25 (sem acesso à instalação física).
 
@@ -54,7 +54,7 @@ Preservar `applicationId`, stores `widget_appearance[_id]`, `has_override`, loca
 
 ## Gate de publicação
 
-**Candidato experimental:** testes, build e lint concluídos, hash e assinatura verificados.  
+**Candidato experimental:** testes, build e lint concluídos, hash e assinatura verificados.
 **Estável:** também exige observação de save/reopen/refresh no Galaxy S25, LockStar quando suportado, e upgrade sem perda de dados.
 
 **Riscos residuais atuais:** `apply()` sem confirmação de disco; duas stores sem atomicidade; concorrência de dois editores; host sem ACK de pintura; ausência de testes físicos; mudanças locais de Codex não acessíveis desta conexão. Esses riscos são **abertos**, não corrigidos nesta rodada.
