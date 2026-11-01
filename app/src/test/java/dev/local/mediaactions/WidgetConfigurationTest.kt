@@ -225,6 +225,25 @@ class WidgetConfigurationTest {
         assertEquals(35, WidgetStyleStore.load(app, second).iconScalePercent)
     }
 
+    @Test fun editorRetainsDraftWhenHostRefreshFailsAndAcceptsRetry() {
+        val id = widget()
+        val editor = WidgetAppearanceSection(app, id)
+        val content = editor.create()
+        val dark = children(content).filterIsInstance<RadioButton>()
+            .first { it.text == app.getString(R.string.widget_icons_dark) }
+        dark.isChecked = true
+        editor.requestWidgetRefresh = { _, _ -> MediaWidgetProvider.RefreshResult.FAILED }
+        assertFalse(editor.applyChanges())
+        assertEquals(R.string.widget_save_refresh_failed, editor.lastApplyFailure)
+        assertTrue(WidgetStyleStore.load(app, id).darkIcons)
+        assertTrue(editor.currentAppearance().darkIcons)
+
+        editor.requestWidgetRefresh = { _, _ -> MediaWidgetProvider.RefreshResult.REQUESTED }
+        assertTrue(editor.applyChanges())
+        assertTrue(WidgetStyleStore.load(app, id).darkIcons)
+        assertTrue(WidgetStyleStore.hasOverride(app, id))
+    }
+
     @Test fun concurrentEditorsCannotSilentlyOverwriteNewerAppearance() {
         val id = widget()
         val first = Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).setup()
