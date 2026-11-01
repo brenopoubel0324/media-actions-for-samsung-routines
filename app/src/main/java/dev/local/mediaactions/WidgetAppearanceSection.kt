@@ -29,6 +29,9 @@ class WidgetAppearanceSection(
     /** Message for a rejected or partially completed save, read by the host Activity. */
     internal var lastApplyFailure = R.string.widget_invalid_values
         private set
+    /** Injectable host request for tests; production always uses the AppWidgetManager path. */
+    internal var requestWidgetRefresh: (Context, Int) -> MediaWidgetProvider.RefreshResult =
+        MediaWidgetProvider::refreshWidgetResult
     private fun traceSave(stage: String) {
         WidgetSaveTrace.record(widgetId, appearanceIntent.name, stage, draft.normalized().hashCode())
     }
@@ -210,7 +213,7 @@ class WidgetAppearanceSection(
             true
         } catch (_: RuntimeException) {
             false
-        } else when (MediaWidgetProvider.refreshWidgetResult(context, widgetId)) {
+        } else when (requestWidgetRefresh(context, widgetId)) {
             MediaWidgetProvider.RefreshResult.REQUESTED -> true
             MediaWidgetProvider.RefreshResult.MISSING_WIDGET ->
                 return rejectSave(R.string.widget_save_refresh_missing)
