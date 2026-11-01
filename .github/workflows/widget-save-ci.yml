@@ -1,9 +1,6 @@
 name: Widget save regression checks
 
 on:
-  push:
-    branches:
-      - fix/widget-save-diagnostics-0.23
   pull_request:
     branches:
       - main
