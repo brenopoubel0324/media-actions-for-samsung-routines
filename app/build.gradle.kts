@@ -27,6 +27,7 @@ android {
         // A separate on-device probe. Never overwrites the user's existing 0.22 installation.
         create("preview") {
             initWith(getByName("debug"))
+            matchingFallbacks += listOf("debug")
             applicationIdSuffix = ".preview"
             versionNameSuffix = "-preview"
         }
