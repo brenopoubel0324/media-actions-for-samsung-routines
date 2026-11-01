@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Spinner
 import android.widget.ImageView
 import android.widget.RadioButton
 import org.junit.Assert.*
@@ -222,5 +223,56 @@ class WidgetConfigurationTest {
             MediaWidgetProvider.refreshWidgetResult(app, first))
         assertTrue(WidgetStyleStore.load(app, first).darkIcons)
         assertEquals(35, WidgetStyleStore.load(app, second).iconScalePercent)
+    }
+
+    @Test fun concurrentEditorsCannotSilentlyOverwriteNewerAppearance() {
+        val id = widget()
+        val first = Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).setup()
+        val stale = Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).setup()
+        try {
+            first.get().findViewById<EditText>(R.id.widget_scale_value).setText("73")
+            first.get().findViewById<Button>(R.id.widget_configuration_save).performClick()
+            assertEquals(73, WidgetStyleStore.load(app, id).iconScalePercent)
+
+            chooseDark(stale.get())
+            stale.get().findViewById<Button>(R.id.widget_configuration_save).performClick()
+            assertFalse(stale.get().isFinishing)
+            assertEquals(Activity.RESULT_CANCELED, shadowOf(stale.get()).resultCode)
+            assertTrue(stale.get().findViewById<TextView>(R.id.widget_configuration_identity)
+                .text.contains(app.getString(R.string.widget_save_conflict)))
+            assertEquals(73, WidgetStyleStore.load(app, id).iconScalePercent)
+            assertFalse(WidgetStyleStore.load(app, id).darkIcons)
+        } finally {
+            first.pause().stop().destroy()
+            stale.pause().stop().destroy()
+        }
+    }
+
+    @Test fun appearanceOnlySaveDoesNotUndoConcurrentLocationChange() {
+        val id = widget()
+        Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).use {
+            val activity = it.setup().get()
+            WidgetLocationStore.save(app, id, WidgetLocation.LOCK_SCREEN)
+            chooseDark(activity)
+            activity.findViewById<Button>(R.id.widget_configuration_save).performClick()
+            assertTrue(activity.isFinishing)
+            assertTrue(WidgetStyleStore.load(app, id).darkIcons)
+            assertEquals(WidgetLocation.LOCK_SCREEN, WidgetLocationStore.load(app, id))
+        }
+    }
+
+    @Test fun concurrentLocationEditsAreRejectedWithoutPartialWrite() {
+        val id = widget()
+        Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).use {
+            val activity = it.setup().get()
+            activity.findViewById<Spinner>(R.id.widget_location_choice)
+                .setSelection(WidgetLocation.LOCK_SCREEN.ordinal)
+            WidgetLocationStore.save(app, id, WidgetLocation.HOME_SCREEN)
+            activity.findViewById<Button>(R.id.widget_configuration_save).performClick()
+            assertFalse(activity.isFinishing)
+            assertTrue(activity.findViewById<TextView>(R.id.widget_configuration_identity)
+                .text.contains(app.getString(R.string.widget_save_location_conflict)))
+            assertEquals(WidgetLocation.HOME_SCREEN, WidgetLocationStore.load(app, id))
+        }
     }
 }
