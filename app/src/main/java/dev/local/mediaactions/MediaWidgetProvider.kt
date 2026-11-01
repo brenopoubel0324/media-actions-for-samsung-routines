@@ -97,10 +97,24 @@ class MediaWidgetProvider : AppWidgetProvider() {
             }
         }
 
+        /** An update request is not proof that the host has drawn the new RemoteViews. */
+        internal enum class RefreshResult { REQUESTED, MISSING_WIDGET, FAILED }
+
+        internal fun refreshWidgetResult(context: Context, id: Int): RefreshResult {
+            if (!isOwnWidget(context, id)) return RefreshResult.MISSING_WIDGET
+            return try {
+                val app = context.applicationContext
+                val manager = AppWidgetManager.getInstance(app)
+                WidgetPlaybackObserver.settingsChanged(app)
+                updateBatch(app, manager, listOf(id))
+                RefreshResult.REQUESTED
+            } catch (_: RuntimeException) {
+                RefreshResult.FAILED
+            }
+        }
+
         internal fun refreshWidget(context: Context, id: Int) {
-            if (!isOwnWidget(context, id)) return
-            val manager = AppWidgetManager.getInstance(context.applicationContext)
-            MediaWidgetProvider().onUpdate(context.applicationContext, manager, intArrayOf(id))
+            refreshWidgetResult(context, id)
         }
 
         private fun updateBatch(context: Context, manager: AppWidgetManager, ids: List<Int>,
