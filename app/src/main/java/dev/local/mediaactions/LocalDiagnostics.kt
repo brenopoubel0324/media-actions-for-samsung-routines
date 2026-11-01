@@ -28,12 +28,25 @@ object LocalDiagnostics {
         val manager = AppWidgetManager.getInstance(context)
         val ids = manager.getAppWidgetIds(ComponentName(context, MediaWidgetProvider::class.java))
             .filter { MediaWidgetProvider.isOwnWidget(context, it) }.sorted()
+        appendLine("defaultsAppearanceHash=" + WidgetStyleStore.load(context).hashCode())
         for (id in ids) {
             val options = manager.getAppWidgetOptions(id)
+            val style = WidgetStyleStore.load(context, id)
             appendLine("Widget #$id: " + WidgetLocationStore.description(context, id))
+            appendLine("hasOverride=" + WidgetStyleStore.hasOverride(context, id))
+            appendLine("appearanceHash=" + style.hashCode() +
+                " style=" + style.iconStyle.name + " dark=" + style.darkIcons +
+                " scale=" + style.iconScalePercent + " progress=" + style.progressRing)
             appendLine("hostCategory=" + options.getInt(AppWidgetManager.OPTION_APPWIDGET_HOST_CATEGORY, 0))
             val sizes = WidgetRenderer.reportedSizes(options)
             appendLine("sizesDp=" + sizes.joinToString { "${it.width} x ${it.height}" }.ifEmpty { "?" })
+            sizes.firstOrNull()?.let { size ->
+                val effective = WidgetGeometry.calculate(size.width, size.height, style)
+                appendLine("requestedSpacingDp=" + style.spacingDp + " effectiveSpacingDp=" + effective.gapDp)
+                appendLine("requestedPaddingDp=" + style.widgetPaddingHorizontalDp + "," +
+                    style.widgetPaddingVerticalDp + " effectivePaddingDp=" +
+                    effective.widgetPaddingHorizontalDp + "," + effective.widgetPaddingVerticalDp)
+            }
         }
         append(context.getString(R.string.diagnostic_versions_manual))
     }
