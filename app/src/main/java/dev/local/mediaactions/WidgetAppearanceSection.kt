@@ -142,7 +142,9 @@ class WidgetAppearanceSection(
         } }
         return false
     }
-    fun applyChanges(): Boolean {
+    fun applyChanges(): Boolean = synchronized(saveLock) { applyChangesLocked() }
+
+    private fun applyChangesLocked(): Boolean {
         lastApplyFailure = R.string.widget_invalid_values
         traceSave("CLICK")
         if (appearanceIntent != AppearanceIntent.INHERIT) {
@@ -235,6 +237,11 @@ class WidgetAppearanceSection(
         confirmation?.setText(R.string.widget_style_applied)
         onApplied?.invoke()
         return true
+    }
+
+    private companion object {
+        // Serializes editor check-and-write in this process; not a disk transaction.
+        private val saveLock = Any()
     }
 
     fun create(showApplyButton: Boolean = true, previewContainer: LinearLayout? = null): View {
