@@ -45,3 +45,15 @@ Além do build: simular erro de gravação e erro de `AppWidgetManager`, testar 
 Foi adicionada injeção local de `dispatch` em `MediaWidgetProvider.refreshWidgetResult` para permitir que um teste Robolectric simule `updateAppWidget` lançando exceção sem alterar o caminho normal de produção. O teste `refreshResultDoesNotClaimSuccessWhenHostUpdateThrows` exige `FAILED`, não `REQUESTED`.
 
 **Autoauditoria final desta sessão: REVISAR.** Há novos testes no código, mas não foram executados. Permanecem as lacunas altas de durabilidade do store, concorrência/estado parcial e falta de validação no Android real; nenhum APK foi produzido ou aprovado. O diff foi examinado via GitHub, mas `git diff --check`, build e lint não puderam ser executados.
+
+## Auditoria complementar — 31/10/2026 (GitHub remoto)
+
+**Evidência:** comparação `main...fix/widget-save-diagnostics-0.23`: 33 commits à frente, 0 atrás, 14 arquivos alterados. GitHub Actions run #16 (41263608731), commit `85ca1b9d333fc8cb1d53cd87c0e2b52b9122dee7`: job `android` e etapa de build/testes/lint concluídos com `success`. Esta auditoria não executou Gradle local nem teste físico.
+
+**Achados:**
+- **ALTO — escrita parcial e durabilidade:** `WidgetAppearanceSection.applyChanges` grava aparência e localização em stores independentes. `SharedPreferences.apply()` e read-back imediato não comprovam persistência em disco; falha da segunda gravação pode deixar aparência já modificada. Antes de considerar estável, especificar estratégia de confirmação fora da UI thread e recuperação/compensação de gravação parcial, com testes de falha injetada e reinício do processo.
+- **ALTO — concorrência não serializada:** a verificação `load/hasOverride` precede gravação sem exclusão mútua/compare-and-set atômico. Dois editores que salvem simultaneamente podem passar pela checagem e sobrescrever valores. O teste existente cobre edição sequencial stale, não a interleaving entre check e write. Introduzir coordenação por widget e teste determinístico de interleaving.
+- **MÉDIO — confirmação do host:** `REQUESTED` significa solicitação de `updateAppWidget`, não renderização observada no LockStar; manter mensagem e telemetria precisas.
+- **MÉDIO — documentação desatualizada:** as seções iniciais desta autoauditoria afirmam que build/testes não foram executados, mas o CI remoto #16 os executou com sucesso. Interpretar essas seções como histórico da rodada original, não estado atual.
+
+**Veredito:** REVISAR. CI remoto aprovado, porém sem garantia de persistência, exclusão mútua na gravação e validação física/assinatura. Não mesclar nem publicar como estável. Nenhuma alteração de código ou APK nesta auditoria complementar.
