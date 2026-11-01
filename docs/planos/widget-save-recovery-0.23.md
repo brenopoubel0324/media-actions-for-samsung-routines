@@ -58,3 +58,15 @@ Preservar `applicationId`, stores `widget_appearance[_id]`, `has_override`, loca
 **Estável:** também exige observação de save/reopen/refresh no Galaxy S25, LockStar quando suportado, e upgrade sem perda de dados.
 
 **Riscos residuais atuais:** `apply()` sem confirmação de disco; duas stores sem atomicidade; concorrência de dois editores; host sem ACK de pintura; ausência de testes físicos; mudanças locais de Codex não acessíveis desta conexão. Esses riscos são **abertos**, não corrigidos nesta rodada.
+
+## Gate de implementação pós-serialização
+
+O bloqueio de processo em `WidgetAppearanceSection.applyChanges` evita interleaving entre editores dentro da mesma instância do processo. **Não** torna `SharedPreferences.apply()` durável, não coordena outros processos e não torna os stores de aparência e localização atômicos.
+
+**Critérios obrigatórios antes de modificar persistência:**
+1. Localizar as implementações reais de `WidgetStyleStore` e `WidgetLocationStore` e todos os consumidores; preservar chaves e formatos existentes.
+2. Definir snapshot anterior, commit confirmado fora da thread principal e política de compensação/reconciliação em falha da segunda escrita. Não afirmar atomicidade entre dois arquivos de preferências sem journal ou store único transacional.
+3. Adicionar testes de falha injetada na primeira e segunda escrita, retry, reinício do processo, concorrência determinística e preservação de configurações antigas.
+4. Validar lint, testes API 33/36, build e upgrade no S25 antes de publicar.
+
+**CI:** run #29, 41266127808, observado `in_progress` durante esta revisão. Resultado pendente, não aprovado antecipadamente.
