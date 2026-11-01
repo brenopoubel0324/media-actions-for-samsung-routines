@@ -24,6 +24,12 @@ android {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
+        // A separate on-device probe. Never overwrites the user's existing 0.22 installation.
+        create("preview") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".preview"
+            versionNameSuffix = "-preview"
+        }
     }
     lint {
         warningsAsErrors = true
