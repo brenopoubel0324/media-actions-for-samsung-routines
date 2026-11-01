@@ -185,4 +185,5 @@
 
     <string name="widget_save_conflict">This widget was changed in another editor. Your draft has not been overwritten. Reopen this widget to review the latest settings.</string>
     <string name="widget_save_location_conflict">The widget location was changed elsewhere while you were editing. No settings were overwritten. Reopen the editor to review.</string>
+    <string name="widget_diagnostic_copy">Copy widget diagnostics</string>
 </resources>
