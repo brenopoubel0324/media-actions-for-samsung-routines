@@ -182,4 +182,7 @@
     <string name="widget_save_location_failed">Appearance may already be saved, but the widget location could not be saved. Keep this editor open and retry.</string>
     <string name="widget_save_refresh_failed">Settings were saved, but the widget refresh request failed. Retry Save; your changes are kept.</string>
     <string name="widget_save_refresh_missing">Settings were saved, but this widget was removed or is no longer available. The editor will keep your draft.</string>
+
+    <string name="widget_save_conflict">This widget was changed in another editor. Your draft has not been overwritten. Reopen this widget to review the latest settings.</string>
+    <string name="widget_save_location_conflict">The widget location was changed elsewhere while you were editing. No settings were overwritten. Reopen the editor to review.</string>
 </resources>
