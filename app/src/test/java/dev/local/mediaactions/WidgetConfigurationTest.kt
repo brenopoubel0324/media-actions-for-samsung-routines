@@ -13,6 +13,8 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.ImageView
 import android.widget.RadioButton
 import org.junit.Assert.*
@@ -176,5 +178,41 @@ class WidgetConfigurationTest {
         MediaWidgetProvider.refreshAll(app)
         assertEquals(custom, WidgetStyleStore.load(app, first))
         assertEquals(defaults, WidgetStyleStore.load(app, second))
+    }
+
+    @Test fun refreshResultIdentifiesAWidgetRemovedByTheHost() {
+        val id = widget()
+        org.robolectric.util.ReflectionHelpers.getField<MutableMap<Int, *>>(
+            shadowOf(manager), "widgetInfos").remove(id)
+        assertEquals(MediaWidgetProvider.RefreshResult.MISSING_WIDGET,
+            MediaWidgetProvider.refreshWidgetResult(app, id))
+    }
+
+    @Test fun validationFailureKeepsDraftAndIdentifiesTheActualProblem() {
+        val id = widget()
+        Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).use {
+            val activity = it.setup().get()
+            val input = activity.findViewById<EditText>(R.id.widget_scale_value)
+            input.setText("999")
+            activity.findViewById<Button>(R.id.widget_configuration_save).performClick()
+            assertFalse(activity.isFinishing)
+            assertEquals(Activity.RESULT_CANCELED, shadowOf(activity).resultCode)
+            assertEquals("999", input.text.toString())
+            assertTrue(activity.findViewById<TextView>(R.id.widget_configuration_identity)
+                .text.contains(activity.getString(R.string.widget_invalid_values)))
+            assertEquals(WidgetAppearance().iconScalePercent,
+                WidgetStyleStore.load(app, id).iconScalePercent)
+        }
+    }
+
+    @Test fun renderingRefreshResultDoesNotMutateAnotherInstancesAppearance() {
+        val first = widget()
+        val second = widget()
+        WidgetStyleStore.save(app, WidgetAppearance(darkIcons = true), first)
+        WidgetStyleStore.save(app, WidgetAppearance(iconScalePercent = 35), second)
+        assertEquals(MediaWidgetProvider.RefreshResult.REQUESTED,
+            MediaWidgetProvider.refreshWidgetResult(app, first))
+        assertTrue(WidgetStyleStore.load(app, first).darkIcons)
+        assertEquals(35, WidgetStyleStore.load(app, second).iconScalePercent)
     }
 }
