@@ -28,6 +28,9 @@ android {
     lint {
         warningsAsErrors = true
         checkReleaseBuilds = true
+        // CI runners may ship a newer SDK than 36. Target SDK upgrades require
+        // separate device compatibility validation; keep all other lint checks.
+        disable += "OldTargetApi"
     }
     testOptions {
         unitTests.isIncludeAndroidResources = true
