@@ -13,6 +13,9 @@ import android.widget.RemoteViews
 
 /** Direct broadcasts for media commands; playback changes arrive through the bound listener. */
 class MediaWidgetProvider : AppWidgetProvider() {
+    /** An update request is not proof that the host has drawn the new RemoteViews. */
+    internal enum class RefreshResult { REQUESTED, MISSING_WIDGET, FAILED }
+
     override fun onUpdate(context: Context, manager: AppWidgetManager, appWidgetIds: IntArray) {
         if (appWidgetIds.isEmpty()) return
         WidgetPlaybackObserver.settingsChanged(context)
@@ -96,9 +99,6 @@ class MediaWidgetProvider : AppWidgetProvider() {
                 false
             }
         }
-
-        /** An update request is not proof that the host has drawn the new RemoteViews. */
-        internal enum class RefreshResult { REQUESTED, MISSING_WIDGET, FAILED }
 
         internal fun refreshWidgetResult(
             context: Context,
