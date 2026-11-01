@@ -57,3 +57,11 @@ Foi adicionada injeção local de `dispatch` em `MediaWidgetProvider.refreshWidg
 - **MÉDIO — documentação desatualizada:** as seções iniciais desta autoauditoria afirmam que build/testes não foram executados, mas o CI remoto #16 os executou com sucesso. Interpretar essas seções como histórico da rodada original, não estado atual.
 
 **Veredito:** REVISAR. CI remoto aprovado, porém sem garantia de persistência, exclusão mútua na gravação e validação física/assinatura. Não mesclar nem publicar como estável. Nenhuma alteração de código ou APK nesta auditoria complementar.
+
+## Investigação dos stores e CI #29
+
+Código inspecionado: `WidgetAppearance.kt` define `WidgetStyleStore` (`widget_appearance[_id]`, `has_override`, `apply()`, `deleteSharedPreferences()`); `WidgetLocation.kt` define `WidgetLocationStore` (`widget_location_$id`, `apply()`, `deleteSharedPreferences()`). O fluxo do editor escreve aparência antes da localização, sem transação entre arquivos. A sincronização adicionada ao editor protege somente editores que compartilham o mesmo monitor no mesmo processo; os stores continuam acessíveis por outros consumidores.
+
+A execução GitHub Actions #29 (41266127808) terminou `cancelled`: a etapa Android build/Robolectric/lint foi cancelada. **Não é evidência de testes aprovados.** A causa do cancelamento não foi determinada por esse resultado.
+
+Próxima implementação segura: testar o contrato de persistência e falha parcial com injeção controlada, considerar escrita serializada em worker e mecanismo de reconciliação; não substituir cegamente `apply()` por `commit()` na UI thread, não alterar chaves nem remover preferências existentes. Validar nova execução CI e S25 antes de estabilidade.
