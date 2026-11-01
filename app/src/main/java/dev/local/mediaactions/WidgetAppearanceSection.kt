@@ -48,7 +48,8 @@ class WidgetAppearanceSection(
     private var expanded = 0
     private var previewState = if (draft.progressRing) WidgetPlaybackState.PLAYING else WidgetPlaybackState.PAUSED
     private var previewStates: RadioGroup? = null
-    private var location = widgetId?.let { WidgetLocationStore.load(context, it) } ?: WidgetLocation.AUTOMATIC
+    private var originalLocation = widgetId?.let { WidgetLocationStore.load(context, it) } ?: WidgetLocation.AUTOMATIC
+    private var location = originalLocation
     private var locationChoice: Spinner? = null
     private val textFields = linkedMapOf<String, EditText>()
     fun currentAppearance() = draft.normalized()
@@ -59,6 +60,7 @@ class WidgetAppearanceSection(
     fun saveUiState(out: Bundle) {
         out.putInt("settings_section", expanded); out.putString("preview_state", previewState.name)
         out.putString("widget_location_draft", location.name)
+        out.putString("widget_original_location", originalLocation.name)
         out.putBoolean("widget_original_override", originalHasOverride)
         out.putString("widget_appearance_intent", appearanceIntent.name)
         out.putBundle("widget_original_appearance", WidgetAppearanceState.write(originalAppearance))
@@ -75,6 +77,9 @@ class WidgetAppearanceSection(
             openSection(state?.getInt("settings_section") ?: 0)
             originalAppearance = WidgetAppearanceState.read(state?.getBundle("widget_original_appearance")) ?: originalAppearance
             originalHasOverride = state?.getBoolean("widget_original_override", originalHasOverride) ?: originalHasOverride
+            originalLocation = WidgetLocation.entries.firstOrNull {
+                it.name == state?.getString("widget_original_location")
+            } ?: originalLocation
             appearanceIntent = AppearanceIntent.entries.firstOrNull { it.name == state?.getString("widget_appearance_intent") } ?: AppearanceIntent.KEEP
             if (appearanceIntent != AppearanceIntent.INHERIT) state?.getBundle("widget_text_draft")?.let { saved -> textFields.forEach { (key, field) ->
                 saved.getBundle(key)?.let { raw -> raw.getString("text")?.let { text ->
@@ -149,6 +154,24 @@ class WidgetAppearanceSection(
         val writesAppearance = widgetId == null || appearanceIntent != AppearanceIntent.KEEP ||
             desired != originalAppearance
         val shouldOverride = widgetId != null && appearanceIntent != AppearanceIntent.INHERIT
+        // A second editor may have changed this instance while the first was open.
+        // A retry after a successful write but failed refresh is also allowed.
+        if (writesAppearance) {
+            val now = WidgetStyleStore.load(context, widgetId)
+            val nowOwn = widgetId?.let { WidgetStyleStore.hasOverride(context, it) } ?: false
+            val target = if (appearanceIntent == AppearanceIntent.INHERIT)
+                WidgetStyleStore.load(context) else desired
+            val alreadyWritten = now == target && nowOwn == shouldOverride
+            if (!alreadyWritten && (now != originalAppearance ||
+                    (widgetId != null && nowOwn != originalHasOverride)))
+                return rejectSave(R.string.widget_save_conflict)
+        }
+        val writesLocation = widgetId != null && location != originalLocation
+        if (writesLocation) {
+            val currentLocation = WidgetLocationStore.load(context, widgetId!!)
+            if (currentLocation != originalLocation && currentLocation != location)
+                return rejectSave(R.string.widget_save_location_conflict)
+        }
         // Preferences are separate stores. If the location fails after appearance succeeds,
         // retain the draft and report partial success; retry is safe for these same values.
         try {
@@ -172,7 +195,7 @@ class WidgetAppearanceSection(
         }
         traceSave("APPEARANCE_READBACK_OK")
         try {
-            if (widgetId != null) {
+            if (writesLocation && widgetId != null) {
                 WidgetLocationStore.save(context, widgetId, location)
                 if (WidgetLocationStore.load(context, widgetId) != location)
                     return rejectSave(R.string.widget_save_location_failed)
@@ -201,6 +224,7 @@ class WidgetAppearanceSection(
             // The explicit RemoteViews request already succeeded. Media callbacks may be unavailable.
         }
         originalAppearance = WidgetStyleStore.load(context, widgetId)
+        originalLocation = widgetId?.let { WidgetLocationStore.load(context, it) } ?: WidgetLocation.AUTOMATIC
         draft = originalAppearance
         originalHasOverride = widgetId?.let { WidgetStyleStore.hasOverride(context, it) } ?: false
         appearanceIntent = AppearanceIntent.KEEP
