@@ -1,8 +1,8 @@
 # Self-audit do PR #1 — editor de widgets / primeiro ciclo
 
-**Base:** `1f09e3a2598372a7e829d25d25eed15431e67f0e` (0.22, main)  
-**Branch:** `fix/widget-save-diagnostics-0.23`  
-**Habilidade:** `breno-review-audit/self-audit-loop` — autoauditoria do próprio executor; não há segundo agente independente.  
+**Base:** `1f09e3a2598372a7e829d25d25eed15431e67f0e` (0.22, main)
+**Branch:** `fix/widget-save-diagnostics-0.23`
+**Habilidade:** `breno-review-audit/self-audit-loop` — autoauditoria do próprio executor; não há segundo agente independente.
 **Veredito:** **REVISAR (parcial)**. Código no GitHub; **não** testado em dispositivo, **não** compilado nesta sessão.
 
 ## Rodada 1 — evidência e simplificação
@@ -45,4 +45,3 @@ Além do build: simular erro de gravação e erro de `AppWidgetManager`, testar 
 Foi adicionada injeção local de `dispatch` em `MediaWidgetProvider.refreshWidgetResult` para permitir que um teste Robolectric simule `updateAppWidget` lançando exceção sem alterar o caminho normal de produção. O teste `refreshResultDoesNotClaimSuccessWhenHostUpdateThrows` exige `FAILED`, não `REQUESTED`.
 
 **Autoauditoria final desta sessão: REVISAR.** Há novos testes no código, mas não foram executados. Permanecem as lacunas altas de durabilidade do store, concorrência/estado parcial e falta de validação no Android real; nenhum APK foi produzido ou aprovado. O diff foi examinado via GitHub, mas `git diff --check`, build e lint não puderam ser executados.
-
