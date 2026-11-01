@@ -180,4 +180,9 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="widget_visual_own">Visual próprio</string>
     <string name="widget_visual_inherited">Segue o visual padrão</string>
     <string name="widget_visual_default_help">Ao usar o padrão, este widget acompanha o visual definido no app. A mudança só é aplicada ao salvar.</string>
+
+    <string name="widget_save_write_failed">Não foi possível verificar a gravação da aparência. Nenhuma atualização do widget foi solicitada. Confira o armazenamento e tente novamente.</string>
+    <string name="widget_save_location_failed">A aparência pode ter sido salva, mas a identificação do local não foi gravada. Mantenha o editor aberto e tente novamente.</string>
+    <string name="widget_save_refresh_failed">As configurações foram salvas, mas a solicitação de atualização do widget falhou. Tente salvar novamente; suas alterações foram mantidas.</string>
+    <string name="widget_save_refresh_missing">As configurações foram salvas, mas esta instância do widget foi removida ou não está mais disponível. O rascunho permanece no editor.</string>
 </resources>
