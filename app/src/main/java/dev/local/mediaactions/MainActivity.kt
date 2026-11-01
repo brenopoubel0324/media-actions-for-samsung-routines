@@ -59,6 +59,11 @@ class MainActivity : Activity() {
         button(widget, R.string.widget_edit_existing, true, ::editExistingWidget).id = R.id.widget_edit_existing
         button(widget, R.string.settings_defaults) { startActivity(Intent(this, WidgetDefaultsActivity::class.java)) }.id = R.id.widget_defaults
         button(widget, R.string.progress_settings_title) { startActivity(Intent(this, ProgressSettingsActivity::class.java)) }.id = R.id.progress_settings
+        button(widget, R.string.widget_diagnostic_copy) {
+            getSystemService(ClipboardManager::class.java).setPrimaryClip(
+                ClipData.newPlainText(getString(R.string.app_name), LocalDiagnostics.text(this)))
+            Toast.makeText(this, R.string.diagnostic_copied, Toast.LENGTH_SHORT).show()
+        }
         val controls = SettingsUi.card(this, body)
         label(controls, R.string.settings_controls, 18f, true)
         player = label(controls, R.string.player_none, 13f)
