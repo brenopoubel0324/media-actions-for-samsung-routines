@@ -180,6 +180,14 @@ class WidgetConfigurationTest {
         assertEquals(defaults, WidgetStyleStore.load(app, second))
     }
 
+    @Test fun refreshResultDoesNotClaimSuccessWhenHostUpdateThrows() {
+        val id = widget()
+        val outcome = MediaWidgetProvider.refreshWidgetResult(app, id) { _, _, _ ->
+            throw IllegalStateException("Injected host update failure")
+        }
+        assertEquals(MediaWidgetProvider.RefreshResult.FAILED, outcome)
+    }
+
     @Test fun refreshResultIdentifiesAWidgetRemovedByTheHost() {
         val id = widget()
         org.robolectric.util.ReflectionHelpers.getField<MutableMap<Int, *>>(
