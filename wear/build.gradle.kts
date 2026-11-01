@@ -4,7 +4,11 @@ android {
     compileSdk = 36
     defaultConfig { applicationId = "dev.local.mediaactions"; minSdk = 33; targetSdk = 36; versionCode = 9; versionName = "0.9-experimental" }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
-    lint { warningsAsErrors = true }
+    lint {
+        warningsAsErrors = true
+        // Keep targetSdk 36 until a separately validated Android upgrade.
+        disable += "OldTargetApi"
+    }
     testOptions {
         unitTests.isIncludeAndroidResources = true
         unitTests.all {
