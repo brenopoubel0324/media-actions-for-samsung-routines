@@ -8,6 +8,16 @@ import java.text.DateFormat
 import java.util.Date
 import java.util.TimeZone
 
+/** Ephemeral, redacted trace of the last user-initiated widget save. No media metadata. */
+internal object WidgetSaveTrace {
+    @Volatile var last: String = "none"
+        private set
+
+    fun record(widgetId: Int?, mode: String, stage: String, appearanceHash: Int) {
+        last = "id=${widgetId ?: "defaults"} mode=$mode stage=$stage appearanceHash=$appearanceHash"
+    }
+}
+
 /** Local, on-demand support text. Never includes player metadata, session tokens or node identifiers. */
 object LocalDiagnostics {
     internal fun completionTime(context: Context, time: Long?): String {
@@ -28,6 +38,7 @@ object LocalDiagnostics {
         val manager = AppWidgetManager.getInstance(context)
         val ids = manager.getAppWidgetIds(ComponentName(context, MediaWidgetProvider::class.java))
             .filter { MediaWidgetProvider.isOwnWidget(context, it) }.sorted()
+        appendLine("lastWidgetSave=" + WidgetSaveTrace.last)
         appendLine("defaultsAppearanceHash=" + WidgetStyleStore.load(context).hashCode())
         for (id in ids) {
             val options = manager.getAppWidgetOptions(id)
