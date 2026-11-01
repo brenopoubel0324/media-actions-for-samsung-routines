@@ -280,6 +280,22 @@ class WidgetConfigurationTest {
         }
     }
 
+    @Test fun serializedSaveDoesNotOverwriteAlreadyUpdatedAppearance() {
+        val id = widget()
+        val first = WidgetAppearanceSection(app, id)
+        val second = WidgetAppearanceSection(app, id)
+        val firstView = first.create()
+        val secondView = second.create()
+        children(firstView).filterIsInstance<EditText>()
+            .first { it.id == R.id.widget_scale_value }.setText("73")
+        assertTrue(first.applyChanges())
+        children(secondView).filterIsInstance<RadioButton>()
+            .first { it.text == app.getString(R.string.widget_icons_dark) }.isChecked = true
+        assertFalse(second.applyChanges())
+        assertEquals(R.string.widget_save_conflict, second.lastApplyFailure)
+        assertEquals(73, WidgetStyleStore.load(app, id).iconScalePercent)
+    }
+
     @Test fun concurrentLocationEditsAreRejectedWithoutPartialWrite() {
         val id = widget()
         Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).use {
