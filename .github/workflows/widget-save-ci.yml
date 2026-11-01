@@ -32,7 +32,18 @@ jobs:
       - name: Android build, Robolectric tests, lint
         run: |
           chmod +x ./gradlew
-          ./gradlew :app:assembleDebug :wear:assembleDebug testDebugUnitTest lintDebug --console=plain --no-daemon
+          ./gradlew :app:assembleDebug :app:assemblePreview :wear:assembleDebug testDebugUnitTest lintDebug --console=plain --no-daemon
+      - name: Verify preview cannot overwrite installed app
+        run: |
+          APK="$(find app/build/outputs/apk/preview -type f -name '*.apk' | head -n 1)"
+          test -n "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | grep "package: name='dev.local.mediaactions.preview'"
+      - name: Upload isolated S25 preview APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: media-actions-s25-isolated-preview
+          path: app/build/outputs/apk/preview/*.apk
+          if-no-files-found: error
       - name: Keep test reports on failure
         if: always()
         uses: actions/upload-artifact@v4
