@@ -2,16 +2,27 @@
 
 ## Escopo e veredito
 
-**Veredito: APROVADO tecnicamente apenas para a base pré-Preview; release estável: NÃO APROVADA.**
+**Veredito (01/11/2026): CI do Preview APROVADO no SHA de código `8ad8c160b188ac82886e9c3c9ee988c93ba172f2`; validação física e release estável: NÃO APROVADAS.**
 
 A revisão original (`docs/reviews/widget-save-diagnostics-0.23.md`) registrou as descobertas de uma etapa anterior e não contém o resultado atualizado do CI. Este documento distingue o que foi testado do que permanece pendente.
 
-## Evidência automatizada
+## Evidência automatizada histórica
+
+As execuções abaixo antecedem a validação mais recente registrada acima.
 
 - O workflow `Widget save regression checks` na execução **41263608731** (SHA `85ca1b9d333fc8cb1d53cd87c0e2b52b9122dee7`) concluiu **success**.
 - Nessa execução, `:app:assembleDebug`, `:wear:assembleDebug`, `testDebugUnitTest`, `lintDebug` e `git diff --check` foram aprovados. Nenhum erro de compilação, teste ou lint no resultado final.
 - Os testes de concorrência, armazenamento lógico, reedição e falha de atualização existentes no snapshot desse SHA passaram.
 - **Mudanças posteriores ao SHA aprovado** acrescentam injeção de falha/retry no editor e build `preview` isolado. Elas só podem ser consideradas aprovadas quando a execução do GitHub Actions vinculada ao HEAD correspondente ficar verde. Não extrapolar o resultado da execução anterior.
+
+## Validação verificada do HEAD de código (01/11/2026)
+
+- PR #1, branch `fix/widget-save-diagnostics-0.23`, SHA verificado **`8ad8c160b188ac82886e9c3c9ee988c93ba172f2`**; execução [Widget save regression checks #32](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/actions/runs/41266780048) (**success**, concluída em 01/11/2026 02:55 UTC).
+- Job `android` e todas as etapas aprovados: `git diff --check origin/main...HEAD`, `:app:assembleDebug`, `:app:assemblePreview`, `:wear:assembleDebug`, `testDebugUnitTest`, `lintDebug`, validação de package pelo `aapt` e upload de artefatos. Gradle: **BUILD SUCCESSFUL in 4m 53s**.
+- `aapt dump badging` no APK produzido confirmou **`package: name='dev.local.mediaactions.preview'`**, `versionCode='22'`, `versionName='0.22-experimental-preview'`. A verificação comprova isolamento do identificador do pacote, não o comportamento do host no dispositivo.
+- Artefato [`media-actions-s25-isolated-preview`](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/actions/runs/41266780048/artifacts/13067726997), ID **13067726997**, 1.958.004 bytes (arquivo ZIP), SHA-256 do **ZIP**: `610572ded48c6da41bd314fea345e664c58429d73f5eb584ffd538ae58219df1`. **Não confundir o digest do ZIP com o SHA-256 do APK interno**, que não foi calculado nesta verificação.
+- Relatórios automatizados: [`widget-save-test-reports`](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/actions/runs/41266780048/artifacts/13068260894), ID **13068260894**.
+- A confirmação acima é vinculada ao SHA **de código** indicado. Um commit posterior de documentação exige CI próprio antes de ser chamado de HEAD verde. Não foi feita instalação no Galaxy S25 nem teste de LockStar, migração, persistência física, assinatura original ou bateria. **PR permanece draft, `main` preservada, nenhuma release publicada.**
 
 ## Principais correções
 
