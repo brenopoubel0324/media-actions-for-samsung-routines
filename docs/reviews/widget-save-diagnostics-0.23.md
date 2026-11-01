@@ -39,3 +39,10 @@ git diff main...HEAD --check
 Além do build: simular erro de gravação e erro de `AppWidgetManager`, testar dois editores concorrentes, recuperar após morte normal de processo, cenários KEEP/INHERIT/CUSTOM, reabrir o ID salvo e validar host S25/LockStar.
 
 **Limites de evidência:** GitHub fornece commits e diffs, não o status de worktree das outras threads Codex. O repositório remoto foi confirmado; as alterações locais das threads interrompidas continuam desconhecidas.
+
+## Rodada 3 — teste de falha do host e veredito
+
+Foi adicionada injeção local de `dispatch` em `MediaWidgetProvider.refreshWidgetResult` para permitir que um teste Robolectric simule `updateAppWidget` lançando exceção sem alterar o caminho normal de produção. O teste `refreshResultDoesNotClaimSuccessWhenHostUpdateThrows` exige `FAILED`, não `REQUESTED`.
+
+**Autoauditoria final desta sessão: REVISAR.** Há novos testes no código, mas não foram executados. Permanecem as lacunas altas de durabilidade do store, concorrência/estado parcial e falta de validação no Android real; nenhum APK foi produzido ou aprovado. O diff foi examinado via GitHub, mas `git diff --check`, build e lint não puderam ser executados.
+
