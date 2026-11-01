@@ -26,6 +26,14 @@ class WidgetAppearanceSection(
     private var rebuild: (() -> Unit)? = null
     private var modeLabel: TextView? = null
     private var draft = (initialAppearance ?: originalAppearance).normalized()
+    /** Message for a rejected or partially completed save, read by the host Activity. */
+    internal var lastApplyFailure = R.string.widget_invalid_values
+        private set
+    private fun rejectSave(message: Int): Boolean {
+        lastApplyFailure = message
+        confirmation?.setText(message)
+        return false
+    }
     private var confirmation: TextView? = null
     private var scaleControl: WidgetNumberControl? = null
     private var spacingControl: WidgetNumberControl? = null
@@ -122,30 +130,75 @@ class WidgetAppearanceSection(
         return false
     }
     fun applyChanges(): Boolean {
+        lastApplyFailure = R.string.widget_invalid_values
         if (appearanceIntent != AppearanceIntent.INHERIT) {
             if (scaleControl?.validate() == false) return invalid(R.id.settings_icons)
             if (spacingControl?.validate() == false || paddingControls?.validate() == false) return invalid(R.id.settings_spacing)
             if (borderControls?.validate() == false || buttonBorderControls?.validate() == false) return invalid(R.id.settings_borders)
         }
-        if (widgetId != null && !MediaWidgetProvider.isOwnWidget(context, widgetId)) {
-            confirmation?.setText(R.string.widget_configuration_missing); return false
+        if (widgetId != null && !MediaWidgetProvider.isOwnWidget(context, widgetId))
+            return rejectSave(R.string.widget_configuration_missing)
+
+        val desired = draft.normalized()
+        val writesAppearance = widgetId == null || appearanceIntent != AppearanceIntent.KEEP ||
+            desired != originalAppearance
+        val shouldOverride = widgetId != null && appearanceIntent != AppearanceIntent.INHERIT
+        // Preferences are separate stores. If the location fails after appearance succeeds,
+        // retain the draft and report partial success; retry is safe for these same values.
+        try {
+            if (widgetId == null) WidgetStyleStore.save(context, desired)
+            else when (appearanceIntent) {
+                AppearanceIntent.INHERIT -> WidgetStyleStore.remove(context, widgetId)
+                AppearanceIntent.CUSTOM -> WidgetStyleStore.save(context, desired, widgetId)
+                AppearanceIntent.KEEP -> if (desired != originalAppearance)
+                    WidgetStyleStore.save(context, desired, widgetId)
+            }
+            if (writesAppearance) {
+                val persisted = WidgetStyleStore.load(context, widgetId)
+                val expected = if (appearanceIntent == AppearanceIntent.INHERIT)
+                    WidgetStyleStore.load(context) else desired
+                if (persisted != expected ||
+                    (widgetId != null && WidgetStyleStore.hasOverride(context, widgetId) != shouldOverride))
+                    return rejectSave(R.string.widget_save_write_failed)
+            }
+        } catch (_: RuntimeException) {
+            return rejectSave(R.string.widget_save_write_failed)
         }
-        // Labelling an inherited instance must not freeze its current default appearance.
-        if (widgetId == null) WidgetStyleStore.save(context, draft)
-        else when (appearanceIntent) {
-            AppearanceIntent.INHERIT -> WidgetStyleStore.remove(context, widgetId)
-            AppearanceIntent.CUSTOM -> WidgetStyleStore.save(context, draft, widgetId)
-            AppearanceIntent.KEEP -> if (draft.normalized() != originalAppearance) WidgetStyleStore.save(context, draft, widgetId)
+        try {
+            if (widgetId != null) {
+                WidgetLocationStore.save(context, widgetId, location)
+                if (WidgetLocationStore.load(context, widgetId) != location)
+                    return rejectSave(R.string.widget_save_location_failed)
+            }
+        } catch (_: RuntimeException) {
+            return rejectSave(R.string.widget_save_location_failed)
         }
-        if (widgetId != null) WidgetLocationStore.save(context, widgetId, location)
-        if (widgetId == null) MediaWidgetProvider.refreshAll(context) else MediaWidgetProvider.refreshWidget(context, widgetId)
-        WidgetPlaybackObserver.settingsChanged(context)
+
+        val refreshRequested = if (widgetId == null) try {
+            MediaWidgetProvider.refreshAll(context)
+            true
+        } catch (_: RuntimeException) {
+            false
+        } else when (MediaWidgetProvider.refreshWidgetResult(context, widgetId)) {
+            MediaWidgetProvider.RefreshResult.REQUESTED -> true
+            MediaWidgetProvider.RefreshResult.MISSING_WIDGET ->
+                return rejectSave(R.string.widget_save_refresh_missing)
+            MediaWidgetProvider.RefreshResult.FAILED -> false
+        }
+        if (!refreshRequested) return rejectSave(R.string.widget_save_refresh_failed)
+        try {
+            WidgetPlaybackObserver.settingsChanged(context)
+        } catch (_: RuntimeException) {
+            // The explicit RemoteViews request already succeeded. Media callbacks may be unavailable.
+        }
         originalAppearance = WidgetStyleStore.load(context, widgetId)
         draft = originalAppearance
         originalHasOverride = widgetId?.let { WidgetStyleStore.hasOverride(context, it) } ?: false
         appearanceIntent = AppearanceIntent.KEEP
         rebuild?.invoke()
-        confirmation?.setText(R.string.widget_style_applied); onApplied?.invoke(); return true
+        confirmation?.setText(R.string.widget_style_applied)
+        onApplied?.invoke()
+        return true
     }
 
     fun create(showApplyButton: Boolean = true, previewContainer: LinearLayout? = null): View {
