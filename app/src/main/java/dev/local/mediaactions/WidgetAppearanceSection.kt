@@ -31,7 +31,7 @@ class WidgetAppearanceSection(
         private set
     /** Injectable host request for tests; production always uses the AppWidgetManager path. */
     internal var requestWidgetRefresh: (Context, Int) -> MediaWidgetProvider.RefreshResult =
-        MediaWidgetProvider::refreshWidgetResult
+        { ctx, widget -> MediaWidgetProvider.refreshWidgetResult(ctx, widget) }
     private fun traceSave(stage: String) {
         WidgetSaveTrace.record(widgetId, appearanceIntent.name, stage, draft.normalized().hashCode())
     }
