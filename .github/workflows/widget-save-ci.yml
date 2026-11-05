@@ -37,6 +37,8 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew :app:assembleDebug :app:assemblePreview :wear:assembleDebug testDebugUnitTest lintDebug --console=plain --no-daemon
+      - name: Verify Preview listener and shortcut isolation
+        run: ./gradlew :app:testPreviewUnitTest --tests '*VariantIsolationTest*' --console=plain --no-daemon
       - name: Verify preview cannot overwrite installed app
         run: |
           APK="$(find app/build/outputs/apk/preview -type f -name '*.apk' | head -n 1)"

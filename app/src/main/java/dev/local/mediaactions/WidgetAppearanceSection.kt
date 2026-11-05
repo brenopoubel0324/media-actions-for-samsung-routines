@@ -194,16 +194,21 @@ class WidgetAppearanceSection(
                 if (persisted != expected ||
                     (widgetId != null && WidgetStyleStore.hasOverride(context, widgetId) != shouldOverride))
                     return rejectSave(R.string.widget_save_write_failed)
+                // This editor owns the verified write, even if location/host refresh later fails.
+                // Keep its draft and intent, but compare retries against the latest own write.
+                originalAppearance = persisted
+                originalHasOverride = shouldOverride
             }
         } catch (_: RuntimeException) {
             return rejectSave(R.string.widget_save_write_failed)
         }
         traceSave("APPEARANCE_READBACK_OK")
         try {
-            if (writesLocation && widgetId != null) {
+            if (writesLocation) {
                 WidgetLocationStore.save(context, widgetId, location)
                 if (WidgetLocationStore.load(context, widgetId) != location)
                     return rejectSave(R.string.widget_save_location_failed)
+                originalLocation = location
             }
         } catch (_: RuntimeException) {
             return rejectSave(R.string.widget_save_location_failed)

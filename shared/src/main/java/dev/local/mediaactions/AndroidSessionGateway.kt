@@ -33,7 +33,8 @@ class AndroidSessionGateway(context: Context) : SessionGateway {
         fun position(session: PlayerSession): SessionPosition? = (session as? AndroidPlayerSession)?.position()
 
         fun listenerComponent(context: Context) =
-            ComponentName(context.packageName, "${context.packageName}.MediaNotificationListener")
+            // Variant application IDs change, while the phone/Wear service class keeps its namespace.
+            ComponentName(context.packageName, "dev.local.mediaactions.MediaNotificationListener")
     }
 }
 

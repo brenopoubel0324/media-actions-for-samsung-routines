@@ -310,4 +310,29 @@ class WidgetConfigurationTest {
             assertEquals(WidgetLocation.HOME_SCREEN, WidgetLocationStore.load(app, id))
         }
     }
+    @Test fun failedRefreshAllowsChangingTheDraftBeforeRetryAndRecreation() {
+        val id=widget();val editor=WidgetAppearanceSection(app,id);val view=editor.create()
+        view.findViewById<EditText>(R.id.widget_scale_value).setText("70")
+        editor.requestWidgetRefresh={_,_->MediaWidgetProvider.RefreshResult.FAILED}
+        assertFalse(editor.applyChanges())
+        view.findViewById<EditText>(R.id.widget_scale_value).setText("60")
+        val state=Bundle();editor.saveUiState(state)
+        val recreated=WidgetAppearanceSection(app,id,editor.currentAppearance())
+        recreated.create();recreated.restoreUiState(state)
+        recreated.requestWidgetRefresh={_,_->MediaWidgetProvider.RefreshResult.REQUESTED}
+        assertTrue(recreated.applyChanges())
+        assertEquals(60,WidgetStyleStore.load(app,id).iconScalePercent)
+    }
+    @Test fun failedRefreshStillDetectsAnExternalWriteAfterItsOwnWrite() {
+        val id=widget();val editor=WidgetAppearanceSection(app,id);val view=editor.create()
+        view.findViewById<EditText>(R.id.widget_scale_value).setText("70")
+        editor.requestWidgetRefresh={_,_->MediaWidgetProvider.RefreshResult.FAILED}
+        assertFalse(editor.applyChanges())
+        WidgetStyleStore.save(app,WidgetAppearance(iconScalePercent=80),id)
+        view.findViewById<EditText>(R.id.widget_scale_value).setText("60")
+        assertFalse(editor.applyChanges())
+        assertEquals(R.string.widget_save_conflict,editor.lastApplyFailure)
+        assertEquals(80,WidgetStyleStore.load(app,id).iconScalePercent)
+    }
+
 }

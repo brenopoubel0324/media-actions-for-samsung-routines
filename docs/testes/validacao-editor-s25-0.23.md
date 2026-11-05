@@ -35,3 +35,9 @@ No app **Media Actions Preview**, tocar **Copiar diagnóstico dos widgets** na s
 ## Critérios para atualizar a instalação original
 
 Somente depois de testes físicos e conferência da assinatura do APK instalado (e versão incremental). A Preview paralela não dá acesso à chave de assinatura do aplicativo existente. Não publicar atualização incompatível com a assinatura original.
+
+## Complemento da review de 05/11/2026
+
+O listener e os três atalhos da Preview foram corrigidos para a instalação isolada. O CI agora testa esses componentes na variante Preview, além de conferir o package do APK. Após falha de atualização, testar também editar novamente o rascunho e tentar salvar, inclusive depois de recriar a tela. A escrita anterior do próprio editor não deve gerar conflito falso; alteração posterior de outro editor deve continuar protegida.
+
+A Preview não valida a ponte com o Wear original, pois o Data Layer exige package/certificado correspondentes. Para o teste de persistência após reinício, comparar valores/modo reais; o hash auxiliar do diagnóstico não é um identificador durável entre processos. [Review desta rodada](../reviews/rodada-editor-preview-2026-11-05.md).
