@@ -24,10 +24,20 @@ android {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
+        // A separate on-device probe. Never overwrites the user's existing 0.22 installation.
+        create("preview") {
+            initWith(getByName("debug"))
+            matchingFallbacks += listOf("debug")
+            applicationIdSuffix = ".preview"
+            versionNameSuffix = "-preview"
+        }
     }
     lint {
         warningsAsErrors = true
         checkReleaseBuilds = true
+        // CI runners may ship a newer SDK than 36. Target SDK upgrades require
+        // separate device compatibility validation; keep all other lint checks.
+        disable += "OldTargetApi"
     }
     testOptions {
         unitTests.isIncludeAndroidResources = true

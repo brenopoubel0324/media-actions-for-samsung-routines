@@ -72,8 +72,10 @@ open class WidgetConfigureActivity : Activity() {
             id = R.id.widget_configuration_cancel
         }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = dp(10) })
         actions.addView(SettingsUi.button(this, getString(R.string.settings_save), true) {
-            if (!editor.applyChanges()) status.text = statusText(if (editsDefaults || MediaWidgetProvider.isOwnWidget(this, widgetId))
-                R.string.widget_invalid_values else R.string.widget_configuration_missing)
+            if (!editor.applyChanges()) {
+                status.text = statusText(editor.lastApplyFailure)
+                // Keep the editor and unsaved draft visible; do not report RESULT_OK.
+            }
         }.apply { id = R.id.widget_configuration_save }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
         root.addView(actions)
 

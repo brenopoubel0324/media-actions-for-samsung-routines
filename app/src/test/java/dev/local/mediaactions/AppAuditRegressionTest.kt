@@ -148,10 +148,17 @@ class AppAuditRegressionTest {
                 WidgetStyleStore.save(app, WidgetAppearance(iconScalePercent = 60), if (mode == "custom") id else null)
                 c.recreate()
                 c.get().findViewById<View>(R.id.widget_configuration_save).performClick()
+                if (mode == "edited") {
+                    // An explicit stale draft must not silently overwrite the newer global style.
+                    assertFalse(c.get().isFinishing)
+                    assertTrue(c.get().findViewById<android.widget.TextView>(R.id.widget_configuration_identity)
+                        .text.contains(app.getString(R.string.widget_save_conflict)))
+                }
             }
-            assertEquals(mode, if (mode == "edited") 70 else 60, WidgetStyleStore.load(app, id).iconScalePercent)
+            assertEquals(mode, 60, WidgetStyleStore.load(app, id).iconScalePercent)
             WidgetStyleStore.save(app, WidgetAppearance(iconScalePercent = 80))
-            assertEquals(mode, when (mode) { "edited" -> 70; "custom" -> 60; else -> 80 }, WidgetStyleStore.load(app, id).iconScalePercent)
+            assertEquals(mode, if (mode == "custom") 60 else 80,
+                WidgetStyleStore.load(app, id).iconScalePercent)
         }
     }
 

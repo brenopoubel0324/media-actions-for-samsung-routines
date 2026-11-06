@@ -13,6 +13,9 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Spinner
 import android.widget.ImageView
 import android.widget.RadioButton
 import org.junit.Assert.*
@@ -177,4 +180,159 @@ class WidgetConfigurationTest {
         assertEquals(custom, WidgetStyleStore.load(app, first))
         assertEquals(defaults, WidgetStyleStore.load(app, second))
     }
+
+    @Test fun refreshResultDoesNotClaimSuccessWhenHostUpdateThrows() {
+        val id = widget()
+        val outcome = MediaWidgetProvider.refreshWidgetResult(app, id) { _, _, _ ->
+            throw IllegalStateException("Injected host update failure")
+        }
+        assertEquals(MediaWidgetProvider.RefreshResult.FAILED, outcome)
+    }
+
+    @Test fun refreshResultIdentifiesAWidgetRemovedByTheHost() {
+        val id = widget()
+        org.robolectric.util.ReflectionHelpers.getField<MutableMap<Int, *>>(
+            shadowOf(manager), "widgetInfos").remove(id)
+        assertEquals(MediaWidgetProvider.RefreshResult.MISSING_WIDGET,
+            MediaWidgetProvider.refreshWidgetResult(app, id))
+    }
+
+    @Test fun validationFailureKeepsDraftAndIdentifiesTheActualProblem() {
+        val id = widget()
+        Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).use {
+            val activity = it.setup().get()
+            val input = activity.findViewById<EditText>(R.id.widget_scale_value)
+            input.setText("999")
+            activity.findViewById<Button>(R.id.widget_configuration_save).performClick()
+            assertFalse(activity.isFinishing)
+            assertEquals(Activity.RESULT_CANCELED, shadowOf(activity).resultCode)
+            assertEquals("999", input.text.toString())
+            assertTrue(activity.findViewById<TextView>(R.id.widget_configuration_identity)
+                .text.contains(activity.getString(R.string.widget_invalid_values)))
+            assertEquals(WidgetAppearance().iconScalePercent,
+                WidgetStyleStore.load(app, id).iconScalePercent)
+        }
+    }
+
+    @Test fun renderingRefreshResultDoesNotMutateAnotherInstancesAppearance() {
+        val first = widget()
+        val second = widget()
+        WidgetStyleStore.save(app, WidgetAppearance(darkIcons = true), first)
+        WidgetStyleStore.save(app, WidgetAppearance(iconScalePercent = 35), second)
+        assertEquals(MediaWidgetProvider.RefreshResult.REQUESTED,
+            MediaWidgetProvider.refreshWidgetResult(app, first))
+        assertTrue(WidgetStyleStore.load(app, first).darkIcons)
+        assertEquals(35, WidgetStyleStore.load(app, second).iconScalePercent)
+    }
+
+    @Test fun editorRetainsDraftWhenHostRefreshFailsAndAcceptsRetry() {
+        val id = widget()
+        val editor = WidgetAppearanceSection(app, id)
+        val content = editor.create()
+        val dark = children(content).filterIsInstance<RadioButton>()
+            .first { it.text == app.getString(R.string.widget_icons_dark) }
+        dark.isChecked = true
+        editor.requestWidgetRefresh = { _, _ -> MediaWidgetProvider.RefreshResult.FAILED }
+        assertFalse(editor.applyChanges())
+        assertEquals(R.string.widget_save_refresh_failed, editor.lastApplyFailure)
+        assertTrue(WidgetStyleStore.load(app, id).darkIcons)
+        assertTrue(editor.currentAppearance().darkIcons)
+
+        editor.requestWidgetRefresh = { _, _ -> MediaWidgetProvider.RefreshResult.REQUESTED }
+        assertTrue(editor.applyChanges())
+        assertTrue(WidgetStyleStore.load(app, id).darkIcons)
+        assertTrue(WidgetStyleStore.hasOverride(app, id))
+    }
+
+    @Test fun concurrentEditorsCannotSilentlyOverwriteNewerAppearance() {
+        val id = widget()
+        val first = Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).setup()
+        val stale = Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).setup()
+        try {
+            first.get().findViewById<EditText>(R.id.widget_scale_value).setText("73")
+            first.get().findViewById<Button>(R.id.widget_configuration_save).performClick()
+            assertEquals(73, WidgetStyleStore.load(app, id).iconScalePercent)
+
+            chooseDark(stale.get())
+            stale.get().findViewById<Button>(R.id.widget_configuration_save).performClick()
+            assertFalse(stale.get().isFinishing)
+            assertEquals(Activity.RESULT_CANCELED, shadowOf(stale.get()).resultCode)
+            assertTrue(stale.get().findViewById<TextView>(R.id.widget_configuration_identity)
+                .text.contains(app.getString(R.string.widget_save_conflict)))
+            assertEquals(73, WidgetStyleStore.load(app, id).iconScalePercent)
+            assertFalse(WidgetStyleStore.load(app, id).darkIcons)
+        } finally {
+            first.pause().stop().destroy()
+            stale.pause().stop().destroy()
+        }
+    }
+
+    @Test fun appearanceOnlySaveDoesNotUndoConcurrentLocationChange() {
+        val id = widget()
+        Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).use {
+            val activity = it.setup().get()
+            WidgetLocationStore.save(app, id, WidgetLocation.LOCK_SCREEN)
+            chooseDark(activity)
+            activity.findViewById<Button>(R.id.widget_configuration_save).performClick()
+            assertTrue(activity.isFinishing)
+            assertTrue(WidgetStyleStore.load(app, id).darkIcons)
+            assertEquals(WidgetLocation.LOCK_SCREEN, WidgetLocationStore.load(app, id))
+        }
+    }
+
+    @Test fun serializedSaveDoesNotOverwriteAlreadyUpdatedAppearance() {
+        val id = widget()
+        val first = WidgetAppearanceSection(app, id)
+        val second = WidgetAppearanceSection(app, id)
+        val firstView = first.create()
+        val secondView = second.create()
+        children(firstView).filterIsInstance<EditText>()
+            .first { it.id == R.id.widget_scale_value }.setText("73")
+        assertTrue(first.applyChanges())
+        children(secondView).filterIsInstance<RadioButton>()
+            .first { it.text == app.getString(R.string.widget_icons_dark) }.isChecked = true
+        assertFalse(second.applyChanges())
+        assertEquals(R.string.widget_save_conflict, second.lastApplyFailure)
+        assertEquals(73, WidgetStyleStore.load(app, id).iconScalePercent)
+    }
+
+    @Test fun concurrentLocationEditsAreRejectedWithoutPartialWrite() {
+        val id = widget()
+        Robolectric.buildActivity(WidgetConfigureActivity::class.java, request(id)).use {
+            val activity = it.setup().get()
+            activity.findViewById<Spinner>(R.id.widget_location_choice)
+                .setSelection(WidgetLocation.LOCK_SCREEN.ordinal)
+            WidgetLocationStore.save(app, id, WidgetLocation.HOME_SCREEN)
+            activity.findViewById<Button>(R.id.widget_configuration_save).performClick()
+            assertFalse(activity.isFinishing)
+            assertTrue(activity.findViewById<TextView>(R.id.widget_configuration_identity)
+                .text.contains(app.getString(R.string.widget_save_location_conflict)))
+            assertEquals(WidgetLocation.HOME_SCREEN, WidgetLocationStore.load(app, id))
+        }
+    }
+    @Test fun failedRefreshAllowsChangingTheDraftBeforeRetryAndRecreation() {
+        val id=widget();val editor=WidgetAppearanceSection(app,id);val view=editor.create()
+        view.findViewById<EditText>(R.id.widget_scale_value).setText("70")
+        editor.requestWidgetRefresh={_,_->MediaWidgetProvider.RefreshResult.FAILED}
+        assertFalse(editor.applyChanges())
+        view.findViewById<EditText>(R.id.widget_scale_value).setText("60")
+        val state=Bundle();editor.saveUiState(state)
+        val recreated=WidgetAppearanceSection(app,id,editor.currentAppearance())
+        recreated.create();recreated.restoreUiState(state)
+        recreated.requestWidgetRefresh={_,_->MediaWidgetProvider.RefreshResult.REQUESTED}
+        assertTrue(recreated.applyChanges())
+        assertEquals(60,WidgetStyleStore.load(app,id).iconScalePercent)
+    }
+    @Test fun failedRefreshStillDetectsAnExternalWriteAfterItsOwnWrite() {
+        val id=widget();val editor=WidgetAppearanceSection(app,id);val view=editor.create()
+        view.findViewById<EditText>(R.id.widget_scale_value).setText("70")
+        editor.requestWidgetRefresh={_,_->MediaWidgetProvider.RefreshResult.FAILED}
+        assertFalse(editor.applyChanges())
+        WidgetStyleStore.save(app,WidgetAppearance(iconScalePercent=80),id)
+        view.findViewById<EditText>(R.id.widget_scale_value).setText("60")
+        assertFalse(editor.applyChanges())
+        assertEquals(R.string.widget_save_conflict,editor.lastApplyFailure)
+        assertEquals(80,WidgetStyleStore.load(app,id).iconScalePercent)
+    }
+
 }
