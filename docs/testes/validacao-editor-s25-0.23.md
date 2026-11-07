@@ -1,5 +1,8 @@
 # Validação no Galaxy S25 — editor de widget 0.23 (Preview isolado)
 
+**Distribuição atual — 07/11/2026:** o usuário solicitou unificar o uso no aplicativo original. A entrega phone 0.23 usa `dev.local.mediaactions` e o certificado histórico. Instalar sobre o original, conferir seus widgets e depois remover somente a Preview. Os cenários abaixo podem ser executados no original atualizado, substituindo os nomes Preview pelos do aplicativo normal. O isolamento descrito a seguir registra a fase de investigação anterior. A disponibilidade desta atualização experimental não comprova resultado físico dos cenários.
+
+
 **Status:** protocolo de teste, não resultado físico. A integração com LockStar depende da versão instalada da Samsung.
 
 ## Instalação sem perda de dados

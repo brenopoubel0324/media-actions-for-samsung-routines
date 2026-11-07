@@ -1,10 +1,12 @@
-# Media Actions for Routines — 0.22 experimental
+# Media Actions for Routines — 0.23 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.22](downloads/v0.22-experimental/media-actions-phone-0.22-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.22-experimental/README.md).
+**APKs:** [Celular 0.23](downloads/v0.23-experimental/media-actions-phone-0.23-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.23-experimental/README.md).
 
-Atualização 0.22: Usar visual padrão por widget, com modo explícito, prévia e Salvar/Cancelar. Mantém local e preferências das outras instâncias; reúne intervalo 5/15/30 s, leituras por lote e diagnóstico local. Wear 0.9 permanece disponível; energia física não medida. [Review](docs/reviews/execucao-heranca-0.22.md).
+Atualização 0.23: Aplicativo original atualizado com as correções de salvamento, diagnóstico e conflitos do editor. Instale sobre o Media Actions original para manter seus dados e ficar com um app no celular; depois confira e remova somente a Preview, se instalada. Preferências exclusivas da Preview não são copiadas automaticamente. Wear permanece 0.9; validação física ainda pendente. [Review](docs/reviews/entrega-original-0.23.md).
+
+Para ficar com **um app no celular**, instale o APK **Celular 0.23** sobre **Media Actions**, sem desinstalar o original. Confira suas configurações e widgets; depois remova somente **Media Actions Preview**, se instalada. Ajustes/widgets exclusivos da Preview não são transferidos automaticamente: recrie os widgets no original antes de removê-la, se precisar. A Preview permanece uma variante de desenvolvimento; seu uso não é necessário para receber estas correções.
 
 Em **Seu widget → Atualização do progresso**, escolha 5/15/30 s para todos os indicadores (padrão 5 s). O liga/desliga continua por widget. No editor da instância, **Usar visual padrão** prepara a herança; confirme em **Salvar alterações** ou descarte com **Cancelar**. A identificação/local permanece independente. [Configurações atuais](docs/SETTINGS_UX.md).
 
