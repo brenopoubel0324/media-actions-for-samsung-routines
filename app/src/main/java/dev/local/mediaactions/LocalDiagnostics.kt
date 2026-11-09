@@ -50,7 +50,9 @@ object LocalDiagnostics {
             val sizes = WidgetRenderer.reportedSizes(options)
             appendLine("sizesDp=" + sizes.joinToString { "${it.width} x ${it.height}" }.ifEmpty { "?" })
             sizes.firstOrNull()?.let { size ->
-                val effective = WidgetGeometry.calculate(size.width, size.height, style, if(WidgetRegistry.isVolume(context,id))2 else 3)
+                val volumeLayout = if(WidgetRegistry.isVolume(context,id)) VolumeWidgetLayout.calculate(size.width,size.height,style) else null
+                if(volumeLayout!=null) appendLine("volumeOrientation="+if(volumeLayout.vertical) "VERTICAL" else "HORIZONTAL")
+                val effective = volumeLayout?.geometry ?: WidgetGeometry.calculate(size.width, size.height, style)
                 appendLine("requestedSpacingDp=" + style.spacingDp + " effectiveSpacingDp=" + effective.gapDp)
                 appendLine("requestedPaddingDp=" + style.widgetPaddingHorizontalDp + "," +
                     style.widgetPaddingVerticalDp + " effectivePaddingDp=" +

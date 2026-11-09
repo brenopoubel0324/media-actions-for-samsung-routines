@@ -69,12 +69,13 @@ object WidgetRenderer {
     internal fun build(context: Context, id: Int, appearance: WidgetAppearance, size: SizeF?,
         bindControls: Boolean = true, playback: WidgetPlaybackState = WidgetPlaybackState.PAUSED,
         progress: WidgetTrackProgress? = null, progressBitmap: Bitmap? = null, volume: Boolean = false): RemoteViews =
-        RemoteViews(context.packageName, if(volume) R.layout.widget_volume_controls else R.layout.widget_media_controls).apply {
+        RemoteViews(context.packageName, if(volume) {if(VolumeWidgetLayout.isVertical(size)) R.layout.widget_volume_vertical else R.layout.widget_volume_controls} else R.layout.widget_media_controls).apply {
             val style = (if(volume) appearance.copy(progressRing=false,centerBorderOnly=false) else appearance).normalized()
             val buttons = if(volume) listOf(R.id.widget_previous,R.id.widget_next) else buttons
             val gaps = if(volume) listOf(R.id.widget_gap_left) else listOf(R.id.widget_gap_left,R.id.widget_gap_right)
             val showProgress = shouldShowProgress(style, playback)
-            val geometry = WidgetGeometry.calculate(size?.width ?: if(volume)96f else 144f, size?.height ?: 48f,
+            val volumeLayout = if(volume && size!=null) VolumeWidgetLayout.calculate(size.width,size.height,style) else null
+            val geometry = volumeLayout?.geometry ?: WidgetGeometry.calculate(size?.width ?: if(volume)96f else 144f, size?.height ?: 48f,
                 if (size == null) style.copy(widgetPaddingHorizontalDp = 0, widgetPaddingVerticalDp = 0) else style, if(volume)2 else 3)
             setInt(R.id.widget_controls, "setBackgroundResource", if (style.widgetBorder)
                 frameBorders[style.borderWidthDp - 1] else android.R.color.transparent)
@@ -137,10 +138,11 @@ object WidgetRenderer {
                 }
             }
             if (size != null) {
-                setViewLayoutWidth(R.id.widget_controls_row, geometry.widthDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
-                setViewLayoutHeight(R.id.widget_controls_row, geometry.buttonDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
+                setViewLayoutWidth(R.id.widget_controls_row, (volumeLayout?.rowWidth ?: geometry.widthDp).toFloat(), TypedValue.COMPLEX_UNIT_DIP)
+                setViewLayoutHeight(R.id.widget_controls_row, (volumeLayout?.rowHeight ?: geometry.buttonDp).toFloat(), TypedValue.COMPLEX_UNIT_DIP)
                 for (gap in gaps) {
-                    setViewLayoutWidth(gap, geometry.gapDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
+                    if(volumeLayout?.vertical == true) setViewLayoutHeight(gap,geometry.gapDp.toFloat(),TypedValue.COMPLEX_UNIT_DIP)
+                    else setViewLayoutWidth(gap, geometry.gapDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
                 }
                 // Reapply geometry padding after any decorative background inset.
                 fun pad(id: Int, dp: Int) {

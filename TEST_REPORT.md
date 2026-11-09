@@ -1,9 +1,9 @@
-# Validação — 0.24 experimental
+# Validação — 0.25 experimental
 
-BUILD SUCCESSFUL. **497 testes**: app 460, wear 15, shared 22. Zero falhas/erros/pulos. Lint dos três módulos aprovado; git diff --check verificado antes de publicar.
+BUILD SUCCESSFUL. **504 testes**: app 467, wear 15, shared 22. Zero falhas/erros/pulos. Lint dos três módulos aprovado; git diff --check verificado antes de publicar.
 
-Novo widget Volume de mídia com −/+ por clique no próprio tablet/celular, transparente e redimensionável, com tamanho, espaçamento e bordas editáveis por instância. Funciona sem acesso às notificações e sem polling de volume. Permissão normal de áudio local; mesmo app original, Wear 0.9 preservado. Teste físico no Tab S10+ ainda pendente.
+O widget de volume adapta a orientação ao redimensionamento: horizontal com −/+ quando mais largo, vertical com + acima de − quando mais alto. Preserva a mesma instância e ajustes, com padding nos eixos físicos, sem sensor nem timer novo. Atualização do app original; Tab S10+ físico ainda não testado.
 
-[Review](docs/reviews/volume-widget-0.24.md) · [Integridade](downloads/v0.24-experimental/VALIDATION.json).
+[Review](docs/reviews/volume-orientacao-0.25.md) · [Integridade](downloads/v0.25-experimental/VALIDATION.json).
 
 Sem teste físico de Tab S10+/Galaxy/LockStar/Spotify/WBR/Watch 8, medição de bateria ou benchmark físico de CPU. As contagens simuladas não equivalem a economia de energia.

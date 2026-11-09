@@ -324,7 +324,7 @@ class WidgetAppearanceSection(
                 contentDescription = context.getString(R.string.widget_preview_action, contentDescription)
                 setOnClickListener { /* Appearance demo only. */ }
             }
-            val g = WidgetGeometry.calculate(size.width, size.height, draft, if(volume)2 else 3)
+            val g = if(volume) VolumeWidgetLayout.calculate(size.width,size.height,draft).geometry else WidgetGeometry.calculate(size.width, size.height, draft)
             effective.text = buildString {
                 append(context.getString(if (hostSizes.isEmpty()) R.string.widget_sample_size else R.string.widget_reported_size, size.width.toInt(), size.height.toInt()))
                 append("\n"); append(context.getString(R.string.widget_effective_spacing, g.gapDp, g.buttonDp + g.gapDp))
@@ -425,6 +425,7 @@ class WidgetAppearanceSection(
             edit(draft.copy(fillWidth = it)); spacingControl?.isEnabled = !it
             manualSpacing.visibility = if (it) View.GONE else View.VISIBLE; updatePreview()
         })
+        if(volume) label(spacing,R.string.volume_orientation_help,13f)
         spacing.addView(manualSpacing)
         label(manualSpacing, R.string.widget_button_spacing).labelFor = R.id.widget_spacing_value
         spacingControl = WidgetNumberControl(context, context.getString(R.string.widget_button_spacing), 0, WidgetAppearance.MAX_SPACING_DP,

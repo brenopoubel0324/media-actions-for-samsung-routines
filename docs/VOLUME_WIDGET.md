@@ -1,4 +1,4 @@
-# Volume de mídia por clique — 0.24 experimental
+# Volume de mídia por clique — 0.25 experimental
 
 No mesmo APK do Media Actions, um segundo tipo de widget oferece **− e +** para o volume de mídia **do aparelho onde foi instalado**. Destinado ao uso no Galaxy Tab S10+ solicitado, sem teste físico desse tablet nesta execução. Requer Android 13 ou posterior, como o restante do app.
 
@@ -23,3 +23,9 @@ Testes com doubles/sombras conferem stream/direção/flags, comandos inválidos/
 Pendentes no Tab S10+: clique/limites reais, saída Bluetooth, volume fixo, DND, tela bloqueada/LockStar, redimensionamento e consumo físico. As chamadas seguem a política do Android; não há promessa de controlar uma saída que o sistema proíbe.
 
 Fontes: [AudioManager](https://developer.android.com/reference/android/media/AudioManager#adjustStreamVolume(int,int,int)), [implementação Android 16](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android16-release/media/java/android/media/AudioManager.java), [AudioService](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android16-release/services/core/java/com/android/server/audio/AudioService.java).
+
+## Orientação automática — 0.25
+
+Redimensionar o **próprio widget** muda o eixo sem recriar a instância: retângulo mais largo usa − à esquerda/+ à direita; mais alto usa + acima/− abaixo. Quadrado e host sem tamanho informado usam horizontal. A seleção é por tamanho de cada variante de RemoteViews e pelo callback de resize do host, sem sensor, polling ou nova preferência.
+
+Distância passa a ser aplicada no eixo dos botões. Padding horizontal/vertical continua nos eixos físicos; o vertical negativo permanece vertical. O host pode impor tamanho mínimo/corte; para dois alvos de 48dp, é necessário espaço para pelo menos 96dp no eixo dos botões. A prévia do editor conserva a escala limitada de demonstração; o diagnóstico descreve o primeiro tamanho fornecido, não comprova qual variante foi pintada pelo host. Controles de reprodução de três botões não mudam de orientação.

@@ -1,0 +1,45 @@
+{
+  "version": "0.25-experimental",
+  "application_id": "dev.local.mediaactions",
+  "apks": [
+    {
+      "kind": "phone",
+      "filename": "media-actions-phone-0.25-experimental-debug.apk",
+      "sha256": "ba9f3dc42b95482b9f698d708845dd22f60b75d8501a20686d9dcfdbe96e0c09",
+      "bytes": 5654554,
+      "version_name": "0.25-experimental",
+      "version_code": 25,
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+    }
+  ],
+  "wear_companion": "0.9-experimental",
+  "tests": {
+    "app": {
+      "tests": 467,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 504,
+  "lint": "No issues found in all modules",
+  "review": "volume-orientacao-0.25.md",
+  "physical_host_tested": false,
+  "physical_wear_tested": false,
+  "physical_battery_measured": false,
+  "progress_default_seconds": 5,
+  "features": "O widget de volume adapta a orientação ao redimensionamento: horizontal com −/+ quando mais largo, vertical com + acima de − quando mais alto. Preserva a mesma instância e ajustes, com padding nos eixos físicos, sem sensor nem timer novo. Atualização do app original; Tab S10+ físico ainda não testado.",
+  "requested_permissions": 1
+}

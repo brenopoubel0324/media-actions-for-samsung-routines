@@ -54,7 +54,7 @@
     <string name="widget_touch_feedback">Touch animation · soft ripple</string>
     <string name="icon_licenses">Icon licenses</string>
     <string name="widget_button_spacing">Gap between touch areas</string>
-    <string name="widget_fill_width">Automatic spacing · use full width</string>
+    <string name="widget_fill_width">Automatic spacing · fill available space</string>
     <string name="widget_spacing_help">Turn off automatic spacing to enter an exact gap (0–144 dp), or use −/+ for 1 dp steps. Gaps separate the touch areas; visible icon spacing also depends on icon size. Widen the widget if the requested gap does not fit.</string>
     <string name="widget_decrease">Decrease %1$s by one</string>
     <string name="widget_increase">Increase %1$s by one</string>
@@ -197,4 +197,5 @@
     <string name="volume_icons_summary">Size, color and shadow</string>
     <string name="volume_preview_help">Appearance demo. The preview does not adjust volume.</string>
     <string name="volume_widget_install">Add the Media volume widget from your home screen widget picker. It works without notification access.</string>
+    <string name="volume_orientation_help">Resize the widget: wider uses −/+ horizontally; taller uses + above −. No recreation is needed.</string>
 </resources>

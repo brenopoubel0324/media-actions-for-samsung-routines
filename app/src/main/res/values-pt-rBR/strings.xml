@@ -200,4 +200,5 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="volume_icons_summary">Tamanho, cor e sombra</string>
     <string name="volume_preview_help">Visual de exemplo. A prévia não altera o volume.</string>
     <string name="volume_widget_install">Adicione Volume de mídia pelo seletor de widgets da tela inicial. Ele funciona sem acesso às notificações.</string>
+    <string name="volume_orientation_help">Redimensione o widget: mais largo usa −/+ na horizontal; mais alto usa + acima de −. Não precisa recriá-lo.</string>
 </resources>

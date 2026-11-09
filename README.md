@@ -1,14 +1,16 @@
-# Media Actions for Routines — 0.24 experimental
+# Media Actions for Routines — 0.25 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.24](downloads/v0.24-experimental/media-actions-phone-0.24-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.24-experimental/README.md).
+**APKs:** [Celular 0.25](downloads/v0.25-experimental/media-actions-phone-0.25-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.25-experimental/README.md).
 
-Atualização 0.24: Novo widget Volume de mídia com −/+ por clique no próprio tablet/celular, transparente e redimensionável, com tamanho, espaçamento e bordas editáveis por instância. Funciona sem acesso às notificações e sem polling de volume. Permissão normal de áudio local; mesmo app original, Wear 0.9 preservado. Teste físico no Tab S10+ ainda pendente. [Review](docs/reviews/volume-widget-0.24.md).
+Atualização 0.25: O widget de volume adapta a orientação ao redimensionamento: horizontal com −/+ quando mais largo, vertical com + acima de − quando mais alto. Preserva a mesma instância e ajustes, com padding nos eixos físicos, sem sensor nem timer novo. Atualização do app original; Tab S10+ físico ainda não testado. [Review](docs/reviews/volume-orientacao-0.25.md).
 
-Para ficar com **um app no celular**, instale o APK **Celular 0.24** sobre **Media Actions**, sem desinstalar o original. Confira suas configurações e widgets; depois remova somente **Media Actions Preview**, se instalada. Ajustes/widgets exclusivos da Preview não são transferidos automaticamente: recrie os widgets no original antes de removê-la, se precisar. A Preview permanece uma variante de desenvolvimento; seu uso não é necessário para receber estas correções.
+Para ficar com **um app no celular**, instale o APK **Celular 0.25** sobre **Media Actions**, sem desinstalar o original. Confira suas configurações e widgets; depois remova somente **Media Actions Preview**, se instalada. Ajustes/widgets exclusivos da Preview não são transferidos automaticamente: recrie os widgets no original antes de removê-la, se precisar. A Preview permanece uma variante de desenvolvimento; seu uso não é necessário para receber estas correções.
 
 Novo: **Volume de mídia** para tablet/celular, com **−/+ por toque**, sem sessão de mídia e sem acesso às notificações. Adicione em **Widgets → Media Actions → Volume de mídia**; personalize em **Editar widget instalado**. Fundo transparente, ícones menores, distância, padding e bordas configuráveis. Não há polling de nível nem novo app. [Funcionamento e limites](docs/VOLUME_WIDGET.md).
+
+Redimensionamento automático do volume: **mais largo → −/+ na horizontal; mais alto → + acima de −**. Segure o próprio widget e arraste suas bordas para mudar o formato, sem recriar a instância. Espaçamento e padding continuam editáveis; não há sensor ou timer novo. [Orientação e limites do host](docs/VOLUME_WIDGET.md#orientação-automática--025).
 
 Em **Seu widget → Atualização do progresso**, escolha 5/15/30 s para todos os indicadores (padrão 5 s). O liga/desliga continua por widget. No editor da instância, **Usar visual padrão** prepara a herança; confirme em **Salvar alterações** ou descarte com **Cancelar**. A identificação/local permanece independente. [Configurações atuais](docs/SETTINGS_UX.md).
 
