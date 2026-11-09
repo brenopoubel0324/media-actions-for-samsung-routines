@@ -2,4 +2,5 @@
     <string name="app_name">Media Actions Preview</string>
     <string name="widget_name">Media controls (Preview)</string>
     <string name="listener_name">Media Actions Preview — media session access</string>
+    <string name="volume_widget_name">Media volume (Preview)</string>
 </resources>

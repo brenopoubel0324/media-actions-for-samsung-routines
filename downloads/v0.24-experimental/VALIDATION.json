@@ -1,0 +1,45 @@
+{
+  "version": "0.24-experimental",
+  "application_id": "dev.local.mediaactions",
+  "apks": [
+    {
+      "kind": "phone",
+      "filename": "media-actions-phone-0.24-experimental-debug.apk",
+      "sha256": "75bf5b8a12161b54cea17f98937acc9af9a6be8d0b00d86381a554039f9cf715",
+      "bytes": 5378017,
+      "version_name": "0.24-experimental",
+      "version_code": 24,
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+    }
+  ],
+  "wear_companion": "0.9-experimental",
+  "tests": {
+    "app": {
+      "tests": 460,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 497,
+  "lint": "No issues found in all modules",
+  "review": "volume-widget-0.24.md",
+  "physical_host_tested": false,
+  "physical_wear_tested": false,
+  "physical_battery_measured": false,
+  "progress_default_seconds": 5,
+  "features": "Novo widget Volume de mídia com −/+ por clique no próprio tablet/celular, transparente e redimensionável, com tamanho, espaçamento e bordas editáveis por instância. Funciona sem acesso às notificações e sem polling de volume. Permissão normal de áudio local; mesmo app original, Wear 0.9 preservado. Teste físico no Tab S10+ ainda pendente.",
+  "requested_permissions": 1
+}

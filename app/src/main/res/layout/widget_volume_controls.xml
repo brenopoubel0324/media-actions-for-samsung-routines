@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/widget_controls"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="96dp"
+    android:minHeight="48dp"
+    android:background="@android:color/transparent">
+
+    <!-- The host-sized root centers this independently sized group of controls. -->
+    <LinearLayout
+        tools:ignore="UselessParent"
+        android:id="@+id/widget_controls_row"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+    <ImageButton
+        android:id="@+id/widget_previous"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:background="@drawable/widget_button_background"
+        android:contentDescription="@string/volume_lower"
+        android:padding="4dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_volume_minus"
+        android:tint="@android:color/white" />
+
+    <!-- Zero is intentional: RemoteViews sets the user's requested spacing. -->
+    <FrameLayout tools:ignore="Suspicious0dp" android:id="@+id/widget_gap_left" android:layout_width="0dp"
+        android:layout_height="match_parent" android:importantForAccessibility="no" />
+
+    <ImageButton
+        android:id="@+id/widget_next"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:background="@drawable/widget_button_background"
+        android:contentDescription="@string/volume_raise"
+        android:padding="4dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_volume_plus"
+        android:tint="@android:color/white" />
+    </LinearLayout>
+</FrameLayout>

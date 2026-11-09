@@ -17,6 +17,7 @@ class WidgetAppearanceSection(
     initialAppearance: WidgetAppearance? = null,
     private val onApplied: (() -> Unit)? = null,
 ) {
+    private val volume = widgetId?.let {WidgetRegistry.isVolume(context,it)} ?: false
     private var originalAppearance = WidgetStyleStore.load(context, widgetId)
     private enum class AppearanceIntent { KEEP, INHERIT, CUSTOM }
     private var originalHasOverride = widgetId?.let { WidgetStyleStore.hasOverride(context, it) } ?: false
@@ -31,7 +32,7 @@ class WidgetAppearanceSection(
         private set
     /** Injectable host request for tests; production always uses the AppWidgetManager path. */
     internal var requestWidgetRefresh: (Context, Int) -> MediaWidgetProvider.RefreshResult =
-        { ctx, widget -> MediaWidgetProvider.refreshWidgetResult(ctx, widget) }
+        { ctx, widget -> WidgetRegistry.refresh(ctx, widget) }
     private fun traceSave(stage: String) {
         WidgetSaveTrace.record(widgetId, appearanceIntent.name, stage, draft.normalized().hashCode())
     }
@@ -152,7 +153,7 @@ class WidgetAppearanceSection(
             if (spacingControl?.validate() == false || paddingControls?.validate() == false) return invalid(R.id.settings_spacing)
             if (borderControls?.validate() == false || buttonBorderControls?.validate() == false) return invalid(R.id.settings_borders)
         }
-        if (widgetId != null && !MediaWidgetProvider.isOwnWidget(context, widgetId))
+        if (widgetId != null && (!WidgetRegistry.isOwnWidget(context, widgetId) || WidgetRegistry.isVolume(context,widgetId) != volume))
             return rejectSave(R.string.widget_configuration_missing)
 
         val desired = draft.normalized()
@@ -216,7 +217,7 @@ class WidgetAppearanceSection(
 
         traceSave("LOCATION_READBACK_OK")
         val refreshRequested = if (widgetId == null) try {
-            MediaWidgetProvider.refreshAll(context)
+            WidgetRegistry.refreshAll(context)
             true
         } catch (_: RuntimeException) {
             false
@@ -295,8 +296,8 @@ class WidgetAppearanceSection(
             WidgetPlaybackState.PAUSED -> R.id.widget_preview_paused
             else -> R.id.widget_preview_unknown
         })
-        previewGroup.addView(states)
-        label(previewGroup, R.string.settings_preview_help, 12f)
+        if(!volume) previewGroup.addView(states)
+        label(previewGroup, if(volume) R.string.volume_preview_help else R.string.settings_preview_help, 12f)
         previewGroup.addView(details)
         val effective = label(details, R.string.widget_spacing_help, 12f).apply {
             id = R.id.widget_effective_spacing; accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
@@ -314,16 +315,16 @@ class WidgetAppearanceSection(
                 .apply { cornerRadius = dp(18).toFloat() }
             preview.removeAllViews()
             val view = WidgetRenderer.build(context, AppWidgetManager.INVALID_APPWIDGET_ID, draft, size,
-                bindControls = false, playback = previewState, progress = WidgetTrackProgress(0.42f)).apply(context, preview)
+                bindControls = false, playback = if(volume) WidgetPlaybackState.PAUSED else previewState, progress = WidgetTrackProgress(0.42f), volume=volume).apply(context, preview)
             val scale = min(1f, min(available / size.width, 72f / size.height))
             view.scaleX = scale; view.scaleY = scale
             preview.addView(view, FrameLayout.LayoutParams((size.width * context.resources.displayMetrics.density).toInt(),
                 (size.height * context.resources.displayMetrics.density).toInt(), android.view.Gravity.CENTER))
-            for (id in listOf(R.id.widget_previous, R.id.widget_toggle, R.id.widget_next)) view.findViewById<View>(id).apply {
+            for (id in if(volume) listOf(R.id.widget_previous,R.id.widget_next) else listOf(R.id.widget_previous, R.id.widget_toggle, R.id.widget_next)) view.findViewById<View>(id).apply {
                 contentDescription = context.getString(R.string.widget_preview_action, contentDescription)
                 setOnClickListener { /* Appearance demo only. */ }
             }
-            val g = WidgetGeometry.calculate(size.width, size.height, draft)
+            val g = WidgetGeometry.calculate(size.width, size.height, draft, if(volume)2 else 3)
             effective.text = buildString {
                 append(context.getString(if (hostSizes.isEmpty()) R.string.widget_sample_size else R.string.widget_reported_size, size.width.toInt(), size.height.toInt()))
                 append("\n"); append(context.getString(R.string.widget_effective_spacing, g.gapDp, g.buttonDp + g.gapDp))
@@ -386,7 +387,8 @@ class WidgetAppearanceSection(
             }.also { identity.addView(it) }
             label(identity, R.string.widget_location_help, 13f)
         }
-        val icons = section(R.id.settings_icons, R.string.settings_icons, R.string.settings_icons_summary)
+        val icons = section(R.id.settings_icons, R.string.settings_icons, if(volume) R.string.volume_icons_summary else R.string.settings_icons_summary)
+        if(!volume) {
         label(icons, R.string.widget_icon_style)
         val styles = WidgetIconStyle.entries
         val styleNames = listOf(R.string.widget_style_outline, R.string.widget_style_rounded, R.string.widget_style_classic,
@@ -403,6 +405,7 @@ class WidgetAppearanceSection(
                 override fun onNothingSelected(parent: AdapterView<*>?) = Unit
             }
         })
+        }
         label(icons, R.string.settings_icon_color)
         val colors = RadioGroup(context).apply { orientation = RadioGroup.HORIZONTAL }
         val light = RadioButton(context).apply { id = View.generateViewId(); setText(R.string.widget_icons_white) }
@@ -433,20 +436,22 @@ class WidgetAppearanceSection(
         val borders = section(R.id.settings_borders, R.string.settings_borders, R.string.settings_borders_summary)
         val centerOnly = SettingsUi.toggle(context, R.string.widget_center_border_only, draft.centerBorderOnly, R.id.widget_center_border_only) {
             edit(draft.copy(centerBorderOnly = it)); updatePreview()
-        }.apply { visibility = if (draft.buttonBorder) View.VISIBLE else View.GONE }
+        }.apply { visibility = if (draft.buttonBorder && !volume) View.VISIBLE else View.GONE }
         buttonBorderControls = WidgetBorderSection(context, draft, WidgetBorderSection.Target.BUTTONS) { enabled, width, color ->
             edit(draft.copy(buttonBorder = enabled, buttonBorderWidthDp = width, buttonBorderColor = color))
-            centerOnly.visibility = if (enabled) View.VISIBLE else View.GONE; updatePreview()
+            centerOnly.visibility = if (enabled && !volume) View.VISIBLE else View.GONE; updatePreview()
         }.also { borders.addView(it.create(centerOnly)) }
         borderControls = WidgetBorderSection(context, draft) { enabled, width, color -> edit(draft.copy(widgetBorder = enabled, borderWidthDp = width, borderColor = color)); updatePreview() }
             .also { borders.addView(it.create()) }
-        val playback = section(R.id.settings_playback, R.string.settings_playback, R.string.settings_playback_summary)
+        val playback = section(R.id.settings_playback, if(volume) R.string.volume_interaction else R.string.settings_playback, if(volume) R.string.volume_interaction_summary else R.string.settings_playback_summary)
+        if(!volume) {
         playback.addView(SettingsUi.toggle(context, R.string.widget_progress_ring, draft.progressRing, R.id.widget_progress_ring) {
             edit(draft.copy(progressRing = it))
             if (it) states.check(R.id.widget_preview_playing)
             updatePreview()
         })
         label(playback, R.string.widget_progress_help, 13f)
+        } else label(playback,R.string.volume_widget_help,13f)
         playback.addView(SettingsUi.toggle(context, R.string.widget_touch_feedback, draft.touchFeedback, R.id.widget_touch_feedback) { edit(draft.copy(touchFeedback = it)); updatePreview() })
         confirmation = label(body, if (widgetId == null) R.string.widget_style_scope else R.string.widget_style_scope_single, 12f).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
         if (showApplyButton) body.addView(SettingsUi.button(context, context.getString(R.string.widget_apply_style), true) { applyChanges() }, LinearLayout.LayoutParams(-1, dp(52)))

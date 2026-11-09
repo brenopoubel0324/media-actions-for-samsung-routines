@@ -1,7 +1,6 @@
 package dev.local.mediaactions
 
 import android.appwidget.AppWidgetManager
-import android.content.ComponentName
 import android.content.Context
 import android.os.Build
 import java.text.DateFormat
@@ -36,14 +35,13 @@ object LocalDiagnostics {
         appendLine("Spotify: " + completion.status.name)
         appendLine(spotifyLine(context, completion))
         val manager = AppWidgetManager.getInstance(context)
-        val ids = manager.getAppWidgetIds(ComponentName(context, MediaWidgetProvider::class.java))
-            .filter { MediaWidgetProvider.isOwnWidget(context, it) }.sorted()
+        val ids = WidgetRegistry.ids(context)
         appendLine("lastWidgetSave=" + WidgetSaveTrace.last)
         appendLine("defaultsAppearanceHash=" + WidgetStyleStore.load(context).hashCode())
         for (id in ids) {
             val options = manager.getAppWidgetOptions(id)
             val style = WidgetStyleStore.load(context, id)
-            appendLine("Widget #$id: " + WidgetLocationStore.description(context, id))
+            appendLine("Widget #$id ["+WidgetRegistry.label(context,id)+"]: " + WidgetLocationStore.description(context, id))
             appendLine("hasOverride=" + WidgetStyleStore.hasOverride(context, id))
             appendLine("appearanceHash=" + style.hashCode() +
                 " style=" + style.iconStyle.name + " dark=" + style.darkIcons +
@@ -52,7 +50,7 @@ object LocalDiagnostics {
             val sizes = WidgetRenderer.reportedSizes(options)
             appendLine("sizesDp=" + sizes.joinToString { "${it.width} x ${it.height}" }.ifEmpty { "?" })
             sizes.firstOrNull()?.let { size ->
-                val effective = WidgetGeometry.calculate(size.width, size.height, style)
+                val effective = WidgetGeometry.calculate(size.width, size.height, style, if(WidgetRegistry.isVolume(context,id))2 else 3)
                 appendLine("requestedSpacingDp=" + style.spacingDp + " effectiveSpacingDp=" + effective.gapDp)
                 appendLine("requestedPaddingDp=" + style.widgetPaddingHorizontalDp + "," +
                     style.widgetPaddingVerticalDp + " effectivePaddingDp=" +

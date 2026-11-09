@@ -22,7 +22,7 @@ open class WidgetConfigureActivity : Activity() {
         setResult(RESULT_CANCELED)
         widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID)
-        if (!editsDefaults && !MediaWidgetProvider.isOwnWidget(this, widgetId)) {
+        if (!editsDefaults && !WidgetRegistry.isOwnWidget(this, widgetId)) {
             finish()
             return
         }
@@ -34,7 +34,7 @@ open class WidgetConfigureActivity : Activity() {
             setPadding(dp(20), dp(16), dp(20), dp(12))
         }
         val title = TextView(this).apply {
-            setText(if (editsDefaults) R.string.settings_defaults else R.string.widget_configuration_title)
+            setText(if (editsDefaults) R.string.settings_defaults else if(WidgetRegistry.isVolume(this@WidgetConfigureActivity,widgetId)) R.string.volume_widget_name else R.string.widget_configuration_title)
             setTextColor(getColor(R.color.settings_text))
             textSize = 25f
             isAccessibilityHeading = true

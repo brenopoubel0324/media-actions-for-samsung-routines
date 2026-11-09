@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
-    <!-- No uses-permission entries: notification access is a separate system grant. -->
+    <!-- Normal permission for local media volume; notification access remains a separate system grant. -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <queries>
         <package android:name="com.spotify.music" />
     </queries>
@@ -47,6 +48,10 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/media_widget_info" />
+        </receiver>
+        <receiver android:name=".VolumeWidgetProvider" android:exported="false" android:label="@string/volume_widget_name">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/volume_widget_info" />
         </receiver>
         <!-- Google Play services validates Binder callers in WearableListenerService. An app-signature permission would block GMS. -->
         <service android:name=".PhoneWearService" android:exported="true" tools:ignore="ExportedService">

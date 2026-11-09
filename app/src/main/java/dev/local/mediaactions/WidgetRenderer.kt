@@ -68,12 +68,14 @@ object WidgetRenderer {
 
     internal fun build(context: Context, id: Int, appearance: WidgetAppearance, size: SizeF?,
         bindControls: Boolean = true, playback: WidgetPlaybackState = WidgetPlaybackState.PAUSED,
-        progress: WidgetTrackProgress? = null, progressBitmap: Bitmap? = null): RemoteViews =
-        RemoteViews(context.packageName, R.layout.widget_media_controls).apply {
-            val style = appearance.normalized()
+        progress: WidgetTrackProgress? = null, progressBitmap: Bitmap? = null, volume: Boolean = false): RemoteViews =
+        RemoteViews(context.packageName, if(volume) R.layout.widget_volume_controls else R.layout.widget_media_controls).apply {
+            val style = (if(volume) appearance.copy(progressRing=false,centerBorderOnly=false) else appearance).normalized()
+            val buttons = if(volume) listOf(R.id.widget_previous,R.id.widget_next) else buttons
+            val gaps = if(volume) listOf(R.id.widget_gap_left) else listOf(R.id.widget_gap_left,R.id.widget_gap_right)
             val showProgress = shouldShowProgress(style, playback)
-            val geometry = WidgetGeometry.calculate(size?.width ?: 144f, size?.height ?: 48f,
-                if (size == null) style.copy(widgetPaddingHorizontalDp = 0, widgetPaddingVerticalDp = 0) else style)
+            val geometry = WidgetGeometry.calculate(size?.width ?: if(volume)96f else 144f, size?.height ?: 48f,
+                if (size == null) style.copy(widgetPaddingHorizontalDp = 0, widgetPaddingVerticalDp = 0) else style, if(volume)2 else 3)
             setInt(R.id.widget_controls, "setBackgroundResource", if (style.widgetBorder)
                 frameBorders[style.borderWidthDp - 1] else android.R.color.transparent)
             setColorStateList(R.id.widget_controls, "setBackgroundTintList",
@@ -94,7 +96,8 @@ object WidgetRenderer {
                 WidgetIconStyle.DOUBLE_TRIANGLES -> R.drawable.ic_double_previous to R.drawable.ic_double_next
                 WidgetIconStyle.SQUARE -> R.drawable.ic_square_previous to R.drawable.ic_square_next
             }
-            val icons = listOf(sides.first, WidgetPlaybackIcons.center(style.iconStyle, playback), sides.second)
+            val icons = if(volume) listOf(R.drawable.ic_volume_minus,R.drawable.ic_volume_plus) else listOf(sides.first, WidgetPlaybackIcons.center(style.iconStyle, playback), sides.second)
+            if(!volume) {
             setContentDescription(R.id.widget_toggle, context.getString(when (playback) {
                 WidgetPlaybackState.PLAYING -> R.string.widget_pause_action
                 WidgetPlaybackState.PAUSED -> R.string.widget_play_action
@@ -102,6 +105,10 @@ object WidgetRenderer {
                 WidgetPlaybackState.UNKNOWN -> R.string.widget_state_unknown
             }))
             setInt(R.id.widget_toggle, "setImageAlpha", if (playback == WidgetPlaybackState.TRANSITIONING) 150 else 255)
+            } else {
+                setContentDescription(R.id.widget_previous,context.getString(R.string.volume_lower))
+                setContentDescription(R.id.widget_next,context.getString(R.string.volume_raise))
+            }
             val color = if (style.darkIcons) Color.rgb(26, 29, 34) else Color.WHITE
             for (index in buttons.indices) {
                 val hasBorder = style.buttonBorder && playback != WidgetPlaybackState.UNKNOWN &&
@@ -132,7 +139,7 @@ object WidgetRenderer {
             if (size != null) {
                 setViewLayoutWidth(R.id.widget_controls_row, geometry.widthDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
                 setViewLayoutHeight(R.id.widget_controls_row, geometry.buttonDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
-                for (gap in listOf(R.id.widget_gap_left, R.id.widget_gap_right)) {
+                for (gap in gaps) {
                     setViewLayoutWidth(gap, geometry.gapDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
                 }
                 // Reapply geometry padding after any decorative background inset.
@@ -141,22 +148,26 @@ object WidgetRenderer {
                     setViewPadding(id, px, px, px, px)
                 }
                 pad(R.id.widget_previous, geometry.sidePaddingDp)
-                pad(R.id.widget_toggle, geometry.centerPaddingDp)
+                if(!volume) pad(R.id.widget_toggle, geometry.centerPaddingDp)
                 pad(R.id.widget_next, geometry.sidePaddingDp)
             } else {
                 // A host that reports no dimensions still gets freely scaling transparent controls.
                 // Keep gaps collapsed to protect minimum touch targets; icon tuning still applies.
-                for (view in listOf(R.id.widget_gap_left, R.id.widget_gap_right)) {
+                for (view in gaps) {
                     setViewLayoutWidth(view, 0f, TypedValue.COMPLEX_UNIT_DIP)
                 }
                 for (button in buttons) {
-                    val dp = if (button == R.id.widget_toggle) geometry.centerPaddingDp else geometry.sidePaddingDp
+                    val dp = if (!volume && button == R.id.widget_toggle) geometry.centerPaddingDp else geometry.sidePaddingDp
                     val px = (dp * context.resources.displayMetrics.density).toInt()
                     setViewPadding(button, px, px, px, px)
                 }
             }
             if (showProgress) setViewPadding(R.id.widget_toggle, 0, 0, 0, 0)
-            if (bindControls) {
+            if(bindControls && volume) {
+                setOnClickPendingIntent(R.id.widget_previous,VolumeWidgetProvider.controlIntent(context,id,false))
+                setOnClickPendingIntent(R.id.widget_next,VolumeWidgetProvider.controlIntent(context,id,true))
+            }
+            if (bindControls && !volume) {
                 setOnClickPendingIntent(R.id.widget_previous, MediaWidgetProvider.controlIntent(context, id, MediaAction.PREVIOUS))
                 setOnClickPendingIntent(R.id.widget_toggle, MediaWidgetProvider.controlIntent(context, id, MediaAction.PLAY_PAUSE))
                 setOnClickPendingIntent(R.id.widget_next, MediaWidgetProvider.controlIntent(context, id, MediaAction.NEXT))

@@ -85,9 +85,9 @@ class AndroidEntryPointTest {
         }
     }
 
-    @Test fun productionManifestHasNoRequestedPermissionsAndProtectedListener() {
+    @Test fun productionManifestRequestsOnlyNormalAudioSettingsAndProtectsListener() {
         val info = app.packageManager.getPackageInfo(app.packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_SERVICES)
-        assertTrue(info.requestedPermissions.isNullOrEmpty())
+        assertEquals(listOf("android.permission.MODIFY_AUDIO_SETTINGS"),info.requestedPermissions?.toList().orEmpty())
         val service = info.services!!.single { it.name == MediaNotificationListener::class.java.name }
         assertFalse(service.exported)
         assertEquals("android.permission.BIND_NOTIFICATION_LISTENER_SERVICE", service.permission)

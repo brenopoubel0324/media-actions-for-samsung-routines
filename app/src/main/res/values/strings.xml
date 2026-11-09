@@ -186,4 +186,15 @@
     <string name="widget_save_conflict">This widget was changed in another editor. Your draft has not been overwritten. Reopen this widget to review the latest settings.</string>
     <string name="widget_save_location_conflict">The widget location was changed elsewhere while you were editing. No settings were overwritten. Reopen the editor to review.</string>
     <string name="widget_diagnostic_copy">Copy widget diagnostics</string>
+    <string name="volume_widget_name">Media volume</string>
+    <string name="volume_widget_help">One tap lowers or raises media volume on this device by one system step. No notification access is needed. Android may limit volume on some audio routes.</string>
+    <string name="volume_lower">Lower media volume</string>
+    <string name="volume_raise">Raise media volume</string>
+    <string name="volume_fixed">This audio route has fixed volume.</string>
+    <string name="volume_failed">Android could not adjust media volume.</string>
+    <string name="volume_interaction">Interaction</string>
+    <string name="volume_interaction_summary">Button touch feedback</string>
+    <string name="volume_icons_summary">Size, color and shadow</string>
+    <string name="volume_preview_help">Appearance demo. The preview does not adjust volume.</string>
+    <string name="volume_widget_install">Add the Media volume widget from your home screen widget picker. It works without notification access.</string>
 </resources>

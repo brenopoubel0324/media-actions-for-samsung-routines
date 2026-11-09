@@ -189,4 +189,15 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="widget_save_conflict">Este widget foi alterado em outro editor. Seu rascunho não foi sobrescrito. Reabra o widget para conferir os ajustes atuais.</string>
     <string name="widget_save_location_conflict">A identificação do local foi alterada em outro editor. Nenhuma configuração foi sobrescrita. Reabra o editor para conferir.</string>
     <string name="widget_diagnostic_copy">Copiar diagnóstico dos widgets</string>
+    <string name="volume_widget_name">Volume de mídia</string>
+    <string name="volume_widget_help">Um toque diminui ou aumenta o volume de mídia deste aparelho em um passo do sistema. Não exige acesso às notificações. O Android pode limitar o volume em algumas saídas de áudio.</string>
+    <string name="volume_lower">Diminuir volume de mídia</string>
+    <string name="volume_raise">Aumentar volume de mídia</string>
+    <string name="volume_fixed">Esta saída de áudio tem volume fixo.</string>
+    <string name="volume_failed">O Android não conseguiu ajustar o volume de mídia.</string>
+    <string name="volume_interaction">Interação</string>
+    <string name="volume_interaction_summary">Realce ao tocar nos botões</string>
+    <string name="volume_icons_summary">Tamanho, cor e sombra</string>
+    <string name="volume_preview_help">Visual de exemplo. A prévia não altera o volume.</string>
+    <string name="volume_widget_install">Adicione Volume de mídia pelo seletor de widgets da tela inicial. Ele funciona sem acesso às notificações.</string>
 </resources>

@@ -1,12 +1,14 @@
-# Media Actions for Routines — 0.23 experimental
+# Media Actions for Routines — 0.24 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.23](downloads/v0.23-experimental/media-actions-phone-0.23-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.23-experimental/README.md).
+**APKs:** [Celular 0.24](downloads/v0.24-experimental/media-actions-phone-0.24-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.24-experimental/README.md).
 
-Atualização 0.23: Aplicativo original atualizado com as correções de salvamento, diagnóstico e conflitos do editor. Instale sobre o Media Actions original para manter seus dados e ficar com um app no celular; depois confira e remova somente a Preview, se instalada. Preferências exclusivas da Preview não são copiadas automaticamente. Wear permanece 0.9; validação física ainda pendente. [Review](docs/reviews/entrega-original-0.23.md).
+Atualização 0.24: Novo widget Volume de mídia com −/+ por clique no próprio tablet/celular, transparente e redimensionável, com tamanho, espaçamento e bordas editáveis por instância. Funciona sem acesso às notificações e sem polling de volume. Permissão normal de áudio local; mesmo app original, Wear 0.9 preservado. Teste físico no Tab S10+ ainda pendente. [Review](docs/reviews/volume-widget-0.24.md).
 
-Para ficar com **um app no celular**, instale o APK **Celular 0.23** sobre **Media Actions**, sem desinstalar o original. Confira suas configurações e widgets; depois remova somente **Media Actions Preview**, se instalada. Ajustes/widgets exclusivos da Preview não são transferidos automaticamente: recrie os widgets no original antes de removê-la, se precisar. A Preview permanece uma variante de desenvolvimento; seu uso não é necessário para receber estas correções.
+Para ficar com **um app no celular**, instale o APK **Celular 0.24** sobre **Media Actions**, sem desinstalar o original. Confira suas configurações e widgets; depois remova somente **Media Actions Preview**, se instalada. Ajustes/widgets exclusivos da Preview não são transferidos automaticamente: recrie os widgets no original antes de removê-la, se precisar. A Preview permanece uma variante de desenvolvimento; seu uso não é necessário para receber estas correções.
+
+Novo: **Volume de mídia** para tablet/celular, com **−/+ por toque**, sem sessão de mídia e sem acesso às notificações. Adicione em **Widgets → Media Actions → Volume de mídia**; personalize em **Editar widget instalado**. Fundo transparente, ícones menores, distância, padding e bordas configuráveis. Não há polling de nível nem novo app. [Funcionamento e limites](docs/VOLUME_WIDGET.md).
 
 Em **Seu widget → Atualização do progresso**, escolha 5/15/30 s para todos os indicadores (padrão 5 s). O liga/desliga continua por widget. No editor da instância, **Usar visual padrão** prepara a herança; confirme em **Salvar alterações** ou descarte com **Cancelar**. A identificação/local permanece independente. [Configurações atuais](docs/SETTINGS_UX.md).
 
@@ -86,7 +88,7 @@ A seleção de aparelho é automática: apenas um tocando → ele; ambos tocando
 
 Os atalhos/widget do celular executam localmente. O companion usa Google Play services Data Layer, que pode transportar por Bluetooth ou infraestrutura de nuvem; não se promete Bluetooth exclusivo. Não há servidor próprio, login Spotify, envio de áudio, título/artista, conteúdo de notificações ou telemetria de mídia.
 
-Os APKs não contêm `uses-permission`; a autorização de listener é uma concessão separada do sistema. O novo serviço Data Layer é exportado conforme o contrato Google, com validação de callers pelo Binder do SDK e pareamento por applicationId/certificado. Não há receiver de comando remoto aberto por broadcast simples.
+O APK phone solicita somente a permissão normal `MODIFY_AUDIO_SETTINGS` para volume local; o Wear não solicita permissões comuns. A autorização de listener continua sendo uma concessão separada do sistema e não é necessária ao widget de volume. O novo serviço Data Layer é exportado conforme o contrato Google, com validação de callers pelo Binder do SDK e pareamento por applicationId/certificado. Não há receiver de comando remoto aberto por broadcast simples.
 
 ## Build e validação
 

@@ -100,17 +100,21 @@ data class WidgetGeometry(
     val centerPaddingDp: Int,
     val widgetPaddingHorizontalDp: Int = 0,
     val widgetPaddingVerticalDp: Int = 0,
+    val buttonCount: Int = 3,
 ) {
-    val widthDp get() = buttonDp * 3 + gapDp * 2
+    val widthDp get() = buttonDp * buttonCount + gapDp * (buttonCount - 1)
 
     companion object {
-        fun calculate(widthDp: Float, heightDp: Float, appearance: WidgetAppearance): WidgetGeometry {
+        fun calculate(widthDp: Float, heightDp: Float, appearance: WidgetAppearance, buttonCount: Int = 3): WidgetGeometry {
+            require(buttonCount in 2..3)
+            val gaps = buttonCount - 1
+            val minimumWidth = 48 * buttonCount
             val width = widthDp.takeIf { it.isFinite() && it > 0 } ?: 180f
             val height = heightDp.takeIf { it.isFinite() && it > 0 } ?: 56f
             val style = appearance.normalized()
-            // Padding cannot consume the minimum 3 × 48dp row or its 48dp height.
+            // Padding cannot consume the minimum 48dp targets or its 48dp height.
             val horizontalPadding = min(style.widgetPaddingHorizontalDp,
-                floor(((width - 144) / 2).coerceAtLeast(0f)).toInt())
+                floor(((width - minimumWidth) / 2).coerceAtLeast(0f)).toInt())
             val verticalPadding = min(style.widgetPaddingVerticalDp,
                 floor(((height - 48) / 2).coerceAtLeast(0f)).toInt())
             val contentWidth = width - horizontalPadding * 2
@@ -118,13 +122,13 @@ data class WidgetGeometry(
             // Reduce requested gaps before sacrificing 48dp touch targets at minimum size.
             // Automatic spacing ignores the saved manual gap, which is disabled in that mode.
             val requestedGap = if (style.fillWidth) 0f else style.spacingDp.toFloat()
-            var gap = floor(min(requestedGap, ((contentWidth - 144) / 2).coerceAtLeast(0f))).toInt()
-            val side = floor(min(contentHeight, (contentWidth - gap * 2) / 3)).toInt().coerceIn(1, 128)
-            if (style.fillWidth) gap = floor((contentWidth - 3 * side) / 2).toInt().coerceAtLeast(0)
+            var gap = floor(min(requestedGap, ((contentWidth - minimumWidth) / gaps).coerceAtLeast(0f))).toInt()
+            val side = floor(min(contentHeight, (contentWidth - gap * gaps) / buttonCount)).toInt().coerceIn(1, 128)
+            if (style.fillWidth) gap = floor((contentWidth - buttonCount * side) / gaps).toInt().coerceAtLeast(0)
             val scale = style.iconScalePercent / 100f
             fun padding(fraction: Float) = (side * (1 - min(1f, fraction * scale)) / 2)
                 .roundToInt().coerceAtLeast(0)
-            return WidgetGeometry(side, gap, padding(0.82f), padding(0.95f), horizontalPadding, verticalPadding)
+            return WidgetGeometry(side, gap, padding(0.82f), padding(0.95f), horizontalPadding, verticalPadding, buttonCount)
         }
     }
 }
