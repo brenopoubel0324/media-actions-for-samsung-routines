@@ -1,0 +1,54 @@
+{
+  "version": "0.26-experimental",
+  "application_id": "dev.local.mediaactions",
+  "apks": [
+    {
+      "kind": "phone",
+      "filename": "media-actions-phone-0.26-experimental-debug.apk",
+      "sha256": "2c1c03fb6fda3577bc15fc197f6a70df1d03b5aa062f4dae05a67b8fb46df614",
+      "bytes": 5697470,
+      "version_name": "0.26-experimental",
+      "version_code": 26,
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+    }
+  ],
+  "wear_companion": "0.9-experimental",
+  "tests": {
+    "app": {
+      "tests": 489,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 526,
+  "lint": "No issues found in all modules",
+  "review": "background-0.26.md",
+  "physical_host_tested": false,
+  "physical_wear_tested": false,
+  "physical_battery_measured": false,
+  "physical_same_device_comparison_completed": false,
+  "physical_recovery_tested": false,
+  "simulated_workload_comparison": "docs/medicoes/energia-0.26/README.md",
+  "progress_default_seconds": 5,
+  "features": "Apresentação do widget orientada a eventos, cache efêmero e deduplicação visual; comandos mantêm verificações atuais. Em 60 s simulados com seis widgets/5 s: consultas de sessão 36→0 e metadados 24→0, mantendo 72 atualizações com avanço real. Dez callbacks idênticos em pausa: 60→0 atualizações. Sem polling de descoberta ou timer que acorde o aparelho; recuperação coberta em testes. Comparação física e economia de bateria NÃO MEDIDAS.",
+  "requested_permissions": 1,
+  "preview_tests": {
+    "tests": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

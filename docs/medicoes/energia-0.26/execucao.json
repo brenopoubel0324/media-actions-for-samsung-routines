@@ -1,0 +1,37 @@
+{
+  "generated_utc": "2026-11-10T11:46:41.572384+00:00",
+  "base_commit": "43dcd29a4692ef3cdd5238131c3895c2dcc2eb7a",
+  "candidate_ref": "v0.26-experimental",
+  "kind": "simulated_workload_not_battery",
+  "tests": {
+    "app": {
+      "tests": 489,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "preview": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "physical_devices_connected": 0,
+  "physical_same_device_comparison_completed": false,
+  "physical_battery_measured": false,
+  "physical_cpu_measured": false,
+  "physical_recovery_tested": false
+}

@@ -34,8 +34,9 @@ object WidgetRenderer {
         R.drawable.button_border_touch_dark_7, R.drawable.button_border_touch_dark_8)
 
     fun render(context: Context, id: Int, options: Bundle,
-        snapshot: WidgetUpdateSnapshot? = null): RemoteViews {
-        val style = WidgetStyleStore.load(context, id)
+        snapshot: WidgetUpdateSnapshot? = null,
+        appearance: WidgetAppearance? = null): RemoteViews {
+        val style = appearance ?: WidgetStyleStore.load(context, id)
         val data = snapshot ?: WidgetUpdateSnapshot.capture(AndroidSessionGateway(context), style.progressRing)
         val state = data.state
         val showProgress = shouldShowProgress(style, state)

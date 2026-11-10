@@ -31,6 +31,7 @@ import java.time.Duration
 
 object EnergyCounters {
     var sessions = 0; var progress = 0; var updates = 0; var bitmaps = 0; var ticks = 0; var events = 0
+    var failSessionReads = 0; var failUpdates = 0
     var state: PlaybackState? = null
     var metadata: MediaMetadata? = null
     val tracked = mutableSetOf<Int>()
@@ -39,7 +40,9 @@ object EnergyCounters {
 @Implements(MediaSessionManager::class)
 class CountingSessionsShadow : ShadowMediaSessionManager() {
     @Implementation public override fun getActiveSessions(component: ComponentName?): List<MediaController> {
-        EnergyCounters.sessions++; return super.getActiveSessions(component)
+        EnergyCounters.sessions++
+        if (EnergyCounters.failSessionReads > 0) { EnergyCounters.failSessionReads--; throw IllegalStateException("Transient test failure") }
+        return super.getActiveSessions(component)
     }
 }
 @Implements(MediaController::class)
@@ -50,6 +53,7 @@ class CountingControllerShadow : ShadowMediaController() {
 @Implements(AppWidgetManager::class)
 class CountingWidgetsShadow : ShadowAppWidgetManager() {
     @Implementation public override fun updateAppWidget(id: Int, views: RemoteViews) {
+        if (EnergyCounters.failUpdates > 0) { EnergyCounters.failUpdates--; throw IllegalStateException("Host test failure") }
         super.updateAppWidget(id, views)
         if (id in EnergyCounters.tracked) {
             EnergyCounters.updates++
@@ -65,7 +69,7 @@ class EnergyActivityTest {
     @Test fun exportControlledActivityCounts() {
         val widgets=AppWidgetManager.getInstance(app)
         EnergyCounters.tracked.clear()
-        EnergyCounters.state=PlaybackState.Builder().setState(PlaybackState.STATE_PLAYING,1000,1f).build()
+        EnergyCounters.state=PlaybackState.Builder().setState(PlaybackState.STATE_PLAYING,1000,1f,1L).build()
         EnergyCounters.metadata=MediaMetadata.Builder().putLong(MediaMetadata.METADATA_KEY_DURATION,300000).build()
         shadowOf(app.getSystemService(NotificationManager::class.java)).setNotificationListenerAccessGranted(AndroidSessionGateway.listenerComponent(app),true)
         shadowOf(app.getSystemService(PowerManager::class.java)).setIsInteractive(true)
@@ -84,6 +88,7 @@ class EnergyActivityTest {
                         shadowOf(widgets).addBoundWidget(id,AppWidgetProviderInfo().apply { provider=ComponentName(app,MediaWidgetProvider::class.java) })
                         WidgetStyleStore.save(app,WidgetAppearance(progressRing=progress),id);EnergyCounters.tracked+=id;id
                     }
+                    EnergyCounters.state=PlaybackState.Builder().setState(PlaybackState.STATE_PLAYING,1000,1f,android.os.SystemClock.elapsedRealtime()).build()
                     WidgetPlaybackObserver(app).use { observer ->
                         observer.observeWork={ when(it) {
                             WidgetPlaybackObserver.Work.PERIODIC_TICK -> EnergyCounters.ticks++
@@ -93,8 +98,8 @@ class EnergyActivityTest {
                         shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(60))
                         assertEquals(if(progress)60/seconds else 0,EnergyCounters.ticks)
                         assertEquals(0,EnergyCounters.events)
-                        assertEquals(if(progress)(60/seconds)*3 else 0,EnergyCounters.sessions)
-                        assertEquals(if(progress)(60/seconds)*2 else 0,EnergyCounters.progress)
+                        assertEquals(0,EnergyCounters.sessions)
+                        assertEquals(0,EnergyCounters.progress)
                         assertEquals(if(progress)(60/seconds)*count else 0,EnergyCounters.updates)
                         rows+="{\"widgets\":$count,\"enabled\":$progress,\"interval_seconds\":$seconds,\"periodic_ticks\":${EnergyCounters.ticks},\"event_refreshes\":${EnergyCounters.events},\"session_reads\":${EnergyCounters.sessions},\"progress_reads\":${EnergyCounters.progress},\"widget_updates\":${EnergyCounters.updates},\"bitmap_builds\":${EnergyCounters.bitmaps}}"
                     }

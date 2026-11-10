@@ -29,6 +29,7 @@ class MediaWidgetProvider : AppWidgetProvider() {
         newOptions: Bundle,
     ) {
         manager.updateAppWidget(appWidgetId, WidgetRenderer.render(context, appWidgetId, newOptions))
+        WidgetPlaybackObserver.settingsChanged(context, resyncSessions = true)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -56,12 +57,49 @@ class MediaWidgetProvider : AppWidgetProvider() {
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        WidgetPlaybackObserver.settingsChanged(context)
         for (id in appWidgetIds) {
             WidgetStyleStore.remove(context, id)
             WidgetLocationStore.remove(context, id)
             for (action in MediaAction.entries) {
                 PendingIntent.getBroadcast(context, id, commandIntent(context, id, action),
                     PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)?.cancel()
+            }
+        }
+    }
+
+    /** Small, listener-lifetime visual keys; no RemoteViews/bitmaps or actionable sessions are retained. */
+    internal class PresentationCache {
+        private data class Key(val style: WidgetAppearance, val sizes: List<android.util.SizeF>,
+            val state: WidgetPlaybackState, val progress: Int?)
+        private data class Configuration(val style: WidgetAppearance, val options: Bundle)
+        private val delivered = mutableMapOf<Int, Key>()
+        private val configurations = mutableMapOf<Int, Configuration>()
+        fun retain(ids: List<Int>) {
+            delivered.keys.retainAll(ids.toSet())
+            configurations.keys.retainAll(ids.toSet())
+        }
+        fun prepare(context: Context, ids: List<Int>) {
+            retain(ids)
+            delivered.clear() // Explicit host/configuration deliveries may have changed what is displayed.
+            val manager = AppWidgetManager.getInstance(context)
+            for (id in ids) configurations[id] = Configuration(WidgetStyleStore.load(context, id).normalized(),
+                Bundle(manager.getAppWidgetOptions(id)))
+        }
+        fun refresh(context: Context, ids: List<Int>, snapshot: WidgetUpdateSnapshot) {
+            val manager = AppWidgetManager.getInstance(context)
+            for (id in ids) {
+                val config = configurations[id] ?: continue
+                val style = config.style
+                val options = config.options
+                // Quantization affects only the drawn ring (less than 0.1%); commands retain full precision.
+                val fraction = if (style.progressRing && snapshot.state == WidgetPlaybackState.PLAYING)
+                    snapshot.progress?.fraction?.times(1024)?.toInt()?.coerceIn(0, 1024) else null
+                val key = Key(style, WidgetRenderer.reportedSizes(options), snapshot.state, fraction)
+                if (delivered[id] == key) continue
+                val data = snapshot.copy(progress = fraction?.let { WidgetTrackProgress(it / 1024f) })
+                manager.updateAppWidget(id, WidgetRenderer.render(context, id, options, data, style))
+                delivered[id] = key // Commit only after successful host delivery.
             }
         }
     }
@@ -111,7 +149,7 @@ class MediaWidgetProvider : AppWidgetProvider() {
             return try {
                 val app = context.applicationContext
                 val manager = AppWidgetManager.getInstance(app)
-                WidgetPlaybackObserver.settingsChanged(app)
+                WidgetPlaybackObserver.settingsChanged(app, resyncSessions = true)
                 dispatch(app, manager, id)
                 RefreshResult.REQUESTED
             } catch (_: RuntimeException) {
@@ -138,6 +176,8 @@ class MediaWidgetProvider : AppWidgetProvider() {
                 .filter { !progressOnly || WidgetStyleStore.load(context, it).progressRing }
             if (ids.isEmpty()) return
             updateBatch(context, manager, ids, playback)
+            if (playback != WidgetPlaybackState.UNKNOWN)
+                WidgetPlaybackObserver.settingsChanged(context, resyncSessions = true)
         }
     }
 }

@@ -3,34 +3,64 @@ package dev.local.mediaactions
 import android.appwidget.AppWidgetManager
 import android.content.BroadcastReceiver
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.PowerManager
 import android.media.MediaMetadata
-import android.content.Context
 import android.media.session.MediaController
 import android.media.session.MediaSession
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
+import android.os.SystemClock
 
-/** Bound to the listener lifecycle; progress refresh is limited to opted-in widgets on an interactive screen. */
+/** Listener-owned presentation cache. Commands always use their own fresh SessionGateway. */
 class WidgetPlaybackObserver(context: Context,
-    private val progressReader: () -> WidgetTrackProgress? = { WidgetTrackProgress.read(context.applicationContext) },
+    private val progressReader: (() -> WidgetTrackProgress?)? = null,
     private val onChanged: ((WidgetPlaybackState) -> Unit)? = null,
 ) : AutoCloseable {
     private val app = context.applicationContext
     private val manager = app.getSystemService(MediaSessionManager::class.java)
+    private val gateway = AndroidSessionGateway(app)
     private val handler = Handler(Looper.getMainLooper())
-    private val watched = mutableMapOf<MediaSession.Token, Pair<MediaController, MediaController.Callback>>()
+    private data class Playback(val state: Int, val position: Long, val updated: Long, val speed: Float) {
+        companion object {
+            fun capture(value: PlaybackState?) = value?.let { Playback(it.state, it.position,
+                it.lastPositionUpdateTime, it.playbackSpeed) }
+        }
+    }
+    private class Entry(val controller: MediaController, val callback: MediaController.Callback) {
+        val packageName: String = controller.packageName
+        var playback: Playback? = null
+        var stateDirty = true
+        var duration = 0L
+        var durationDirty = true
+    }
+    private val watched = linkedMapOf<MediaSession.Token, Entry>()
+    private val destroyed = mutableSetOf<MediaSession.Token>()
+    private var order = emptyList<MediaSession.Token>()
+    private var selectionDirty = true
+    private var selectedEntry: Entry? = null
+    private var keyToken: MediaSession.Token? = null
+    private var keyPackage: String? = null
+    private var pendingControllers: List<MediaController>? = null
+    private var resyncNeeded = false
     private var running = false
-    private var activeRegistered = false
-    private var keyRegistered = false
+    private var generation = 0
+    private var activeListener: MediaSessionManager.OnActiveSessionsChangedListener? = null
+    private var keyListener: MediaSessionManager.OnMediaKeyEventSessionChangedListener? = null
     private var lastState: WidgetPlaybackState? = null
     private var refreshPending = false
     private var forceRefresh = false
+    private var allTargetsPending = false
+    private var deliveryPending = false
     private var receiverRegistered = false
+    private var screenOff = false
+    private var ids = emptyList<Int>()
+    private var progressIds = emptyList<Int>()
+    private val presentation = MediaWidgetProvider.PresentationCache()
     /** Optional test/debug observer; no counters, storage or logging when unset. */
     internal enum class Work { PERIODIC_TICK, EVENT_REFRESH }
     internal var observeWork: ((Work) -> Unit)? = null
@@ -42,96 +72,237 @@ class WidgetPlaybackObserver(context: Context,
     private val visibilityReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             handler.removeCallbacks(pulse)
-            if (intent.action != Intent.ACTION_SCREEN_OFF) scheduleRefresh(true)
+            when (intent.action) {
+                Intent.ACTION_SCREEN_OFF -> screenOff = true
+                Intent.ACTION_SCREEN_ON -> {
+                    screenOff = false
+                    loadTargets()
+                    resyncNeeded = true
+                    scheduleRefresh(true)
+                }
+                SETTINGS_CHANGED -> {
+                    resyncNeeded = resyncNeeded || intent.getBooleanExtra(RESYNC_SESSIONS, false)
+                    allTargetsPending = true
+                    loadTargets()
+                    scheduleRefresh(true)
+                }
+            }
         }
     }
-    private fun progressWidgets(): Boolean = try {
-        val widgets = AppWidgetManager.getInstance(app)
-        widgets.getAppWidgetIds(ComponentName(app, MediaWidgetProvider::class.java)).any {
-            WidgetStyleStore.load(app, it).progressRing
-        }
-    } catch (_: RuntimeException) { false }
-    private fun updatePulse(state: WidgetPlaybackState) {
+
+    private fun loadTargets() {
+        try {
+            ids = AppWidgetManager.getInstance(app)
+                .getAppWidgetIds(ComponentName(app, MediaWidgetProvider::class.java)).toList()
+            progressIds = ids.filter { WidgetStyleStore.load(app, it).progressRing }
+            presentation.prepare(app, ids)
+        } catch (_: RuntimeException) { ids = emptyList(); progressIds = emptyList() }
+    }
+
+    private fun updatePulse(snapshot: WidgetUpdateSnapshot) {
         handler.removeCallbacks(pulse)
-        if (running && state == WidgetPlaybackState.PLAYING && progressWidgets() &&
-            app.getSystemService(PowerManager::class.java).isInteractive && progressReader() != null)
+        val playback = selectedEntry?.playback
+        val advances = progressReader != null || (playback?.state == PlaybackState.STATE_PLAYING &&
+            playback.updated > 0 && playback.speed.isFinite() &&
+            (playback.speed > 0 && (snapshot.progress?.fraction ?: 1f) < 1f ||
+                playback.speed < 0 && (snapshot.progress?.fraction ?: 0f) > 0f))
+        if (running && advances && snapshot.state == WidgetPlaybackState.PLAYING && progressIds.isNotEmpty() &&
+            !screenOff && app.getSystemService(PowerManager::class.java).isInteractive && snapshot.progress != null)
+            // Handler uptime delays do not wake a sleeping device. No alarms, jobs or wake locks.
             handler.postDelayed(pulse, WidgetProgressSettings.load(app) * 1_000L)
     }
+
     private val refresh = Runnable {
         refreshPending = false
         if (running) {
-            val state = WidgetPlaybackState.read(AndroidSessionGateway(app))
             val event = eventPending
             eventPending = false
-            if (observeWork != null && event && (state != lastState || forceRefresh && progressWidgets())) observeWork?.invoke(Work.EVENT_REFRESH)
-            if (state != lastState) emit(state)
-            else if (forceRefresh && progressWidgets()) emit(state, progressOnly = true)
+            val force = forceRefresh
             forceRefresh = false
-            updatePulse(state)
+            val allTargets = allTargetsPending
+            allTargetsPending = false
+            val snapshot = readPresentation()
+            val changed = snapshot.state != lastState
+            if (changed || allTargets || deliveryPending || force && progressIds.isNotEmpty()) {
+                if (event) observeWork?.invoke(Work.EVENT_REFRESH)
+                emit(snapshot, progressOnly = !changed && !allTargets && !deliveryPending)
+            }
+            updatePulse(snapshot)
         }
-    }
-    private val activeListener = MediaSessionManager.OnActiveSessionsChangedListener { controllers ->
-        if (running) {
-            watch(controllers.orEmpty())
-            scheduleRefresh(true)
-        }
-    }
-    private val keyListener = MediaSessionManager.OnMediaKeyEventSessionChangedListener { _, _ ->
-        scheduleRefresh(true)
     }
 
     fun start() {
         if (running) return
         running = true
+        loadTargets()
         try {
             app.registerReceiver(visibilityReceiver, IntentFilter(Intent.ACTION_SCREEN_ON).apply {
                 addAction(Intent.ACTION_SCREEN_OFF); addAction(SETTINGS_CHANGED)
             }, Context.RECEIVER_NOT_EXPORTED)
             receiverRegistered = true
-            manager.addOnActiveSessionsChangedListener(activeListener,
-                AndroidSessionGateway.listenerComponent(app), handler)
-            activeRegistered = true
-            watch(manager.getActiveSessions(AndroidSessionGateway.listenerComponent(app)))
         } catch (_: RuntimeException) {
-            // A revoked grant or a vendor failure must not crash the system-bound service.
             close()
-            emit(WidgetPlaybackState.UNKNOWN)
+            emit(WidgetUpdateSnapshot(WidgetPlaybackState.UNKNOWN, null))
             return
         }
-        try {
-            manager.addOnMediaKeyEventSessionChangedListener(app.mainExecutor, keyListener)
-            keyRegistered = true
-        } catch (_: RuntimeException) {
-            // Playback and active-session callbacks remain useful if this hint is unavailable.
-        }
+        resyncNeeded = true
         scheduleRefresh()
     }
 
-    private fun watch(controllers: List<MediaController>) {
-        val tokens = controllers.map { it.sessionToken }.toSet()
-        for (token in watched.keys.toList()) if (token !in tokens) {
-            watched.remove(token)?.let { (controller, callback) ->
-                try { controller.unregisterCallback(callback) } catch (_: RuntimeException) { /* Already gone. */ }
+    /** Only presentation uses these entries. No transport controls or persistent media data. */
+    private fun readPresentation(): WidgetUpdateSnapshot {
+        val unknown = WidgetUpdateSnapshot(WidgetPlaybackState.UNKNOWN, null)
+        if (ids.isEmpty() && onChanged == null) {
+            detachSessions()
+            return unknown
+        }
+        return try {
+            // Revocation must win even if disconnect/callback delivery is delayed.
+            if (!gateway.hasNotificationAccess()) {
+                detachSessions()
+                return unknown
+            }
+            if (activeListener == null) attachSessions()
+            if (resyncNeeded) {
+                pendingControllers = manager.getActiveSessions(AndroidSessionGateway.listenerComponent(app))
+                keyToken = try { manager.mediaKeyEventSession } catch (_: RuntimeException) { null }
+                keyPackage = try { manager.mediaKeyEventSessionPackageName?.takeIf { it.isNotBlank() } }
+                    catch (_: RuntimeException) { null }
+                watched.values.forEach { it.stateDirty = true; it.durationDirty = true }
+                selectionDirty = true
+                resyncNeeded = false
+            }
+            pendingControllers?.let { pendingControllers = null; watch(it) }
+            if (selectionDirty) {
+                val players = order.mapNotNull { token -> watched[token]?.let { entry ->
+                    if (entry.stateDirty) {
+                        entry.playback = Playback.capture(entry.controller.playbackState)
+                        entry.stateDirty = false
+                    }
+                    CachedPlayer(token, entry.packageName, classify(entry.playback))
+                } }
+                val selected = (MediaSessionSelector.select(SessionSnapshot(players,
+                    players.firstOrNull { it.sessionIdentity == keyToken }, keyPackage)) as? Selection.Selected)
+                    ?.session as? CachedPlayer
+                selectedEntry = selected?.let { watched[it.sessionIdentity] }
+                selectionDirty = false
+            }
+            val entry = selectedEntry ?: return unknown
+            val state = WidgetPlaybackState.fromSessionState(classify(entry.playback))
+            val progress = if (state == WidgetPlaybackState.PLAYING && progressIds.isNotEmpty()) {
+                if (progressReader != null) progressReader.invoke() else {
+                    if (entry.durationDirty) {
+                        entry.duration = entry.controller.metadata?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0
+                        entry.durationDirty = false
+                    }
+                    entry.playback?.let { playback -> WidgetTrackProgress.fraction(playback.position,
+                        entry.duration, playback.updated, playback.speed,
+                        playback.state == PlaybackState.STATE_PLAYING, SystemClock.elapsedRealtime()) }
+                }
+            } else null
+            WidgetUpdateSnapshot(state, progress)
+        } catch (_: SecurityException) {
+            detachSessions()
+            unknown
+        } catch (_: RuntimeException) {
+            // Keep event subscriptions for recovery after a transient vendor/binder failure.
+            selectedEntry = null
+            selectionDirty = true
+            resyncNeeded = true
+            watched.values.forEach { it.playback = null; it.duration = 0; it.stateDirty = true; it.durationDirty = true }
+            unknown
+        }
+    }
+
+    private fun attachSessions() {
+        val epoch = ++generation
+        val active = MediaSessionManager.OnActiveSessionsChangedListener { controllers ->
+            if (running && epoch == generation) {
+                pendingControllers = controllers.orEmpty()
+                scheduleRefresh(true)
             }
         }
+        manager.addOnActiveSessionsChangedListener(active, AndroidSessionGateway.listenerComponent(app), handler)
+        activeListener = active
+        resyncNeeded = true
+        val key = MediaSessionManager.OnMediaKeyEventSessionChangedListener { pkg, token ->
+            if (running && epoch == generation) {
+                // The callback itself supplies both hints; enumerate only to discover an unknown token.
+                if (token != null && token !in watched && token != keyToken) resyncNeeded = true
+                selectionDirty = true
+                keyToken = token
+                keyPackage = pkg?.takeIf { it.isNotBlank() }
+                scheduleRefresh(true)
+            }
+        }
+        try {
+            manager.addOnMediaKeyEventSessionChangedListener(app.mainExecutor, key)
+            keyListener = key
+        } catch (_: RuntimeException) { /* Active-session and playback events still work without this hint. */ }
+    }
+
+    private fun watch(controllers: List<MediaController>) {
+        selectionDirty = true
+        val tokens = controllers.map { it.sessionToken }.toSet()
+        destroyed.retainAll(tokens)
+        for (token in watched.keys.toList()) if (token !in tokens) removeEntry(token)
+        order = controllers.map { it.sessionToken }.distinct()
         for (controller in controllers) {
             val token = controller.sessionToken
-            if (token in watched) continue
+            if (token in destroyed) continue
+            val existing = watched[token]
+            if (existing != null) { existing.stateDirty = true; existing.durationDirty = true; continue }
+            lateinit var entry: Entry
             val callback = object : MediaController.Callback() {
-                override fun onPlaybackStateChanged(state: PlaybackState?) = scheduleRefresh(true)
-                override fun onMetadataChanged(metadata: MediaMetadata?) = scheduleRefresh(true)
-                override fun onSessionDestroyed() {
-                    watched.remove(token)?.let { (old, registered) ->
-                        try { old.unregisterCallback(registered) } catch (_: RuntimeException) { /* Already gone. */ }
+                private fun current() = running && watched[token] === entry
+                override fun onPlaybackStateChanged(state: PlaybackState?) {
+                    if (current()) {
+                        entry.playback = Playback.capture(state)
+                        entry.stateDirty = false
+                        selectionDirty = true
+                        scheduleRefresh(true)
                     }
-                    scheduleRefresh(true)
+                }
+                override fun onMetadataChanged(metadata: MediaMetadata?) {
+                    if (current()) {
+                        entry.duration = metadata?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0
+                        entry.durationDirty = false
+                        entry.stateDirty = true // A new track may also reset position before its next playback event.
+                        selectionDirty = true
+                        scheduleRefresh(true)
+                    }
+                }
+                override fun onSessionDestroyed() {
+                    if (current()) { destroyed += token; removeEntry(token); scheduleRefresh(true) }
                 }
             }
-            try {
-                controller.registerCallback(callback, handler)
-                watched[token] = controller to callback
-            } catch (_: RuntimeException) { /* A session may disappear while the list is being read. */ }
+            entry = Entry(controller, callback)
+            watched[token] = entry
+            try { controller.registerCallback(callback, handler) }
+            catch (_: RuntimeException) { watched.remove(token) }
         }
+    }
+
+    private fun removeEntry(token: MediaSession.Token) {
+        selectionDirty = true
+        selectedEntry = null
+        watched.remove(token)?.let {
+            try { it.controller.unregisterCallback(it.callback) } catch (_: RuntimeException) { /* Already gone. */ }
+        }
+    }
+    private fun detachSessions() {
+        ++generation
+        for (token in watched.keys.toList()) removeEntry(token)
+        activeListener?.let {
+            try { manager.removeOnActiveSessionsChangedListener(it) } catch (_: RuntimeException) { /* Grant revoked. */ }
+        }
+        keyListener?.let {
+            try { manager.removeOnMediaKeyEventSessionChangedListener(it) } catch (_: RuntimeException) { /* Grant revoked. */ }
+        }
+        activeListener = null; keyListener = null
+        pendingControllers = null; order = emptyList(); destroyed.clear()
+        keyToken = null; keyPackage = null; resyncNeeded = true
+        selectedEntry = null; selectionDirty = true
     }
 
     private fun scheduleRefresh(force: Boolean = false, event: Boolean = true) {
@@ -142,21 +313,38 @@ class WidgetPlaybackObserver(context: Context,
         handler.post(refresh)
     }
 
-    private fun emit(state: WidgetPlaybackState, progressOnly: Boolean = false) {
+    private fun emit(snapshot: WidgetUpdateSnapshot, progressOnly: Boolean = false) {
         try {
-            if (onChanged != null) onChanged.invoke(state)
-            else MediaWidgetProvider.refreshAll(app, state, progressOnly)
-            lastState = state
+            if (onChanged != null) onChanged.invoke(snapshot.state)
+            else presentation.refresh(app, if (progressOnly) progressIds else ids, snapshot)
+            lastState = snapshot.state
+            deliveryPending = false
         } catch (_: RuntimeException) {
-            // A host failure must not kill the listener or mark an undelivered state as current.
+            deliveryPending = true
+            // A failed delivery is retried on the next event; do not mark it current.
         }
     }
 
     companion object {
         private const val SETTINGS_CHANGED = "dev.local.mediaactions.WIDGET_PROGRESS_SETTINGS"
-        fun settingsChanged(context: Context) {
-            context.sendBroadcast(Intent(SETTINGS_CHANGED).setPackage(context.packageName))
+        private const val RESYNC_SESSIONS = "resync_sessions"
+        fun settingsChanged(context: Context, resyncSessions: Boolean = false) {
+            context.sendBroadcast(Intent(SETTINGS_CHANGED).setPackage(context.packageName)
+                .putExtra(RESYNC_SESSIONS, resyncSessions))
         }
+        private fun classify(playback: Playback?): SessionState = when (playback?.state) {
+            PlaybackState.STATE_PLAYING, PlaybackState.STATE_FAST_FORWARDING, PlaybackState.STATE_REWINDING -> SessionState.PLAYING
+            PlaybackState.STATE_PAUSED -> SessionState.PAUSED
+            PlaybackState.STATE_STOPPED -> SessionState.STOPPED
+            PlaybackState.STATE_BUFFERING, PlaybackState.STATE_CONNECTING, PlaybackState.STATE_SKIPPING_TO_NEXT,
+            PlaybackState.STATE_SKIPPING_TO_PREVIOUS, PlaybackState.STATE_SKIPPING_TO_QUEUE_ITEM -> SessionState.TRANSITIONING
+            else -> SessionState.UNAVAILABLE
+        }
+    }
+    private data class CachedPlayer(override val sessionIdentity: MediaSession.Token,
+        override val packageName: String, override val state: SessionState) : PlayerSession {
+        override val supportedCommands = emptySet<TransportCommand>()
+        override fun send(command: TransportCommand): Unit = error("Presentation entries cannot execute commands")
     }
 
     override fun close() {
@@ -167,21 +355,9 @@ class WidgetPlaybackObserver(context: Context,
             try { app.unregisterReceiver(visibilityReceiver) } catch (_: RuntimeException) { /* Already gone. */ }
             receiverRegistered = false
         }
-        refreshPending = false
-        forceRefresh = false
-        eventPending = false
-        for ((controller, callback) in watched.values) {
-            try { controller.unregisterCallback(callback) } catch (_: RuntimeException) { /* Already gone. */ }
-        }
-        watched.clear()
-        if (activeRegistered) try {
-            manager.removeOnActiveSessionsChangedListener(activeListener)
-        } catch (_: RuntimeException) { /* Grant may already be revoked. */ }
-        if (keyRegistered) try {
-            manager.removeOnMediaKeyEventSessionChangedListener(keyListener)
-        } catch (_: RuntimeException) { /* Grant may already be revoked. */ }
-        activeRegistered = false
-        keyRegistered = false
+        refreshPending = false; forceRefresh = false; eventPending = false; allTargetsPending = false; deliveryPending = false
+        detachSessions()
+        presentation.retain(emptyList())
         lastState = null
     }
 }
