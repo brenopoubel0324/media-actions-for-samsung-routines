@@ -69,8 +69,20 @@ object WidgetStyleStore {
     }
 
     fun save(context: Context, appearance: WidgetAppearance, widgetId: Int? = null) {
+        editor(context, appearance, widgetId).apply()
+    }
+
+    internal fun saveDurably(context: Context, appearance: WidgetAppearance?, widgetId: Int? = null): Boolean {
+        require(appearance != null || widgetId != null)
+        val edit = if (appearance != null) editor(context, appearance, widgetId)
+            else context.getSharedPreferences(name(widgetId), Context.MODE_PRIVATE).edit().clear()
+        return edit.commit() && if (appearance != null) load(context, widgetId) == appearance.normalized()
+            else !hasOverride(context, widgetId!!)
+    }
+
+    private fun editor(context: Context, appearance: WidgetAppearance, widgetId: Int?): android.content.SharedPreferences.Editor {
         val style = appearance.normalized()
-        context.getSharedPreferences(name(widgetId), Context.MODE_PRIVATE).edit()
+        return context.getSharedPreferences(name(widgetId), Context.MODE_PRIVATE).edit()
             .putInt("scale", style.iconScalePercent).putInt("spacing", style.spacingDp)
             .putBoolean("dark_icons", style.darkIcons)
             .putString("icon_style", style.iconStyle.name).putBoolean("fill_width", style.fillWidth)
@@ -84,7 +96,7 @@ object WidgetStyleStore {
             .putInt("widget_padding_vertical", style.widgetPaddingVerticalDp)
             .putBoolean("center_border_only", style.centerBorderOnly)
             .putBoolean("progress_ring", style.progressRing)
-            .putBoolean("has_override", widgetId != null).apply()
+            .putBoolean("has_override", widgetId != null)
     }
 
     fun remove(context: Context, widgetId: Int) {

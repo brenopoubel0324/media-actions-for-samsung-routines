@@ -64,6 +64,10 @@ class MainActivity : Activity() {
                 ClipData.newPlainText(getString(R.string.app_name), LocalDiagnostics.text(this)))
             Toast.makeText(this, R.string.diagnostic_copied, Toast.LENGTH_SHORT).show()
         }
+        val backup = SettingsUi.card(this, body)
+        label(backup, R.string.backup_title, 18f, true)
+        label(backup, R.string.backup_home_help, 13f)
+        button(backup, R.string.backup_open) { startActivity(Intent(this, BackupActivity::class.java)) }.id = R.id.backup_open
         val controls = SettingsUi.card(this, body)
         label(controls, R.string.settings_controls, 18f, true)
         player = label(controls, R.string.player_none, 13f)

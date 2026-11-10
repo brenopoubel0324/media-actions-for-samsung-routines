@@ -1,0 +1,67 @@
+{
+  "version": "0.27-experimental",
+  "application_id": "dev.local.mediaactions",
+  "apks": [
+    {
+      "kind": "phone",
+      "filename": "media-actions-phone-0.27-experimental-debug.apk",
+      "sha256": "ad9eb30d67060d7b70ac66a1fa06c805e1551175133a2edd27ebbe5c2dae8824",
+      "bytes": 5472004,
+      "version_name": "0.27-experimental",
+      "version_code": 27,
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+    },
+    {
+      "kind": "preview_migration_only",
+      "application_id": "dev.local.mediaactions.preview",
+      "filename": "media-actions-preview-0.27-migration.apk",
+      "sha256": "0d1154be596908947d36cd625af5288094f4f74633bf2c34388ba9ded96603b8",
+      "bytes": 5472140,
+      "version_name": "0.27-experimental-preview",
+      "version_code": 27,
+      "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a"
+    }
+  ],
+  "wear_companion": "0.9-experimental",
+  "tests": {
+    "app": {
+      "tests": 536,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 573,
+  "lint": "No issues found in all modules",
+  "review": "backup-0.27.md",
+  "physical_host_tested": false,
+  "physical_wear_tested": false,
+  "physical_battery_measured": false,
+  "physical_same_device_comparison_completed": false,
+  "physical_recovery_tested": false,
+  "backup_format": "media-actions-settings",
+  "backup_format_version": 1,
+  "backup_max_bytes": 262144,
+  "physical_backup_migration_tested": false,
+  "progress_default_seconds": 5,
+  "features": "Backup manual com exportação JSON conferida e importação revisada antes de aplicar. Preserva padrão, intervalo e perfis portáveis de widgets de mídia/volume, incluindo herança e localização. Perfis podem ser aplicados a novos widgets após reinstalar; posições e permissões do Android não são transferidas. Atualização do app original, sem novo timer nem permissão de armazenamento.",
+  "requested_permissions": 1,
+  "preview_tests": {
+    "tests": 48,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

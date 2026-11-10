@@ -201,4 +201,36 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="volume_preview_help">Visual de exemplo. A prévia não altera o volume.</string>
     <string name="volume_widget_install">Adicione Volume de mídia pelo seletor de widgets da tela inicial. Ele funciona sem acesso às notificações.</string>
     <string name="volume_orientation_help">Redimensione o widget: mais largo usa −/+ na horizontal; mais alto usa + acima de −. Não precisa recriá-lo.</string>
+    <string name="backup_title">Backup e transferência</string>
+    <string name="backup_home_help">Salve seus ajustes em um arquivo e leve os visuais para outra instalação.</string>
+    <string name="backup_open">Exportar ou restaurar configurações</string>
+    <string name="backup_scope">Inclui visual padrão, intervalo do progresso e perfis dos widgets de mídia e volume. Exporte antes de desinstalar ou trocar de instalação.</string>
+    <string name="backup_export">Exportar backup</string>
+    <string name="backup_import">Importar arquivo</string>
+    <string name="backup_ready">Escolha onde salvar o arquivo ou selecione um backup existente.</string>
+    <string name="backup_working">Preparando arquivo ou aplicando configurações…</string>
+    <string name="backup_review">Revisar importação</string>
+    <plurals name="backup_summary"><item quantity="one">%1$d perfil de widget · progresso a cada %2$d s. Os widgets instalados não serão associados automaticamente aos perfis.</item><item quantity="many">%1$d perfis de widget · progresso a cada %2$d s. Os widgets instalados não serão associados automaticamente aos perfis.</item><item quantity="other">%1$d perfis de widget · progresso a cada %2$d s. Os widgets instalados não serão associados automaticamente aos perfis.</item></plurals>
+    <string name="backup_restore_globals">Restaurar visual padrão e intervalo do progresso</string>
+    <string name="backup_replace_notice">A confirmação substitui a biblioteca de perfis salvos. Restaurar o padrão também altera os widgets que seguem esse padrão. Posição, tamanho no launcher/LockStar, acesso às notificações e rotinas Samsung não são transferidos.</string>
+    <string name="backup_restore">Confirmar importação</string>
+    <string name="backup_cancelled">Operação cancelada. Nenhuma importação foi aplicada.</string>
+    <string name="backup_exported">Arquivo exportado e conferido. Guarde-o antes de remover a instalação de teste.</string>
+    <string name="backup_restored">Configurações salvas. Os perfis estão disponíveis abaixo para aplicar aos widgets.</string>
+    <string name="backup_export_failed">Não foi possível concluir a exportação. O arquivo pode estar incompleto; exporte novamente antes de desinstalar.</string>
+    <string name="backup_import_failed">Não foi possível ler o backup. Confira se é um arquivo Media Actions compatível, válido e de até 256 KiB. Nenhuma importação foi aplicada.</string>
+    <string name="backup_partial">Não foi possível verificar todas as gravações. Pode haver alterações parciais. Mantenha o arquivo de backup e importe ou aplique novamente.</string>
+    <string name="backup_refresh_failed">Ajustes salvos, mas não foi possível atualizar todos os widgets. Reabra o editor do widget para conferir e salvar novamente.</string>
+    <string name="backup_picker_failed">Não foi possível abrir o seletor de arquivos. Confira se há um aplicativo de documentos disponível.</string>
+    <string name="backup_profiles">Perfis salvos</string>
+    <string name="backup_profiles_help">Após reinstalar, adicione os widgets pelo launcher ou LockStar e aplique um perfil ao widget correspondente. Cada perfil pode ser usado mais de uma vez.</string>
+    <string name="backup_profiles_empty">Nenhum perfil importado. Seus widgets atuais já entram na exportação.</string>
+    <string name="backup_apply_widget">Aplicar a um widget instalado</string>
+    <string name="backup_use_default">Usar este visual como padrão</string>
+    <string name="backup_default_notice">Isso muda o padrão e todos os widgets que o seguem. Os widgets com visual próprio permanecem com seus ajustes.</string>
+    <string name="backup_apply">Aplicar</string>
+    <string name="backup_add_widget">Adicione primeiro um widget do mesmo tipo (mídia ou volume) pelo launcher ou LockStar. Depois volte aqui para aplicar o perfil.</string>
+    <string name="backup_choose_widget">Escolha o widget de destino</string>
+    <string name="backup_follow_default">Seguir o visual padrão atual</string>
+    <string name="backup_apply_notice">Marque para restaurar o vínculo com o padrão atual do app. Desmarque para copiar exatamente o visual salvo neste perfil. A identificação de local também será restaurada.</string>
 </resources>

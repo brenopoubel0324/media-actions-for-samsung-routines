@@ -1,12 +1,12 @@
-# Media Actions for Routines — 0.26 experimental
+# Media Actions for Routines — 0.27 experimental
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.26](downloads/v0.26-experimental/media-actions-phone-0.26-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.26-experimental/README.md).
+**APKs:** [Celular 0.27](downloads/v0.27-experimental/media-actions-phone-0.27-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.27-experimental/README.md).
 
-Atualização 0.26: Apresentação do widget orientada a eventos, cache efêmero e deduplicação visual; comandos mantêm verificações atuais. Em 60 s simulados com seis widgets/5 s: consultas de sessão 36→0 e metadados 24→0, mantendo 72 atualizações com avanço real. Dez callbacks idênticos em pausa: 60→0 atualizações. Sem polling de descoberta ou timer que acorde o aparelho; recuperação coberta em testes. Comparação física e economia de bateria NÃO MEDIDAS. [Review](docs/reviews/background-0.26.md).
+Atualização 0.27: Backup manual com exportação JSON conferida e importação revisada antes de aplicar. Preserva padrão, intervalo e perfis portáveis de widgets de mídia/volume, incluindo herança e localização. Perfis podem ser aplicados a novos widgets após reinstalar; posições e permissões do Android não são transferidas. Atualização do app original, sem novo timer nem permissão de armazenamento. [Review](docs/reviews/backup-0.27.md).
 
-Para ficar com **um app no celular**, instale o APK **Celular 0.26** sobre **Media Actions**, sem desinstalar o original. Confira suas configurações e widgets; depois remova somente **Media Actions Preview**, se instalada. Ajustes/widgets exclusivos da Preview não são transferidos automaticamente: recrie os widgets no original antes de removê-la, se precisar. A Preview permanece uma variante de desenvolvimento; seu uso não é necessário para receber estas correções.
+Para ficar com **um app no celular**, instale o APK **Celular 0.27** sobre **Media Actions**, sem desinstalar o original. Confira suas configurações e widgets; depois remova somente **Media Actions Preview**, se instalada. Para transferir os ajustes da Preview, atualize-a primeiro com o APK de migração, exporte o backup e importe no original. Recrie os widgets e reaplique os perfis antes de remover a Preview. [Guia de backup e migração](docs/BACKUP.md). A Preview permanece uma variante de desenvolvimento; seu uso não é necessário para receber estas correções.
 
 Novo: **Volume de mídia** para tablet/celular, com **−/+ por toque**, sem sessão de mídia e sem acesso às notificações. Adicione em **Widgets → Media Actions → Volume de mídia**; personalize em **Editar widget instalado**. Fundo transparente, ícones menores, distância, padding e bordas configuráveis. Não há polling de nível nem novo app. [Funcionamento e limites](docs/VOLUME_WIDGET.md).
 

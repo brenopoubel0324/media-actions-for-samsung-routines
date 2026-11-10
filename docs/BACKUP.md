@@ -1,0 +1,35 @@
+# Backup e transferência de configurações
+
+Na tela inicial do app, abra **Backup e transferência → Exportar ou restaurar configurações**. A exportação/importação é manual, por arquivo JSON escolhido no seletor de documentos do Android. Não há backup periódico, serviço adicional, timer, tráfego de rede próprio ou nova permissão de armazenamento. Um provedor de documentos escolhido por você pode guardar o arquivo na nuvem.
+
+## Quando os ajustes são preservados
+
+Atualizar o app com o mesmo pacote e certificado mantém seus dados, sem desinstalar. Os APKs originais 0.26 e 0.27 mantêm essa compatibilidade. A instalação Preview tem dados separados do app original; mudar de assinatura pode exigir remover a instalação anterior. **Exporte e confira o arquivo antes de remover o app que contém os ajustes.** Instalar backup apenas no app novo não dá acesso aos dados privados do antigo.
+
+Para quem ainda usa **Media Actions Preview**, há um [APK Preview 0.27 opcional](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/raw/refs/tags/v0.27-experimental/downloads/v0.27-experimental/media-actions-preview-0.27-migration.apk) apenas para atualizar essa instalação, exportar e depois importar no original. Quem usa **Media Actions** instala somente o APK original. Não é necessário manter dois aplicativos. Este backup não troca chaves de assinatura nem transforma a versão experimental em uma distribuição estável assinada para produção.
+
+## Fluxo de migração
+
+1. Atualize a instalação que contém seus ajustes para uma versão com backup, sem removê-la. Escolha o APK original ou Preview conforme o nome do app já instalado.
+2. Abra **Exportar backup**, escolha uma pasta como Downloads e aguarde **Arquivo exportado e conferido**. O app fecha, reabre e decodifica o documento para conferir o conteúdo. Se houver falha, não dependa daquele arquivo para desinstalar: exporte novamente.
+3. Na instalação de destino, abra **Importar arquivo**. Ler o arquivo não aplica ajustes. Confira a quantidade de perfis e o intervalo, e escolha se deseja restaurar também o padrão/intervalo globais. A confirmação substitui a biblioteca de perfis anteriormente importada; exporte-a antes se quiser guardá-la.
+4. Confirme a importação. Restaurar o visual padrão altera os widgets que já seguem esse padrão; widgets com visual próprio permanecem com seus ajustes até você escolher aplicar um perfil.
+5. Recrie os widgets no launcher ou LockStar. Em **Perfis salvos**, escolha o perfil, **Aplicar a um widget instalado** e o widget de destino do mesmo tipo. A tela mostra identificação de local e instância para escolher. O app não usa IDs antigos para decidir o destino.
+6. Na confirmação, **Seguir o visual padrão atual** restaura a herança do padrão. Desmarque para copiar exatamente a aparência salva no perfil, mesmo que o padrão atual seja diferente. **Usar este visual como padrão** também está disponível para preparar novos widgets.
+7. Confira o resultado no host. Só depois remova a instalação de teste que não será mais usada. A importação não remove aplicativos nem solicita controle de mídia.
+
+## Conteúdo e limites
+
+Inclui todos os 17 campos de aparência: família/tamanho/cor de ícones, espaçamento/distribuição, sombras, feedback, bordas independentes com cores/espessuras, padding horizontal e vertical negativo, borda somente central e indicador de progresso. Inclui intervalo global 5/15/30s, perfis de mídia/volume, indicação de vínculo com padrão e localização manual. Perfis iguais podem ser reutilizados; a exportação deduplica configurações idênticas e mantém os perfis importados mesmo se nenhum widget estiver instalado.
+
+Não inclui permissões de sistema, posição/tamanho controlados pelo launcher/LockStar, instâncias Android, rotinas Samsung, bindings do Wear Button Remapper ou configurações do app no relógio. Reautorize acesso a notificações no destino se necessário. Não exporta conteúdo de notificações, sessão/reprodução, títulos, artistas, capa ou diagnósticos Spotify.
+
+Formato `media-actions-settings`, versão 1, UTF-8 JSON, no máximo 256 KiB e 100 perfis. Valores/tipos/limites/enumerações são conferidos antes da primeira gravação; formato incompatível, dados incompletos ou profundidade excessiva são recusados. Formato comum entre original e Preview, independente de package/IDs locais. Cores ARGB usam o inteiro assinado Android. O arquivo exportado é conferido pela comparação dos dados decodificados após a gravação; não é validação física de um provedor de arquivos específico.
+
+Leitura/escrita e commits de restauração rodam fora da UI. A transferência em andamento e a confirmação são retidas em rotação; o documento canônico pendente também é salvo para recriação de processo. Uma operação interrompida por encerramento de processo pode precisar ser repetida. Não há promessa de conclusão após Forçar parada. A operação nunca executa comandos de reprodução ou altera o volume.
+
+A restauração grava primeiro a biblioteca de perfis e verifica os commits/readback. Diferentes SharedPreferences não formam uma transação única: falha de armazenamento pode produzir gravação parcial, identificada pela mensagem de erro. Guarde o arquivo e repita a importação/aplicação. Falha ao pedir atualização do host é relatada separadamente de falha de gravação; salvar não prova que o launcher/LockStar já desenhou o resultado. Uma nova importação substitui a biblioteca, mas não apaga os ajustes próprios dos widgets atuais.
+
+## Validação
+
+Testes API 33/36 cobrem codec, limites, todos os ícones/campos/locais, arquivos inválidos/profundos, ausência de widgets, aplicação em instância nova, tipo incorreto, herança versus cópia, ausência de gravação ao ler/cancelar, falhas de I/O/commit e conferência de exportação. A UI é renderizada com Android/Skia em português, inclusive tema escuro e fonte ampliada. Migração real entre instalações, seletor/provedor Samsung e LockStar físicos ainda precisam de teste no aparelho; os testes simulados não substituem essa etapa.

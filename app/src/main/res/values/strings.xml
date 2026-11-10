@@ -198,4 +198,36 @@
     <string name="volume_preview_help">Appearance demo. The preview does not adjust volume.</string>
     <string name="volume_widget_install">Add the Media volume widget from your home screen widget picker. It works without notification access.</string>
     <string name="volume_orientation_help">Resize the widget: wider uses −/+ horizontally; taller uses + above −. No recreation is needed.</string>
+    <string name="backup_title">Backup and transfer</string>
+    <string name="backup_home_help">Save settings to a file and carry widget appearances to another installation.</string>
+    <string name="backup_open">Export or restore settings</string>
+    <string name="backup_scope">Includes default appearance, progress interval and media/volume widget profiles. Export before uninstalling or switching installations.</string>
+    <string name="backup_export">Export backup</string>
+    <string name="backup_import">Import file</string>
+    <string name="backup_ready">Choose where to save a file, or select an existing backup.</string>
+    <string name="backup_working">Preparing file or applying settings…</string>
+    <string name="backup_review">Review import</string>
+    <plurals name="backup_summary"><item quantity="one">%1$d widget profile · progress every %2$d s. Installed widgets will not be matched to profiles automatically.</item><item quantity="other">%1$d widget profiles · progress every %2$d s. Installed widgets will not be matched to profiles automatically.</item></plurals>
+    <string name="backup_restore_globals">Restore default appearance and progress interval</string>
+    <string name="backup_replace_notice">Confirming replaces the saved profile library. Restoring defaults also changes widgets that follow those defaults. Launcher/LockStar placement and size, notification access and Samsung routines are not transferred.</string>
+    <string name="backup_restore">Confirm import</string>
+    <string name="backup_cancelled">Cancelled. No import was applied.</string>
+    <string name="backup_exported">File exported and verified. Keep it before removing the test installation.</string>
+    <string name="backup_restored">Settings saved. Profiles are available below to apply to your widgets.</string>
+    <string name="backup_export_failed">Export could not finish. The file may be incomplete; export again before uninstalling.</string>
+    <string name="backup_import_failed">Could not read the backup. Choose a valid, compatible Media Actions file of up to 256 KiB. No import was applied.</string>
+    <string name="backup_partial">Could not verify every write. Some settings may have changed. Keep the backup file and import or apply again.</string>
+    <string name="backup_refresh_failed">Settings saved, but some widgets could not refresh. Open the widget editor to check and save again.</string>
+    <string name="backup_picker_failed">Could not open the file picker. Check that a document provider is available.</string>
+    <string name="backup_profiles">Saved profiles</string>
+    <string name="backup_profiles_help">After reinstalling, add widgets through your launcher or LockStar and apply a profile to the matching widget. You can reuse a profile.</string>
+    <string name="backup_profiles_empty">No imported profiles. Your current widgets are already included when exporting.</string>
+    <string name="backup_apply_widget">Apply to an installed widget</string>
+    <string name="backup_use_default">Use this appearance as default</string>
+    <string name="backup_default_notice">This changes defaults and every widget that follows them. Widgets with their own appearance keep their settings.</string>
+    <string name="backup_apply">Apply</string>
+    <string name="backup_add_widget">First add a widget of the same type (media or volume) through your launcher or LockStar, then return here to apply the profile.</string>
+    <string name="backup_choose_widget">Choose the destination widget</string>
+    <string name="backup_follow_default">Follow the current default appearance</string>
+    <string name="backup_apply_notice">Check to restore the link to current app defaults. Uncheck to copy the exact appearance saved in this profile. The location label will also be restored.</string>
 </resources>

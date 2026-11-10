@@ -67,4 +67,14 @@
     <item type="id" name="diagnostic_copy" />
     <item type="id" name="widget_visual_mode" />
     <item type="id" name="widget_use_default_visual" />
+    <item type="id" name="backup_open" />
+    <item type="id" name="backup_export" />
+    <item type="id" name="backup_import" />
+    <item type="id" name="backup_status" />
+    <item type="id" name="backup_preview" />
+    <item type="id" name="backup_summary" />
+    <item type="id" name="backup_globals" />
+    <item type="id" name="backup_restore" />
+    <item type="id" name="backup_cancel" />
+    <item type="id" name="backup_profiles" />
 </resources>

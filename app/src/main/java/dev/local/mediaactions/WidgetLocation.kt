@@ -25,6 +25,10 @@ object WidgetLocationStore {
         context.getSharedPreferences(name(id), Context.MODE_PRIVATE).edit().putString("location", location.name).apply()
     }
 
+    internal fun saveDurably(context: Context, id: Int, location: WidgetLocation): Boolean =
+        context.getSharedPreferences(name(id), Context.MODE_PRIVATE).edit().putString("location", location.name)
+            .commit() && load(context, id) == location
+
     fun remove(context: Context, id: Int) { context.deleteSharedPreferences(name(id)) }
 
     internal fun hostLocation(options: Bundle): WidgetLocation? = when (options.getInt(AppWidgetManager.OPTION_APPWIDGET_HOST_CATEGORY, 0)) {

@@ -9,6 +9,12 @@ object WidgetProgressSettings {
         (context.getSharedPreferences("widget_progress_settings", Context.MODE_PRIVATE).all["interval_seconds"] as? Int)
             ?.takeIf { it in intervals } ?: 5
 
+    internal fun saveDurably(context: Context, seconds: Int): Boolean {
+        require(seconds in intervals)
+        return context.getSharedPreferences("widget_progress_settings", Context.MODE_PRIVATE).edit()
+            .putInt("interval_seconds", seconds).commit() && load(context) == seconds
+    }
+
     fun save(context: Context, seconds: Int) {
         require(seconds in intervals)
         context.getSharedPreferences("widget_progress_settings", Context.MODE_PRIVATE).edit()
