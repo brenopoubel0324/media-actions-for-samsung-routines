@@ -1,0 +1,52 @@
+{
+  "version": "0.28",
+  "version_code": 28,
+  "channel": "stable",
+  "application_id": "dev.local.mediaactions",
+  "build_type": "release",
+  "debuggable": false,
+  "minified": false,
+  "filename": "media-actions-phone-0.28.apk",
+  "sha256": "b61e83c1ab1e2a3e87ff55982397cc21392f4bb6afde82faa0e85894a96d5252",
+  "bytes": 4710529,
+  "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a",
+  "previous_certificate_matches": true,
+  "requested_permissions": [
+    "android.permission.MODIFY_AUDIO_SETTINGS"
+  ],
+  "test_runs": {
+    "app_debug": {
+      "tests": 536,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app_release": {
+      "tests": 536,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear_debug": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared_debug": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_test_executions": 1109,
+  "lint": "No issues found: phone Debug/Release, shared Debug, Wear Debug",
+  "backup_format_version": 1,
+  "wear_version": "0.9-experimental",
+  "review": "docs/reviews/stable-0.28.md",
+  "user_reported_normal_operation": true,
+  "physical_agent_tested": false,
+  "physical_upgrade_to_0_28_tested": false,
+  "battery_measured": false
+}

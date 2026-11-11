@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Media Actions</string>
-    <string name="experimental">Experimental • Samsung locked-button operation needs testing on your phone.</string>
+    <string name="integration_help">Action availability depends on the player and Android settings.</string>
     <string name="listener_name">Media Actions — media session access</string>
     <string name="access_granted">Notification access granted</string>
     <string name="access_denied">Notification access not granted</string>

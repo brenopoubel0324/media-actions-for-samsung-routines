@@ -96,7 +96,7 @@ class MainActivity : Activity() {
         label(help.content, R.string.access_reason, 13f)
         label(help.content, R.string.setup_heading, 17f, true); label(help.content, R.string.setup_steps, 13f)
         label(help.content, R.string.widget_setup_heading, 17f, true); label(help.content, R.string.widget_setup_steps, 13f)
-        label(help.content, R.string.experimental, 12f)
+        label(help.content, R.string.integration_help, 12f)
         button(help.content, R.string.icon_licenses) {
             val notices = resources.openRawResource(R.raw.icon_licenses).bufferedReader().use { it.readText() }
             AlertDialog.Builder(this).setTitle(R.string.icon_licenses).setMessage(notices).setPositiveButton(android.R.string.ok, null).show()

@@ -12,8 +12,8 @@ android {
         applicationId = "dev.local.mediaactions"
         minSdk = 33
         targetSdk = 36
-        versionCode = 27
-        versionName = "0.27-experimental"
+        versionCode = 28
+        versionName = "0.28"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -21,10 +21,12 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = true
+            // Keep runtime behavior aligned with the validated unshrunk distribution.
+            isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
-        // A separate on-device probe. Never overwrites the user's existing 0.22 installation.
+        debug { versionNameSuffix = "-dev" }
+        // Development-only installation, separate from the original app.
         create("preview") {
             initWith(getByName("debug"))
             matchingFallbacks += listOf("debug")

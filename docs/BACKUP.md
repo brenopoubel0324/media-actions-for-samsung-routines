@@ -4,9 +4,9 @@ Na tela inicial do app, abra **Backup e transferência → Exportar ou restaurar
 
 ## Quando os ajustes são preservados
 
-Atualizar o app com o mesmo pacote e certificado mantém seus dados, sem desinstalar. Os APKs originais 0.26 e 0.27 mantêm essa compatibilidade. A instalação Preview tem dados separados do app original; mudar de assinatura pode exigir remover a instalação anterior. **Exporte e confira o arquivo antes de remover o app que contém os ajustes.** Instalar backup apenas no app novo não dá acesso aos dados privados do antigo.
+Atualizar o app com o mesmo pacote e certificado mantém seus dados, sem desinstalar. Os APKs originais 0.26, 0.27 e 0.28 mantêm essa compatibilidade. A instalação Preview tem dados separados do app original; mudar de assinatura pode exigir remover a instalação anterior. **Exporte e confira o arquivo antes de remover o app que contém os ajustes.** Instalar backup apenas no app novo não dá acesso aos dados privados do antigo.
 
-Para quem ainda usa **Media Actions Preview**, há um [APK Preview 0.27 opcional](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/raw/refs/tags/v0.27-experimental/downloads/v0.27-experimental/media-actions-preview-0.27-migration.apk) apenas para atualizar essa instalação, exportar e depois importar no original. Quem usa **Media Actions** instala somente o APK original. Não é necessário manter dois aplicativos. Este backup não troca chaves de assinatura nem transforma a versão experimental em uma distribuição estável assinada para produção.
+Para quem ainda usa **Media Actions Preview**, há um [APK Preview 0.27 opcional](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/raw/refs/tags/v0.27-experimental/downloads/v0.27-experimental/media-actions-preview-0.27-migration.apk) apenas para atualizar essa instalação, exportar e depois importar no original. Quem usa **Media Actions** instala somente o APK original. Não é necessário manter dois aplicativos. A 0.28 estável mantém a identidade histórica de assinatura para atualizar o original. [Build e identidade da distribuição](STABLE_RELEASE.md).
 
 ## Fluxo de migração
 

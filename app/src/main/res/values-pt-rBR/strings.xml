@@ -1,6 +1,6 @@
 <resources>
   <string name="app_name">Media Actions</string>
-  <string name="experimental">Versão experimental. A integração com LockStar e teclas Samsung precisa ser validada no aparelho.</string>
+  <string name="integration_help">A disponibilidade das ações depende do player e das configurações do Android.</string>
   <string name="access_granted">Acesso permitido · pronto para controlar</string>
   <string name="access_denied">Permita o acesso para controlar sua música</string>
   <string name="access_unknown">Não foi possível verificar o acesso. Tente atualizar.</string>

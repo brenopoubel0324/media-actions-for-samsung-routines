@@ -1,12 +1,12 @@
-# Media Actions for Routines — 0.27 experimental
+# Media Actions for Routines — 0.28 estável
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.27](downloads/v0.27-experimental/media-actions-phone-0.27-experimental-debug.apk) · [Relógio 0.9](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.27-experimental/README.md).
+**APKs:** [Celular 0.28 estável](downloads/v0.28/media-actions-phone-0.28.apk) · [Relógio 0.9 experimental](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.28/README.md).
 
-Atualização 0.27: Backup manual com exportação JSON conferida e importação revisada antes de aplicar. Preserva padrão, intervalo e perfis portáveis de widgets de mídia/volume, incluindo herança e localização. Perfis podem ser aplicados a novos widgets após reinstalar; posições e permissões do Android não são transferidas. Atualização do app original, sem novo timer nem permissão de armazenamento. [Review](docs/reviews/backup-0.27.md).
+Atualização 0.28: distribuição estável do original, em modo Release sem depuração, com o mesmo pacote e certificado. Mantém os recursos e backups da 0.27. [Review](docs/reviews/stable-0.28.md).
 
-Para ficar com **um app no celular**, instale o APK **Celular 0.27** sobre **Media Actions**, sem desinstalar o original. Confira suas configurações e widgets; depois remova somente **Media Actions Preview**, se instalada. Para transferir os ajustes da Preview, atualize-a primeiro com o APK de migração, exporte o backup e importe no original. Recrie os widgets e reaplique os perfis antes de remover a Preview. [Guia de backup e migração](docs/BACKUP.md). A Preview permanece uma variante de desenvolvimento; seu uso não é necessário para receber estas correções.
+Para ficar com **um app no celular**, instale o APK **Celular 0.28** sobre **Media Actions**, sem desinstalar o original. Confira suas configurações e widgets; depois remova somente **Media Actions Preview**, se instalada. Para transferir os ajustes da Preview, atualize-a primeiro com o APK de migração, exporte o backup e importe no original. Recrie os widgets e reaplique os perfis antes de remover a Preview. [Guia de backup e migração](docs/BACKUP.md). A Preview permanece uma variante de desenvolvimento; seu uso não é necessário para receber estas correções.
 
 Novo: **Volume de mídia** para tablet/celular, com **−/+ por toque**, sem sessão de mídia e sem acesso às notificações. Adicione em **Widgets → Media Actions → Volume de mídia**; personalize em **Editar widget instalado**. Fundo transparente, ícones menores, distância, padding e bordas configuráveis. Não há polling de nível nem novo app. [Funcionamento e limites](docs/VOLUME_WIDGET.md).
 
@@ -24,7 +24,7 @@ Novidade 0.16: configurações separadas em grupos, tela própria de edição co
 
 ![Configurações organizadas](downloads/v0.16-experimental/configuracoes-organizadas.png)
 
-Esta versão é experimental. Testes em Android simulado não confirmam integração física com S25/LockStar/Watch 8. As funções de mídia usam sessões elegíveis e ações anunciadas pelo player; Spotify Connect remoto pode não expor uma sessão local controlável.
+O canal estável do celular foi promovido após relato de funcionamento normal do usuário e validação automatizada. Os testes simulados não certificam todos os cenários físicos S25/LockStar/Watch 8. As funções de mídia usam sessões elegíveis e ações anunciadas pelo player; Spotify Connect remoto pode não expor uma sessão local controlável.
 
 ## Celular
 
