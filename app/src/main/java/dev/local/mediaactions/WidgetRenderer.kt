@@ -17,6 +17,13 @@ object WidgetRenderer {
         R.drawable.widget_border_3, R.drawable.widget_border_4,
         R.drawable.widget_border_5, R.drawable.widget_border_6,
         R.drawable.widget_border_7, R.drawable.widget_border_8)
+    private val compactBorders = intArrayOf(R.drawable.widget_compact_border_1,R.drawable.widget_compact_border_2,R.drawable.widget_compact_border_3,R.drawable.widget_compact_border_4,R.drawable.widget_compact_border_5,R.drawable.widget_compact_border_6,R.drawable.widget_compact_border_7,R.drawable.widget_compact_border_8)
+    private val cornerBorders = mapOf(
+        0 to intArrayOf(R.drawable.widget_frame_radius_0_1,R.drawable.widget_frame_radius_0_2,R.drawable.widget_frame_radius_0_3,R.drawable.widget_frame_radius_0_4,R.drawable.widget_frame_radius_0_5,R.drawable.widget_frame_radius_0_6,R.drawable.widget_frame_radius_0_7,R.drawable.widget_frame_radius_0_8),
+        8 to intArrayOf(R.drawable.widget_frame_radius_8_1,R.drawable.widget_frame_radius_8_2,R.drawable.widget_frame_radius_8_3,R.drawable.widget_frame_radius_8_4,R.drawable.widget_frame_radius_8_5,R.drawable.widget_frame_radius_8_6,R.drawable.widget_frame_radius_8_7,R.drawable.widget_frame_radius_8_8),
+        24 to intArrayOf(R.drawable.widget_frame_radius_24_1,R.drawable.widget_frame_radius_24_2,R.drawable.widget_frame_radius_24_3,R.drawable.widget_frame_radius_24_4,R.drawable.widget_frame_radius_24_5,R.drawable.widget_frame_radius_24_6,R.drawable.widget_frame_radius_24_7,R.drawable.widget_frame_radius_24_8),
+        32 to intArrayOf(R.drawable.widget_frame_radius_32_1,R.drawable.widget_frame_radius_32_2,R.drawable.widget_frame_radius_32_3,R.drawable.widget_frame_radius_32_4,R.drawable.widget_frame_radius_32_5,R.drawable.widget_frame_radius_32_6,R.drawable.widget_frame_radius_32_7,R.drawable.widget_frame_radius_32_8)
+    )
     private val buttonBorders = intArrayOf(
         R.drawable.button_border_1, R.drawable.button_border_2,
         R.drawable.button_border_3, R.drawable.button_border_4,
@@ -75,13 +82,22 @@ object WidgetRenderer {
             val buttons = if(volume) listOf(R.id.widget_previous,R.id.widget_next) else buttons
             val gaps = if(volume) listOf(R.id.widget_gap_left) else listOf(R.id.widget_gap_left,R.id.widget_gap_right)
             val showProgress = shouldShowProgress(style, playback)
-            val volumeLayout = if(volume && size!=null) VolumeWidgetLayout.calculate(size.width,size.height,style) else null
-            val geometry = volumeLayout?.geometry ?: WidgetGeometry.calculate(size?.width ?: if(volume)96f else 144f, size?.height ?: 48f,
-                if (size == null) style.copy(widgetPaddingHorizontalDp = 0, widgetPaddingVerticalDp = 0) else style, if(volume)2 else 3)
-            setInt(R.id.widget_controls, "setBackgroundResource", if (style.widgetBorder)
-                frameBorders[style.borderWidthDp - 1] else android.R.color.transparent)
+            val content = WidgetContentLayout.calculate(size, style, volume)
+            val geometry = content.geometry
+            val compact = style.widgetBorder && style.frameMode == WidgetFrameMode.COMPACT
+            val border = if (style.frameCorner == WidgetFrameCorner.AUTOMATIC)
+                (if (compact) compactBorders else frameBorders)[style.borderWidthDp - 1]
+                else (cornerBorders[style.frameCorner.radiusDp] ?: frameBorders)[style.borderWidthDp - 1]
+            setInt(R.id.widget_controls, "setBackgroundResource", if (style.widgetBorder && !compact)
+                border else android.R.color.transparent)
             setColorStateList(R.id.widget_controls, "setBackgroundTintList",
-                if (style.widgetBorder) ColorStateList.valueOf(style.borderColor) else null)
+                if (style.widgetBorder && !compact) ColorStateList.valueOf(style.borderColor) else null)
+            setInt(R.id.widget_frame, "setBackgroundResource", if (compact) border else android.R.color.transparent)
+            setColorStateList(R.id.widget_frame, "setBackgroundTintList", if (compact) ColorStateList.valueOf(style.borderColor) else null)
+            setViewLayoutHeight(R.id.widget_frame, if (compact) -2f else -1f, TypedValue.COMPLEX_UNIT_PX)
+            setInt(R.id.widget_frame, "setMinimumHeight", if (compact)
+                (maxOf(style.frameHeightDp, content.rowHeight + style.borderWidthDp * 2)
+                    .coerceAtMost(size?.height?.toInt()?.coerceAtLeast(1) ?: Int.MAX_VALUE) * context.resources.displayMetrics.density).toInt() else 0)
             val density = context.resources.displayMetrics.density
             val horizontalPadding = (geometry.widgetPaddingHorizontalDp * density).toInt()
             val verticalPadding = (geometry.widgetPaddingVerticalDp * density).toInt()
@@ -139,10 +155,10 @@ object WidgetRenderer {
                 }
             }
             if (size != null) {
-                setViewLayoutWidth(R.id.widget_controls_row, (volumeLayout?.rowWidth ?: geometry.widthDp).toFloat(), TypedValue.COMPLEX_UNIT_DIP)
-                setViewLayoutHeight(R.id.widget_controls_row, (volumeLayout?.rowHeight ?: geometry.buttonDp).toFloat(), TypedValue.COMPLEX_UNIT_DIP)
+                setViewLayoutWidth(R.id.widget_controls_row, content.rowWidth.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
+                setViewLayoutHeight(R.id.widget_controls_row, content.rowHeight.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
                 for (gap in gaps) {
-                    if(volumeLayout?.vertical == true) setViewLayoutHeight(gap,geometry.gapDp.toFloat(),TypedValue.COMPLEX_UNIT_DIP)
+                    if(content.vertical) setViewLayoutHeight(gap,geometry.gapDp.toFloat(),TypedValue.COMPLEX_UNIT_DIP)
                     else setViewLayoutWidth(gap, geometry.gapDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
                 }
                 // Reapply geometry padding after any decorative background inset.
@@ -154,6 +170,7 @@ object WidgetRenderer {
                 if(!volume) pad(R.id.widget_toggle, geometry.centerPaddingDp)
                 pad(R.id.widget_next, geometry.sidePaddingDp)
             } else {
+                if (compact) setViewLayoutHeight(R.id.widget_controls_row, content.rowHeight.toFloat(), TypedValue.COMPLEX_UNIT_DIP)
                 // A host that reports no dimensions still gets freely scaling transparent controls.
                 // Keep gaps collapsed to protect minimum touch targets; icon tuning still applies.
                 for (view in gaps) {

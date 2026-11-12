@@ -17,6 +17,7 @@ internal object WidgetAppearanceState {
         putInt("widget_padding_horizontal", style.widgetPaddingHorizontalDp)
         putInt("widget_padding_vertical", style.widgetPaddingVerticalDp)
         putBoolean("center_border_only", style.centerBorderOnly); putBoolean("progress_ring", style.progressRing)
+        putString("frame_mode", style.frameMode.name); putInt("frame_height", style.frameHeightDp); putString("frame_corner", style.frameCorner.name)
     }
 
     fun read(state: Bundle?): WidgetAppearance? = state?.let {
@@ -33,6 +34,9 @@ internal object WidgetAppearanceState {
             widgetPaddingHorizontalDp = it.getInt("widget_padding_horizontal", 0),
             widgetPaddingVerticalDp = it.getInt("widget_padding_vertical", 0),
             centerBorderOnly = it.getBoolean("center_border_only", false), progressRing = it.getBoolean("progress_ring", false),
+            frameMode = WidgetFrameMode.entries.firstOrNull { mode -> mode.name == it.getString("frame_mode") } ?: WidgetFrameMode.FILL,
+            frameHeightDp = it.getInt("frame_height", 64),
+            frameCorner = WidgetFrameCorner.entries.firstOrNull { corner -> corner.name == it.getString("frame_corner") } ?: WidgetFrameCorner.AUTOMATIC,
         ).normalized()
     }
 }

@@ -77,4 +77,11 @@
     <item type="id" name="backup_restore" />
     <item type="id" name="backup_cancel" />
     <item type="id" name="backup_profiles" />
+    <item type="id" name="widget_frame" />
+    <item type="id" name="widget_frame_mode" />
+    <item type="id" name="widget_frame_height_value" />
+    <item type="id" name="widget_frame_height_slider" />
+    <item type="id" name="widget_frame_height_decrease" />
+    <item type="id" name="widget_frame_height_increase" />
+    <item type="id" name="widget_frame_corner" />
 </resources>

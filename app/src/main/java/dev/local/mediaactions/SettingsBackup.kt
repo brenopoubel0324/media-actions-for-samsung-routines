@@ -27,8 +27,9 @@ internal object SettingsBackupCodec {
         val tokener = JSONTokener(text.removePrefix("\uFEFF"))
         val root = tokener.nextValue() as? JSONObject ?: error("Expected object")
         require(tokener.nextClean() == '\u0000')
-        require(root.get("format") == FORMAT && number(root, "version") == 1)
-        val defaults = style(root.getJSONObject("defaults"))
+        require(root.get("format") == FORMAT)
+        val version = number(root, "version").also { require(it in 1..2) }
+        val defaults = style(root.getJSONObject("defaults"), version)
         val interval = number(root, "interval_seconds").also { require(it in WidgetProgressSettings.intervals) }
         val profiles = root.getJSONArray("profiles")
         require(profiles.length() <= MAX_PROFILES)
@@ -40,7 +41,7 @@ internal object SettingsBackupCodec {
             require(kind == "media" || kind == "volume")
             val location = WidgetLocation.entries.firstOrNull { it.name == value.get("location") }
                 ?: error("Unknown location")
-            BackupProfile(name, kind == "volume", style(value.getJSONObject("appearance")),
+            BackupProfile(name, kind == "volume", style(value.getJSONObject("appearance"), version),
                 boolean(value, "follow_defaults"), location)
         })
     }
@@ -51,7 +52,7 @@ internal object SettingsBackupCodec {
             .put("kind", if (profile.volume) "volume" else "media")
             .put("appearance", style(profile.appearance)).put("follow_defaults", profile.followDefaults)
             .put("location", profile.location.name)) }
-        return JSONObject().put("format", FORMAT).put("version", 1).put("defaults", style(backup.defaults))
+        return JSONObject().put("format", FORMAT).put("version", 2).put("defaults", style(backup.defaults))
             .put("interval_seconds", backup.intervalSeconds).put("profiles", profiles).toString(2).also {
                 // Validate our own output with exactly the same contract as the importer.
                 decode(it)
@@ -83,7 +84,7 @@ internal object SettingsBackupCodec {
         return number.toInt()
     }
     private fun boolean(value: JSONObject, key: String) = value.get(key) as? Boolean ?: error("Expected Boolean")
-    private fun style(value: JSONObject): WidgetAppearance {
+    private fun style(value: JSONObject, version: Int): WidgetAppearance {
         val icon = WidgetIconStyle.entries.firstOrNull { it.name == value.get("icon_style") }
             ?: error("Unknown icon")
         return WidgetAppearance(number(value, "scale"), number(value, "spacing"), boolean(value, "dark_icons"), icon,
@@ -91,7 +92,10 @@ internal object SettingsBackupCodec {
             boolean(value, "widget_border"), number(value, "border_width"), number(value, "border_color"),
             boolean(value, "button_border"), number(value, "button_border_width"), number(value, "button_border_color"),
             number(value, "padding_horizontal"), number(value, "padding_vertical"), boolean(value, "center_border_only"),
-            boolean(value, "progress_ring")).also { require(it == it.normalized()) { "Invalid appearance range" } }
+            boolean(value, "progress_ring"),
+            if (version == 1) WidgetFrameMode.FILL else WidgetFrameMode.entries.firstOrNull { it.name == value.get("frame_mode") } ?: error("Unknown frame mode"),
+            if (version == 1) 64 else number(value, "frame_height"),
+            if (version == 1) WidgetFrameCorner.AUTOMATIC else WidgetFrameCorner.entries.firstOrNull { it.name == value.get("frame_corner") } ?: error("Unknown frame corner")).also { require(it == it.normalized()) { "Invalid appearance range" } }
     }
     private fun style(value: WidgetAppearance) = with(value) {
         JSONObject().put("scale", iconScalePercent).put("spacing", spacingDp).put("dark_icons", darkIcons)
@@ -100,7 +104,7 @@ internal object SettingsBackupCodec {
             .put("border_color", borderColor).put("button_border", buttonBorder).put("button_border_width", buttonBorderWidthDp)
             .put("button_border_color", buttonBorderColor).put("padding_horizontal", widgetPaddingHorizontalDp)
             .put("padding_vertical", widgetPaddingVerticalDp).put("center_border_only", centerBorderOnly)
-            .put("progress_ring", progressRing)
+            .put("progress_ring", progressRing).put("frame_mode", frameMode.name).put("frame_height", frameHeightDp).put("frame_corner", frameCorner.name)
     }
 }
 

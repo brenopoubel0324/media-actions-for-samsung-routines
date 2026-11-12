@@ -10,6 +10,14 @@ enum class WidgetIconStyle {
     CIRCULAR, CHEVRONS, DOUBLE_TRIANGLES, SQUARE,
 }
 
+enum class WidgetFrameMode { FILL, COMPACT }
+
+enum class WidgetFrameCorner(val radiusDp: Int, val label: Int) {
+    AUTOMATIC(-1, R.string.widget_corner_auto), SQUARE(0, R.string.widget_corner_square),
+    SOFT(8, R.string.widget_corner_soft), MEDIUM(16, R.string.widget_corner_medium),
+    ROUND(24, R.string.widget_corner_round), EXTRA_ROUND(32, R.string.widget_corner_extra),
+}
+
 data class WidgetAppearance(
     val iconScalePercent: Int = 100,
     val spacingDp: Int = 0,
@@ -28,13 +36,17 @@ data class WidgetAppearance(
     val widgetPaddingVerticalDp: Int = 0,
     val centerBorderOnly: Boolean = false,
     val progressRing: Boolean = false,
+    val frameMode: WidgetFrameMode = WidgetFrameMode.FILL,
+    val frameHeightDp: Int = 64,
+    val frameCorner: WidgetFrameCorner = WidgetFrameCorner.AUTOMATIC,
 ) {
     fun normalized() = copy(iconScalePercent = iconScalePercent.coerceIn(20, 150),
         spacingDp = spacingDp.coerceIn(0, MAX_SPACING_DP),
         borderWidthDp = borderWidthDp.coerceIn(1, MAX_BORDER_DP),
         buttonBorderWidthDp = buttonBorderWidthDp.coerceIn(1, MAX_BORDER_DP),
         widgetPaddingHorizontalDp = widgetPaddingHorizontalDp.coerceIn(0, MAX_PADDING_DP),
-        widgetPaddingVerticalDp = widgetPaddingVerticalDp.coerceIn(MIN_PADDING_DP, MAX_PADDING_DP))
+        widgetPaddingVerticalDp = widgetPaddingVerticalDp.coerceIn(MIN_PADDING_DP, MAX_PADDING_DP),
+        frameHeightDp = frameHeightDp.coerceIn(56, 160))
 
     companion object {
         const val MAX_SPACING_DP = 144
@@ -65,7 +77,10 @@ object WidgetStyleStore {
             prefs.getBoolean("button_border", false), prefs.getInt("button_border_width", 1),
             prefs.getInt("button_border_color", android.graphics.Color.WHITE),
             prefs.getInt("widget_padding_horizontal", 0), prefs.getInt("widget_padding_vertical", 0), prefs.getBoolean("center_border_only", false),
-            prefs.getBoolean("progress_ring", false)).normalized()
+            prefs.getBoolean("progress_ring", false),
+            WidgetFrameMode.entries.firstOrNull { it.name == prefs.getString("frame_mode", null) } ?: WidgetFrameMode.FILL,
+            prefs.getInt("frame_height", 64),
+            WidgetFrameCorner.entries.firstOrNull { it.name == prefs.getString("frame_corner", null) } ?: WidgetFrameCorner.AUTOMATIC).normalized()
     }
 
     fun save(context: Context, appearance: WidgetAppearance, widgetId: Int? = null) {
@@ -96,6 +111,7 @@ object WidgetStyleStore {
             .putInt("widget_padding_vertical", style.widgetPaddingVerticalDp)
             .putBoolean("center_border_only", style.centerBorderOnly)
             .putBoolean("progress_ring", style.progressRing)
+            .putString("frame_mode", style.frameMode.name).putInt("frame_height", style.frameHeightDp).putString("frame_corner", style.frameCorner.name)
             .putBoolean("has_override", widgetId != null)
     }
 

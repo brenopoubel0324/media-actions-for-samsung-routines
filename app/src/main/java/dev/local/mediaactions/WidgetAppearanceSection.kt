@@ -47,6 +47,8 @@ class WidgetAppearanceSection(
     private var spacingControl: WidgetNumberControl? = null
     private var borderControls: WidgetBorderSection? = null
     private var buttonBorderControls: WidgetBorderSection? = null
+    private var frameSettingsVisibility: (() -> Unit)? = null
+    private var frameHeightControl: WidgetNumberControl? = null
     private var paddingControls: WidgetPaddingSection? = null
     private val sections = linkedMapOf<Int, SettingsSection>()
     private var expanded = 0
@@ -151,7 +153,8 @@ class WidgetAppearanceSection(
         if (appearanceIntent != AppearanceIntent.INHERIT) {
             if (scaleControl?.validate() == false) return invalid(R.id.settings_icons)
             if (spacingControl?.validate() == false || paddingControls?.validate() == false) return invalid(R.id.settings_spacing)
-            if (borderControls?.validate() == false || buttonBorderControls?.validate() == false) return invalid(R.id.settings_borders)
+            if (borderControls?.validate() == false || buttonBorderControls?.validate() == false ||
+                (draft.widgetBorder && draft.frameMode == WidgetFrameMode.COMPACT && frameHeightControl?.validate() == false)) return invalid(R.id.settings_borders)
         }
         if (widgetId != null && (!WidgetRegistry.isOwnWidget(context, widgetId) || WidgetRegistry.isVolume(context,widgetId) != volume))
             return rejectSave(R.string.widget_configuration_missing)
@@ -255,7 +258,7 @@ class WidgetAppearanceSection(
         rebuild = {
             val reopen = expanded
             generation++
-            sections.clear(); textFields.clear()
+            sections.clear(); textFields.clear(); frameSettingsVisibility = null
             previewContainer?.removeAllViews()
             container.removeAllViews()
             container.addView(createContent(showApplyButton, previewContainer))
@@ -309,7 +312,8 @@ class WidgetAppearanceSection(
         fun updatePreview() {
             if (epoch != generation) return
             val available = if (preview.width > 0) min(360f, (preview.width / context.resources.displayMetrics.density - 16).coerceAtLeast(1f)) else 280f
-            val size = previewSize ?: SizeF(available, 56f)
+            val size = previewSize ?: SizeF(available,
+                if (draft.widgetBorder && draft.frameMode == WidgetFrameMode.COMPACT) 160f else 56f)
             preview.background = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 if (draft.darkIcons) intArrayOf(0xFFF0ECE2.toInt(), 0xFFC7DCD5.toInt()) else intArrayOf(0xFF244B58.toInt(), 0xFF172335.toInt()))
                 .apply { cornerRadius = dp(18).toFloat() }
@@ -324,7 +328,7 @@ class WidgetAppearanceSection(
                 contentDescription = context.getString(R.string.widget_preview_action, contentDescription)
                 setOnClickListener { /* Appearance demo only. */ }
             }
-            val g = if(volume) VolumeWidgetLayout.calculate(size.width,size.height,draft).geometry else WidgetGeometry.calculate(size.width, size.height, draft)
+            val g = WidgetContentLayout.calculate(size,draft,volume).geometry
             effective.text = buildString {
                 append(context.getString(if (hostSizes.isEmpty()) R.string.widget_sample_size else R.string.widget_reported_size, size.width.toInt(), size.height.toInt()))
                 append("\n"); append(context.getString(R.string.widget_effective_spacing, g.gapDp, g.buttonDp + g.gapDp))
@@ -442,8 +446,52 @@ class WidgetAppearanceSection(
             edit(draft.copy(buttonBorder = enabled, buttonBorderWidthDp = width, buttonBorderColor = color))
             centerOnly.visibility = if (enabled && !volume) View.VISIBLE else View.GONE; updatePreview()
         }.also { borders.addView(it.create(centerOnly)) }
-        borderControls = WidgetBorderSection(context, draft) { enabled, width, color -> edit(draft.copy(widgetBorder = enabled, borderWidthDp = width, borderColor = color)); updatePreview() }
+        borderControls = WidgetBorderSection(context, draft) { enabled, width, color -> edit(draft.copy(widgetBorder = enabled, borderWidthDp = width, borderColor = color)); updatePreview(); frameSettingsVisibility?.invoke() }
             .also { borders.addView(it.create()) }
+        val frameSettings = SettingsUi.column(context)
+        label(frameSettings, R.string.widget_frame_mode).labelFor = R.id.widget_frame_mode
+        val mode = Spinner(context).apply {
+            id = R.id.widget_frame_mode
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item,
+                listOf(context.getString(R.string.widget_frame_fill), context.getString(R.string.widget_frame_compact)))
+                .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+            setSelection(draft.frameMode.ordinal)
+        }
+        frameSettings.addView(mode)
+        label(frameSettings, R.string.widget_frame_corner).labelFor = R.id.widget_frame_corner
+        frameSettings.addView(Spinner(context).apply {
+            id = R.id.widget_frame_corner
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item,
+                WidgetFrameCorner.entries.map { context.getString(it.label) })
+                .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+            setSelection(draft.frameCorner.ordinal)
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    if (draft.frameCorner.ordinal != position) { edit(draft.copy(frameCorner = WidgetFrameCorner.entries[position])); updatePreview() }
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+            }
+        })
+        label(frameSettings, R.string.widget_frame_height)
+        frameHeightControl = WidgetNumberControl(context, context.getString(R.string.widget_frame_height), 56, 160,
+            draft.frameHeightDp, R.id.widget_frame_height_value, R.id.widget_frame_height_slider,
+            R.id.widget_frame_height_decrease, R.id.widget_frame_height_increase, "dp") {
+                edit(draft.copy(frameHeightDp = it)); updatePreview()
+            }.also { frameSettings.addView(it) }
+        fun frameControls() {
+            frameSettings.visibility = if (draft.widgetBorder) View.VISIBLE else View.GONE
+            frameHeightControl?.isEnabled = draft.frameMode == WidgetFrameMode.COMPACT
+        }
+        mode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (draft.frameMode.ordinal != position) { edit(draft.copy(frameMode = WidgetFrameMode.entries[position])); frameControls(); updatePreview() }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+        }
+        label(frameSettings, R.string.widget_frame_help, 13f)
+        borders.addView(frameSettings)
+        frameSettingsVisibility = ::frameControls
+        frameControls()
         val playback = section(R.id.settings_playback, if(volume) R.string.volume_interaction else R.string.settings_playback, if(volume) R.string.volume_interaction_summary else R.string.settings_playback_summary)
         if(!volume) {
         playback.addView(SettingsUi.toggle(context, R.string.widget_progress_ring, draft.progressRing, R.id.widget_progress_ring) {

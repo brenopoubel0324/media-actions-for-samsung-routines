@@ -233,4 +233,16 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="backup_choose_widget">Escolha o widget de destino</string>
     <string name="backup_follow_default">Seguir o visual padrão atual</string>
     <string name="backup_apply_notice">Marque para restaurar o vínculo com o padrão atual do app. Desmarque para copiar exatamente o visual salvo neste perfil. A identificação de local também será restaurada.</string>
+    <string name="widget_frame_mode">Formato da moldura</string>
+    <string name="widget_frame_fill">Preencher widget</string>
+    <string name="widget_frame_compact">Compacta</string>
+    <string name="widget_frame_height">Altura da moldura</string>
+    <string name="widget_frame_help">Compacta aproxima a borda dos controles de 48 dp. A altura adiciona folga, e o host continua reservando a área do widget. Volume vertical precisa de espaço para dois botões. O espaço disponível pode limitar a altura da moldura.</string>
+    <string name="widget_frame_corner">Arredondamento</string>
+    <string name="widget_corner_auto">Automático</string>
+    <string name="widget_corner_square">Reto · 0 dp</string>
+    <string name="widget_corner_soft">Suave · 8 dp</string>
+    <string name="widget_corner_medium">Médio · 16 dp</string>
+    <string name="widget_corner_round">Arredondado · 24 dp</string>
+    <string name="widget_corner_extra">Bem arredondado · 32 dp</string>
 </resources>

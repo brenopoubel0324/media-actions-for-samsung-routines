@@ -100,7 +100,7 @@ class SettingsBackupTest {
     @Test fun invalidFieldsVersionsTypesRangesAndTrailingDataAreRejected() {
         val text=SettingsBackupCodec.encode(backup())
         rejects(text+"{}")
-        for((key,value) in listOf("version" to 2,"version" to "1","interval_seconds" to 10,"format" to "another-app")) {
+        for((key,value) in listOf("version" to 99,"version" to "1","interval_seconds" to 10,"format" to "another-app")) {
             rejects(JSONObject(text).put(key,value).toString())
         }
         for((key,value) in listOf("scale" to 19,"spacing" to -1,"padding_vertical" to -25,"border_width" to 9,
