@@ -1,7 +1,7 @@
-# Validação — 0.28 estável
+# Validação — 0.29 estável
 
-BUILD SUCCESSFUL. 1109 execuções de testes; 573 Debug nos três módulos e 536 do app Release. Zero falhas/erros/pulos. Lint phone Debug/Release, shared/Wear Debug aprovado; git diff --check passou.
+BUILD SUCCESSFUL. 593 testes Debug nos três módulos e 556 do app Release: 1.149 execuções, zero falhas/erros/pulos. Lint phone Debug/Release e shared/Wear Debug aprovado; git diff --check passou.
 
-[Review](docs/reviews/stable-0.28.md) · [APK e validação de assinatura/manifest](downloads/v0.28/VALIDATION.json).
+[Review](docs/reviews/options-dedup-0.29.md) · [Integridade](downloads/v0.29/VALIDATION.json).
 
-Original não depurável, package/certificado históricos preservados e code28. O usuário relatou funcionamento normal; agente sem aparelho para validar a atualização exata 0.27→0.28 ou toda a matriz Samsung. Sem medição de bateria e sem execução do plano de wallpaper.
+Dez callbacks equivalentes após primeira entrega geram zero redesenhos/consultas de sessão nos cenários controlados API33/36. LockStar físico, tempo real de apagamento e bateria não foram medidos. APK original Release não depurável com certificado histórico, code29; backup v1 e Wear0.9 compatíveis.

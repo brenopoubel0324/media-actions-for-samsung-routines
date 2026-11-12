@@ -15,10 +15,13 @@ import android.widget.Toast
 /** One local music-stream step per click. No media session, timer, Activity or global key event. */
 class VolumeWidgetProvider: AppWidgetProvider() {
     override fun onUpdate(context:Context, manager:AppWidgetManager, appWidgetIds:IntArray) {
+        WidgetOptionsUpdates.forget(context,appWidgetIds)
         for(id in appWidgetIds) if(isOwnWidget(context,id)) manager.updateAppWidget(id,render(context,id,manager.getAppWidgetOptions(id)))
     }
     override fun onAppWidgetOptionsChanged(context:Context,manager:AppWidgetManager,appWidgetId:Int,newOptions:Bundle) {
-        if(isOwnWidget(context,appWidgetId))manager.updateAppWidget(appWidgetId,render(context,appWidgetId,newOptions))
+        if(isOwnWidget(context,appWidgetId)) WidgetOptionsUpdates.deliver(context,appWidgetId,true,newOptions) { appearance ->
+            manager.updateAppWidget(appWidgetId,render(context,appWidgetId,newOptions,appearance))
+        }
     }
     override fun onReceive(context:Context,intent:Intent) {
         if(intent.action!=ACTION){super.onReceive(context,intent);return}
@@ -32,6 +35,7 @@ class VolumeWidgetProvider: AppWidgetProvider() {
         } catch(_:RuntimeException) {Toast.makeText(context,R.string.volume_failed,Toast.LENGTH_SHORT).show()}
     }
     override fun onDeleted(context:Context,appWidgetIds:IntArray) {
+        WidgetOptionsUpdates.forget(context,appWidgetIds)
         for(id in appWidgetIds){
             WidgetStyleStore.remove(context,id);WidgetLocationStore.remove(context,id)
             for(up in listOf(false,true))PendingIntent.getBroadcast(context,id,command(context,id,up),PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)?.cancel()
@@ -44,8 +48,8 @@ class VolumeWidgetProvider: AppWidgetProvider() {
             .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
         internal fun controlIntent(context:Context,id:Int,up:Boolean):PendingIntent=PendingIntent.getBroadcast(context,id,command(context,id,up),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         internal fun isOwnWidget(context:Context,id:Int):Boolean = id>0 && try {AppWidgetManager.getInstance(context).getAppWidgetInfo(id)?.provider==ComponentName(context,VolumeWidgetProvider::class.java)}catch(_:RuntimeException){false}
-        internal fun render(context:Context,id:Int,options:Bundle):RemoteViews {
-            val style=WidgetStyleStore.load(context,id)
+        internal fun render(context:Context,id:Int,options:Bundle,appearance:WidgetAppearance?=null):RemoteViews {
+            val style=appearance ?: WidgetStyleStore.load(context,id)
             val sizes=WidgetRenderer.reportedSizes(options)
             if(sizes.isEmpty())return WidgetRenderer.build(context,id,style,null,volume=true)
             if(sizes.size==1)return WidgetRenderer.build(context,id,style,sizes.single(),volume=true)
@@ -53,6 +57,7 @@ class VolumeWidgetProvider: AppWidgetProvider() {
         }
         internal fun refresh(context:Context,id:Int):MediaWidgetProvider.RefreshResult {
             if(!isOwnWidget(context,id))return MediaWidgetProvider.RefreshResult.MISSING_WIDGET
+            WidgetOptionsUpdates.forget(context,intArrayOf(id))
             return try{val manager=AppWidgetManager.getInstance(context);manager.updateAppWidget(id,render(context,id,manager.getAppWidgetOptions(id)));MediaWidgetProvider.RefreshResult.REQUESTED}
             catch(_:RuntimeException){MediaWidgetProvider.RefreshResult.FAILED}
         }

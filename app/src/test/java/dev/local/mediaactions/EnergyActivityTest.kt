@@ -57,7 +57,7 @@ class CountingWidgetsShadow : ShadowAppWidgetManager() {
         super.updateAppWidget(id, views)
         if (id in EnergyCounters.tracked) {
             EnergyCounters.updates++
-            if (getViewFor(id).findViewById<ImageView>(R.id.widget_toggle).drawable is BitmapDrawable) EnergyCounters.bitmaps++
+            if (getViewFor(id).findViewById<ImageView>(R.id.widget_toggle)?.drawable is BitmapDrawable) EnergyCounters.bitmaps++
         }
     }
 }

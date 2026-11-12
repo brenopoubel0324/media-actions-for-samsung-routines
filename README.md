@@ -1,12 +1,12 @@
-# Media Actions for Routines — 0.28 estável
+# Media Actions for Routines — 0.29 estável
 
 Atalhos de **Anterior, Play/Pause e Próxima** para Rotinas Samsung, widget transparente e redimensionável para hosts Android como LockStar, e companion Wear OS com três entradas para **Wear Button Remapper**.
 
-**APKs:** [Celular 0.28 estável](downloads/v0.28/media-actions-phone-0.28.apk) · [Relógio 0.9 experimental](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.28/README.md).
+**APKs:** [Celular 0.29 estável](downloads/v0.29/media-actions-phone-0.29.apk) · [Relógio 0.9 experimental](downloads/v0.21-experimental/media-actions-wear-0.9-experimental-debug.apk) · [Checksums e instruções](downloads/v0.29/README.md).
 
-Atualização 0.28: distribuição estável do original, em modo Release sem depuração, com o mesmo pacote e certificado. Mantém os recursos e backups da 0.27. [Review](docs/reviews/stable-0.28.md).
+Atualização 0.29: deduplicação de callbacks equivalentes de opções dos widgets, preservando atualizações explícitas, resize e recuperação. A ligação com o timeout do LockStar ainda depende de teste físico. [Review](docs/reviews/options-dedup-0.29.md).
 
-Para ficar com **um app no celular**, instale o APK **Celular 0.28** sobre **Media Actions**, sem desinstalar o original. Confira suas configurações e widgets; depois remova somente **Media Actions Preview**, se instalada. Para transferir os ajustes da Preview, atualize-a primeiro com o APK de migração, exporte o backup e importe no original. Recrie os widgets e reaplique os perfis antes de remover a Preview. [Guia de backup e migração](docs/BACKUP.md). A Preview permanece uma variante de desenvolvimento; seu uso não é necessário para receber estas correções.
+Para ficar com **um app no celular**, instale o APK **Celular 0.29** sobre **Media Actions**, sem desinstalar o original. Confira suas configurações e widgets; depois remova somente **Media Actions Preview**, se instalada. Para transferir os ajustes da Preview, atualize-a primeiro com o APK de migração, exporte o backup e importe no original. Recrie os widgets e reaplique os perfis antes de remover a Preview. [Guia de backup e migração](docs/BACKUP.md). A Preview permanece uma variante de desenvolvimento; seu uso não é necessário para receber estas correções.
 
 Novo: **Volume de mídia** para tablet/celular, com **−/+ por toque**, sem sessão de mídia e sem acesso às notificações. Adicione em **Widgets → Media Actions → Volume de mídia**; personalize em **Editar widget instalado**. Fundo transparente, ícones menores, distância, padding e bordas configuráveis. Não há polling de nível nem novo app. [Funcionamento e limites](docs/VOLUME_WIDGET.md).
 

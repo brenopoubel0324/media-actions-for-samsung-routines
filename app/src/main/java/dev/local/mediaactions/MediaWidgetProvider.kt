@@ -28,8 +28,11 @@ class MediaWidgetProvider : AppWidgetProvider() {
         appWidgetId: Int,
         newOptions: Bundle,
     ) {
-        manager.updateAppWidget(appWidgetId, WidgetRenderer.render(context, appWidgetId, newOptions))
-        WidgetPlaybackObserver.settingsChanged(context, resyncSessions = true)
+        if (!isOwnWidget(context, appWidgetId)) return
+        WidgetOptionsUpdates.deliver(context, appWidgetId, false, newOptions) { appearance ->
+            manager.updateAppWidget(appWidgetId, WidgetRenderer.render(context, appWidgetId, newOptions, appearance = appearance))
+            WidgetPlaybackObserver.settingsChanged(context, resyncSessions = true)
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -57,6 +60,7 @@ class MediaWidgetProvider : AppWidgetProvider() {
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        WidgetOptionsUpdates.forget(context, appWidgetIds)
         WidgetPlaybackObserver.settingsChanged(context)
         for (id in appWidgetIds) {
             WidgetStyleStore.remove(context, id)
@@ -146,6 +150,7 @@ class MediaWidgetProvider : AppWidgetProvider() {
             },
         ): RefreshResult {
             if (!isOwnWidget(context, id)) return RefreshResult.MISSING_WIDGET
+            WidgetOptionsUpdates.forget(context, intArrayOf(id))
             return try {
                 val app = context.applicationContext
                 val manager = AppWidgetManager.getInstance(app)
@@ -164,6 +169,7 @@ class MediaWidgetProvider : AppWidgetProvider() {
         private fun updateBatch(context: Context, manager: AppWidgetManager, ids: List<Int>,
             playback: WidgetPlaybackState? = null) {
             if (ids.isEmpty()) return
+            WidgetOptionsUpdates.forget(context, ids.toIntArray())
             val needProgress = ids.any { WidgetStyleStore.load(context, it).progressRing }
             val snapshot = WidgetUpdateSnapshot.capture(AndroidSessionGateway(context), needProgress, playback)
             for (id in ids) manager.updateAppWidget(id,
