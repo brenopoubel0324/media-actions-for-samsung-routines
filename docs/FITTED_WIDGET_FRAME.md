@@ -1,3 +1,5 @@
+**Histórico da0.32. Esta opção foi retirada na0.33. Use [Compacta com altura de16–160dp](COMPACT_WIDGET_FRAME.md).**
+
 # Borda justa aos botões — 0.32
 
 Em **Editar widget instalado → Bordas → Formato da moldura**, escolha **Justa aos botões** e salve. O contorno acompanha o tamanho visual dos ícones e a distância entre eles, na largura e na altura. As áreas de toque continuam com 48 dp quando há espaço; a moldura é decorativa e pode ficar dentro dessas áreas. O widget continua transparente. A altura manual fica oculta nesse modo, pois é calculada pelos controles.

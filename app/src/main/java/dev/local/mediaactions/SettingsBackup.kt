@@ -93,12 +93,12 @@ internal object SettingsBackupCodec {
             boolean(value, "button_border"), number(value, "button_border_width"), number(value, "button_border_color"),
             number(value, "padding_horizontal"), number(value, "padding_vertical"), boolean(value, "center_border_only"),
             boolean(value, "progress_ring"),
-            if (version == 1) WidgetFrameMode.FILL else WidgetFrameMode.entries.firstOrNull { it.name == value.get("frame_mode") } ?: error("Unknown frame mode"),
+            if (version == 1) WidgetFrameMode.FILL else WidgetFrameMode.fromSaved(value.get("frame_mode") as? String) ?: error("Unknown frame mode"),
             if (version == 1) 64 else number(value, "frame_height"),
             if (version == 1) WidgetFrameCorner.AUTOMATIC else WidgetFrameCorner.entries.firstOrNull { it.name == value.get("frame_corner") } ?: error("Unknown frame corner"),
             if (version < 3) WidgetColorMode.FIXED else WidgetColorMode.entries.firstOrNull { it.name == value.get("color_mode") } ?: error("Unknown color mode"),
             if (version < 3) WidgetWallpaperTarget.FOLLOW_LOCATION else WidgetWallpaperTarget.entries.firstOrNull { it.name == value.get("wallpaper_target") } ?: error("Unknown wallpaper target"),
-            if (version < 3) false else boolean(value, "auto_border_colors")).also { require(it == it.normalized()) { "Invalid appearance range" }; require(version >= 4 || it.frameMode != WidgetFrameMode.FIT_BUTTONS) { "Frame mode requires backup v4" } }
+            if (version < 3) false else boolean(value, "auto_border_colors")).also { require(it == it.normalized()) { "Invalid appearance range" } }
     }
     private fun style(value: WidgetAppearance) = with(value) {
         JSONObject().put("scale", iconScalePercent).put("spacing", spacingDp).put("dark_icons", darkIcons)

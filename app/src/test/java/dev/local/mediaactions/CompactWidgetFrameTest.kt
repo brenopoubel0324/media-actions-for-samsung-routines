@@ -36,12 +36,12 @@ class CompactWidgetFrameTest {
         assertEquals(48,root.findViewById<View>(R.id.widget_toggle).height)
     }
     @Test fun changingFrameHeightDoesNotChangeButtonOrIconGeometry() {
-        val short=view(compact.copy(frameHeightDp=56));val tall=view(compact.copy(frameHeightDp=120))
+        val short=view(compact.copy(frameHeightDp=32));val tall=view(compact.copy(frameHeightDp=120))
         for(id in listOf(R.id.widget_previous,R.id.widget_toggle,R.id.widget_next)) {
             val a=short.findViewById<View>(id);val b=tall.findViewById<View>(id)
             assertEquals(a.height,b.height);assertEquals(a.width,b.width);assertEquals(a.paddingLeft,b.paddingLeft)
         }
-        assertEquals(56,short.findViewById<View>(R.id.widget_frame).height)
+        assertEquals(32,short.findViewById<View>(R.id.widget_frame).height)
         assertEquals(120,tall.findViewById<View>(R.id.widget_frame).height)
     }
     @Test fun frameFitsSmallHostUnknownDimensionsAndNegativePadding() {
@@ -88,7 +88,7 @@ class CompactWidgetFrameTest {
         old.getJSONArray("profiles").getJSONObject(0).getJSONObject("appearance").apply{remove("frame_mode");remove("frame_height")}
         val restored=SettingsBackupCodec.decode(old.toString());assertEquals(WidgetFrameMode.FILL,restored.defaults.frameMode)
         assertEquals(WidgetFrameMode.FILL,restored.profiles.single().appearance.frameMode)
-        val invalid=JSONObject(text);invalid.getJSONObject("defaults").put("frame_height",12)
+        val invalid=JSONObject(text);invalid.getJSONObject("defaults").put("frame_height",15)
         try {SettingsBackupCodec.decode(invalid.toString());fail("Bad height")}catch(_:IllegalArgumentException){}
     }
     @Test fun globalPreviewWithoutHostShowsHeightChangesAndDoesNotWriteTheDraft() {

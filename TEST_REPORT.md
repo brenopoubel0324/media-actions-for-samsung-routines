@@ -1,9 +1,9 @@
-# Validação — 0.32 estável
+# Validação — 0.33 estável
 
-BUILD SUCCESSFUL. App Debug 642, app Release 642, shared Debug 22 e Wear Debug 15: **1321 execuções**, zero falhas/erros/pulos. Lint phone Debug/Release e shared/Wear Debug aprovado; git diff --check passou.
+BUILD SUCCESSFUL. App Debug 635, app Release 635, shared Debug 22 e Wear Debug 15: **1307 execuções**, zero falhas/erros/pulos. Lint phone Debug/Release e shared/Wear Debug aprovado; git diff --check passou.
 
-[Review](docs/reviews/fitted-frame-0.32.md) · [Integridade](downloads/v0.32/VALIDATION.json).
+[Review](docs/reviews/compact-height-0.33.md) · [Integridade](downloads/v0.33/VALIDATION.json).
 
-Testes API33/36 cobrem contorno decorativo mais justo, alvo48dp preservado, escala/espaçamento, reserva de ring/bordas, volumeH/V, padding/espessura, hosts limitados e sem dimensões, reaplicação, editor/salvamento, Store/Bundle e backup1/2/3/4. Renderização nativa Android/Skia exibida antes da publicação. Regressões de wallpaper, mídia/recuperação, volume e Wear passaram.
+Compacta aceita16/24/32/40/48/56dp com largura e alvos48dp preservados, host com/sem dimensões, editor com os dois modos originais e salvamento32dp. Store/Bundle/backup mantêm altura menor e leem a opção removida como Compacta sem perder os demais campos. Testes antigos da opção removida foram substituídos pelos testes do comportamento pedido. Prévias nativas Android/Skia exibidas antes de publicar. Regressões de mídia, wallpaper, volume e Wear passaram.
 
-Mesmo package/certificado histórico, Release não depurável, code32. Sem validação física de LockStar/encaixe/toque/atualização e sem medição de bateria. A moldura adiciona apenas cálculo por renderização, sem trabalho recorrente novo. Wear não foi alterado.
+Mesmo package/certificado histórico, Release não depurável, code33. Sem validação física de encaixe/toque/atualização no LockStar e sem medição de bateria. Sem trabalho recorrente novo. Wear não foi alterado.

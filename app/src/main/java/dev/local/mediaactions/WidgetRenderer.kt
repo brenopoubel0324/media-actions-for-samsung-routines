@@ -85,7 +85,7 @@ object WidgetRenderer {
             val showProgress = shouldShowProgress(style, playback)
             val content = WidgetContentLayout.calculate(size, style, volume)
             val geometry = content.geometry
-            val compact = style.widgetBorder && style.frameMode != WidgetFrameMode.FILL
+            val compact = style.widgetBorder && style.frameMode == WidgetFrameMode.COMPACT
             val border = if (style.frameCorner == WidgetFrameCorner.AUTOMATIC)
                 (if (compact) compactBorders else frameBorders)[style.borderWidthDp - 1]
                 else (cornerBorders[style.frameCorner.radiusDp] ?: frameBorders)[style.borderWidthDp - 1]
@@ -97,25 +97,10 @@ object WidgetRenderer {
             setColorStateList(R.id.widget_frame, "setBackgroundTintList", if (compact) ColorStateList.valueOf(style.borderColor) else null)
             setViewLayoutHeight(R.id.widget_frame, if (compact) -2f else -1f, TypedValue.COMPLEX_UNIT_PX)
             setInt(R.id.widget_frame, "setMinimumHeight", if (compact)
-                (maxOf(style.frameHeightDp, content.rowHeight + style.borderWidthDp * 2)
+                ((if (content.vertical) maxOf(style.frameHeightDp, content.rowHeight + style.borderWidthDp * 2) else style.frameHeightDp)
                     .coerceAtMost(size?.height?.toInt()?.coerceAtLeast(1) ?: Int.MAX_VALUE) * context.resources.displayMetrics.density).toInt() else 0)
-            val fitted = compact && style.frameMode == WidgetFrameMode.FIT_BUTTONS
-            val frameSize = if (fitted) content.fittedFrame(size, style) else null
-            setViewLayoutWidth(R.id.widget_frame, frameSize?.width ?: -1f,
-                if (fitted) TypedValue.COMPLEX_UNIT_DIP else TypedValue.COMPLEX_UNIT_PX)
+            setViewLayoutWidth(R.id.widget_frame, -1f, TypedValue.COMPLEX_UNIT_PX)
             setInt(R.id.widget_frame, "setMinimumWidth", 0)
-            if (frameSize != null) {
-                if (size == null) {
-                    // Native WRAP_CONTENT clamps to an unknown host's actual measured bounds.
-                    setViewLayoutWidth(R.id.widget_frame, -2f, TypedValue.COMPLEX_UNIT_PX)
-                    setViewLayoutHeight(R.id.widget_frame, -2f, TypedValue.COMPLEX_UNIT_PX)
-                    setInt(R.id.widget_frame, "setMinimumWidth", (frameSize.width * context.resources.displayMetrics.density).toInt())
-                    setInt(R.id.widget_frame, "setMinimumHeight", (frameSize.height * context.resources.displayMetrics.density).toInt())
-                } else {
-                    setInt(R.id.widget_frame, "setMinimumHeight", 0)
-                    setViewLayoutHeight(R.id.widget_frame, frameSize.height, TypedValue.COMPLEX_UNIT_DIP)
-                }
-            }
             val density = context.resources.displayMetrics.density
             val horizontalPadding = (geometry.widgetPaddingHorizontalDp * density).toInt()
             val verticalPadding = (geometry.widgetPaddingVerticalDp * density).toInt()
@@ -190,8 +175,7 @@ object WidgetRenderer {
             } else {
                 setViewLayoutHeight(R.id.widget_controls_row, if (compact) content.rowHeight.toFloat() else -1f,
                     if (compact) TypedValue.COMPLEX_UNIT_DIP else TypedValue.COMPLEX_UNIT_PX)
-                setViewLayoutWidth(R.id.widget_controls_row, if (fitted) content.rowWidth.toFloat() else -1f,
-                    if (fitted) TypedValue.COMPLEX_UNIT_DIP else TypedValue.COMPLEX_UNIT_PX)
+                setViewLayoutWidth(R.id.widget_controls_row, -1f, TypedValue.COMPLEX_UNIT_PX)
                 // A host that reports no dimensions still gets freely scaling transparent controls.
                 // Keep gaps collapsed to protect minimum touch targets; icon tuning still applies.
                 for (view in gaps) {

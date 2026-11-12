@@ -13,7 +13,14 @@ enum class WidgetIconStyle {
 enum class WidgetColorMode { FIXED, WALLPAPER }
 enum class WidgetWallpaperTarget { FOLLOW_LOCATION, HOME, LOCK }
 
-enum class WidgetFrameMode { FILL, COMPACT, FIT_BUTTONS }
+enum class WidgetFrameMode {
+    FILL, COMPACT;
+    companion object {
+        // Read the briefly published extra mode as Compact without losing the rest of its settings.
+        internal fun fromSaved(value: String?): WidgetFrameMode? =
+            if (value == "FIT_BUTTONS") COMPACT else entries.firstOrNull { it.name == value }
+    }
+}
 
 enum class WidgetFrameCorner(val radiusDp: Int, val label: Int) {
     AUTOMATIC(-1, R.string.widget_corner_auto), SQUARE(0, R.string.widget_corner_square),
@@ -52,9 +59,10 @@ data class WidgetAppearance(
         buttonBorderWidthDp = buttonBorderWidthDp.coerceIn(1, MAX_BORDER_DP),
         widgetPaddingHorizontalDp = widgetPaddingHorizontalDp.coerceIn(0, MAX_PADDING_DP),
         widgetPaddingVerticalDp = widgetPaddingVerticalDp.coerceIn(MIN_PADDING_DP, MAX_PADDING_DP),
-        frameHeightDp = frameHeightDp.coerceIn(56, 160))
+        frameHeightDp = frameHeightDp.coerceIn(MIN_FRAME_HEIGHT_DP, 160))
 
     companion object {
+        const val MIN_FRAME_HEIGHT_DP = 16
         const val MAX_SPACING_DP = 144
         const val MAX_BORDER_DP = 8
         const val MAX_PADDING_DP = 144
@@ -84,7 +92,7 @@ object WidgetStyleStore {
             prefs.getInt("button_border_color", android.graphics.Color.WHITE),
             prefs.getInt("widget_padding_horizontal", 0), prefs.getInt("widget_padding_vertical", 0), prefs.getBoolean("center_border_only", false),
             prefs.getBoolean("progress_ring", false),
-            WidgetFrameMode.entries.firstOrNull { it.name == prefs.getString("frame_mode", null) } ?: WidgetFrameMode.FILL,
+            WidgetFrameMode.fromSaved(prefs.getString("frame_mode", null)) ?: WidgetFrameMode.FILL,
             prefs.getInt("frame_height", 64),
             WidgetFrameCorner.entries.firstOrNull { it.name == prefs.getString("frame_corner", null) } ?: WidgetFrameCorner.AUTOMATIC,
             WidgetColorMode.entries.firstOrNull { it.name == prefs.getString("color_mode", null) } ?: WidgetColorMode.FIXED,

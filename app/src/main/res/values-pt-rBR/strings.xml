@@ -237,7 +237,7 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="widget_frame_fill">Preencher widget</string>
     <string name="widget_frame_compact">Compacta</string>
     <string name="widget_frame_height">Altura da moldura</string>
-    <string name="widget_frame_help">Compacta aproxima a borda dos controles de 48 dp. A altura adiciona folga, e o host continua reservando a área do widget. Volume vertical precisa de espaço para dois botões. O espaço disponível pode limitar a altura da moldura.</string>
+    <string name="widget_frame_help">Compacta ajusta somente a altura da borda, de 16 a 160 dp, mantendo alvos de toque de 48 dp quando há espaço. A largura continua igual. Volume vertical ainda precisa envolver os dois botões. O host controla a área reservada pelo widget.</string>
     <string name="widget_frame_corner">Arredondamento</string>
     <string name="widget_corner_auto">Automático</string>
     <string name="widget_corner_square">Reto · 0 dp</string>
@@ -257,6 +257,4 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="widget_wallpaper_dark_active">Contraste do wallpaper: ícones escuros.</string>
     <string name="widget_wallpaper_white_active">Contraste do wallpaper: ícones brancos.</string>
     <string name="widget_wallpaper_help">Usa as cores informadas pelo Android. Wallpapers animados precisam avisar quando as cores mudam. Estima o contraste geral, não a área atrás do widget. Sem acesso à imagem ou consultas periódicas.</string>
-    <string name="widget_frame_fit">Justa aos botões</string>
-    <string name="widget_frame_fit_help">Ajusta a borda ao grupo de controles com pouca folga. As áreas de toque são preservadas; tamanho dos ícones e espaçamento continuam independentes.</string>
 </resources>

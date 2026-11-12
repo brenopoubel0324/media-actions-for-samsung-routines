@@ -46,19 +46,19 @@ class CompactFrameVisualTest {
     @Test fun exportNativeComparison() {
         val sheet=Bitmap.createBitmap(980,310,Bitmap.Config.ARGB_8888);val canvas=Canvas(sheet);canvas.drawColor(0xFF101619.toInt())
         val paint=Paint(Paint.ANTI_ALIAS_FLAG).apply{color=Color.WHITE;textSize=23f}
-        canvas.drawText("Moldura independente da área reservada pelo LockStar",20f,32f,paint)
+        canvas.drawText("Compacta · o mesmo formato com alturas menores",20f,32f,paint)
         paint.textSize=15f;paint.color=0xFFB7C9CD.toInt();canvas.drawText("Prévia Android/Skia · mesmo espaço de 300 × 160 dp · fundo transparente",20f,58f,paint)
-        val styles=listOf(compact.copy(frameMode=WidgetFrameMode.FILL),compact,compact.copy(frameHeightDp=96))
+        val styles=listOf(compact,compact.copy(frameHeightDp=48),compact.copy(frameHeightDp=32))
         for((i,style)in styles.withIndex()) {
             val x=20f+i*320
             paint.shader=LinearGradient(x,95f,x+300,255f,intArrayOf(0xFFFF7A00.toInt(),0xFFC94700.toInt(),0xFF1A1410.toInt()),null,Shader.TileMode.CLAMP)
             canvas.drawRect(x,95f,x+300,255f,paint);paint.shader=null
             canvas.drawBitmap(raster(root(style)),x,95f,null)
             paint.color=Color.WHITE;paint.textSize=18f
-            canvas.drawText(listOf("Preencher widget","Compacta · 64 dp","Compacta · 96 dp")[i],x,84f,paint)
+            canvas.drawText(listOf("Compacta · 64 dp","Compacta · 48 dp","Compacta · 32 dp")[i],x,84f,paint)
         }
         paint.textSize=15f;paint.color=0xFFB7C9CD.toInt();canvas.drawText("A altura da moldura compacta muda a folga; os botões permanecem em 48 dp.",20f,289f,paint)
-        save(sheet,"moldura-compacta-comparacao")
+        save(sheet,"compacta-altura-menor")
     }
     @Test fun squareAndRoundedCornersHaveDifferentPixelsAndExportNativeChoices() {
         val sheet=Bitmap.createBitmap(940,350,Bitmap.Config.ARGB_8888);val c=Canvas(sheet);c.drawColor(0xFF101619.toInt())

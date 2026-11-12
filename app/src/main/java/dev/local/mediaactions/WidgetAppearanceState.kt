@@ -35,7 +35,7 @@ internal object WidgetAppearanceState {
             widgetPaddingHorizontalDp = it.getInt("widget_padding_horizontal", 0),
             widgetPaddingVerticalDp = it.getInt("widget_padding_vertical", 0),
             centerBorderOnly = it.getBoolean("center_border_only", false), progressRing = it.getBoolean("progress_ring", false),
-            frameMode = WidgetFrameMode.entries.firstOrNull { mode -> mode.name == it.getString("frame_mode") } ?: WidgetFrameMode.FILL,
+            frameMode = WidgetFrameMode.fromSaved(it.getString("frame_mode")) ?: WidgetFrameMode.FILL,
             frameHeightDp = it.getInt("frame_height", 64),
             frameCorner = WidgetFrameCorner.entries.firstOrNull { corner -> corner.name == it.getString("frame_corner") } ?: WidgetFrameCorner.AUTOMATIC,
             colorMode = WidgetColorMode.entries.firstOrNull { mode -> mode.name == it.getString("color_mode") } ?: WidgetColorMode.FIXED,

@@ -234,7 +234,7 @@
     <string name="widget_frame_fill">Fill widget</string>
     <string name="widget_frame_compact">Compact</string>
     <string name="widget_frame_height">Frame height</string>
-    <string name="widget_frame_help">Compact keeps the frame close to 48 dp controls. Height adds breathing room; the host still owns the widget area. Tall volume controls need room for two buttons. Limited host space may reduce the frame height.</string>
+    <string name="widget_frame_help">Compact adjusts only the frame height, from 16 to 160 dp, while keeping 48 dp touch targets where space permits. Width stays unchanged. Vertical volume controls still need room for both buttons. The host owns the reserved widget area.</string>
     <string name="widget_frame_corner">Corner rounding</string>
     <string name="widget_corner_auto">Automatic</string>
     <string name="widget_corner_square">Square · 0 dp</string>
@@ -254,6 +254,4 @@
     <string name="widget_wallpaper_dark_active">Wallpaper contrast: dark icons.</string>
     <string name="widget_wallpaper_white_active">Wallpaper contrast: white icons.</string>
     <string name="widget_wallpaper_help">Uses colors reported by Android. Live wallpapers must report color changes. This estimates overall contrast, not the area behind the widget. No image access or polling.</string>
-    <string name="widget_frame_fit">Close to buttons</string>
-    <string name="widget_frame_fit_help">Fits the border around the control group with a small gap. Touch targets stay unchanged; icon size and spacing remain independent.</string>
 </resources>
