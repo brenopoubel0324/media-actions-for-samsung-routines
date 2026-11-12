@@ -134,6 +134,7 @@ class WidgetPlaybackObserver(context: Context,
     fun start() {
         if (running) return
         running = true
+        if (onChanged == null) WidgetWallpaperRuntime.get(app)?.observer = java.lang.ref.WeakReference(this)
         loadTargets()
         try {
             app.registerReceiver(visibilityReceiver, IntentFilter(Intent.ACTION_SCREEN_ON).apply {
@@ -325,10 +326,26 @@ class WidgetPlaybackObserver(context: Context,
         }
     }
 
+    /** Wallpaper changes use listener-owned state; they never request a media-session rescan. */
+    internal fun wallpaperSnapshot(): WidgetUpdateSnapshot? {
+        if (!running || onChanged != null || resyncNeeded || activeListener == null) return null
+        val snapshot = readPresentation()
+        if (snapshot.state != lastState) scheduleRefresh()
+        return snapshot
+    }
+
+    internal fun refreshWallpaper(id: Int, snapshot: WidgetUpdateSnapshot): Boolean {
+        if (!running || onChanged != null || id !in ids) return false
+        presentation.reload(app, id)
+        presentation.refresh(app, listOf(id), snapshot)
+        return true
+    }
+
     companion object {
         private const val SETTINGS_CHANGED = "dev.local.mediaactions.WIDGET_PROGRESS_SETTINGS"
         private const val RESYNC_SESSIONS = "resync_sessions"
         fun settingsChanged(context: Context, resyncSessions: Boolean = false) {
+            WidgetWallpaperRuntime.get(context)?.settingsChanged()
             context.sendBroadcast(Intent(SETTINGS_CHANGED).setPackage(context.packageName)
                 .putExtra(RESYNC_SESSIONS, resyncSessions))
         }
@@ -348,6 +365,7 @@ class WidgetPlaybackObserver(context: Context,
     }
 
     override fun close() {
+        WidgetWallpaperRuntime.get(app)?.let { if (it.observer?.get() === this) it.observer = null }
         running = false
         handler.removeCallbacks(refresh)
         handler.removeCallbacks(pulse)

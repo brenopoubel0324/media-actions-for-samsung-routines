@@ -6,6 +6,7 @@
         <package android:name="com.spotify.music" />
     </queries>
     <application
+        android:name=".MediaActionsApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@drawable/ic_app"

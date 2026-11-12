@@ -10,6 +10,9 @@ enum class WidgetIconStyle {
     CIRCULAR, CHEVRONS, DOUBLE_TRIANGLES, SQUARE,
 }
 
+enum class WidgetColorMode { FIXED, WALLPAPER }
+enum class WidgetWallpaperTarget { FOLLOW_LOCATION, HOME, LOCK }
+
 enum class WidgetFrameMode { FILL, COMPACT }
 
 enum class WidgetFrameCorner(val radiusDp: Int, val label: Int) {
@@ -39,6 +42,9 @@ data class WidgetAppearance(
     val frameMode: WidgetFrameMode = WidgetFrameMode.FILL,
     val frameHeightDp: Int = 64,
     val frameCorner: WidgetFrameCorner = WidgetFrameCorner.AUTOMATIC,
+    val colorMode: WidgetColorMode = WidgetColorMode.FIXED,
+    val wallpaperTarget: WidgetWallpaperTarget = WidgetWallpaperTarget.FOLLOW_LOCATION,
+    val autoBorderColors: Boolean = false,
 ) {
     fun normalized() = copy(iconScalePercent = iconScalePercent.coerceIn(20, 150),
         spacingDp = spacingDp.coerceIn(0, MAX_SPACING_DP),
@@ -80,7 +86,10 @@ object WidgetStyleStore {
             prefs.getBoolean("progress_ring", false),
             WidgetFrameMode.entries.firstOrNull { it.name == prefs.getString("frame_mode", null) } ?: WidgetFrameMode.FILL,
             prefs.getInt("frame_height", 64),
-            WidgetFrameCorner.entries.firstOrNull { it.name == prefs.getString("frame_corner", null) } ?: WidgetFrameCorner.AUTOMATIC).normalized()
+            WidgetFrameCorner.entries.firstOrNull { it.name == prefs.getString("frame_corner", null) } ?: WidgetFrameCorner.AUTOMATIC,
+            WidgetColorMode.entries.firstOrNull { it.name == prefs.getString("color_mode", null) } ?: WidgetColorMode.FIXED,
+            WidgetWallpaperTarget.entries.firstOrNull { it.name == prefs.getString("wallpaper_target", null) } ?: WidgetWallpaperTarget.FOLLOW_LOCATION,
+            prefs.getBoolean("auto_border_colors", false)).normalized()
     }
 
     fun save(context: Context, appearance: WidgetAppearance, widgetId: Int? = null) {
@@ -112,6 +121,8 @@ object WidgetStyleStore {
             .putBoolean("center_border_only", style.centerBorderOnly)
             .putBoolean("progress_ring", style.progressRing)
             .putString("frame_mode", style.frameMode.name).putInt("frame_height", style.frameHeightDp).putString("frame_corner", style.frameCorner.name)
+            .putString("color_mode", style.colorMode.name).putString("wallpaper_target", style.wallpaperTarget.name)
+            .putBoolean("auto_border_colors", style.autoBorderColors)
             .putBoolean("has_override", widgetId != null)
     }
 

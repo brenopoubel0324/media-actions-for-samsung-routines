@@ -84,4 +84,8 @@
     <item type="id" name="widget_frame_height_decrease" />
     <item type="id" name="widget_frame_height_increase" />
     <item type="id" name="widget_frame_corner" />
+    <item type="id" name="widget_color_mode" />
+    <item type="id" name="widget_wallpaper_source" />
+    <item type="id" name="widget_wallpaper_borders" />
+    <item type="id" name="widget_wallpaper_status" />
 </resources>

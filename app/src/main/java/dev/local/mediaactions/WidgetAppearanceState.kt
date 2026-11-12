@@ -17,6 +17,7 @@ internal object WidgetAppearanceState {
         putInt("widget_padding_horizontal", style.widgetPaddingHorizontalDp)
         putInt("widget_padding_vertical", style.widgetPaddingVerticalDp)
         putBoolean("center_border_only", style.centerBorderOnly); putBoolean("progress_ring", style.progressRing)
+        putString("color_mode", style.colorMode.name); putString("wallpaper_target", style.wallpaperTarget.name); putBoolean("auto_border_colors", style.autoBorderColors)
         putString("frame_mode", style.frameMode.name); putInt("frame_height", style.frameHeightDp); putString("frame_corner", style.frameCorner.name)
     }
 
@@ -37,6 +38,9 @@ internal object WidgetAppearanceState {
             frameMode = WidgetFrameMode.entries.firstOrNull { mode -> mode.name == it.getString("frame_mode") } ?: WidgetFrameMode.FILL,
             frameHeightDp = it.getInt("frame_height", 64),
             frameCorner = WidgetFrameCorner.entries.firstOrNull { corner -> corner.name == it.getString("frame_corner") } ?: WidgetFrameCorner.AUTOMATIC,
+            colorMode = WidgetColorMode.entries.firstOrNull { mode -> mode.name == it.getString("color_mode") } ?: WidgetColorMode.FIXED,
+            wallpaperTarget = WidgetWallpaperTarget.entries.firstOrNull { target -> target.name == it.getString("wallpaper_target") } ?: WidgetWallpaperTarget.FOLLOW_LOCATION,
+            autoBorderColors = it.getBoolean("auto_border_colors", false),
         ).normalized()
     }
 }

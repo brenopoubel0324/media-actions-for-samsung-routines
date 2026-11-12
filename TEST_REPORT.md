@@ -1,7 +1,9 @@
-# Validação — 0.30 estável
+# Validação — 0.31 estável
 
-BUILD SUCCESSFUL. 617 testes Debug nos três módulos e 580 do app Release: 1.197 execuções, zero falhas/erros/pulos. Lint phone Debug/Release e shared/Wear Debug aprovado; git diff --check passou.
+BUILD SUCCESSFUL. 627 testes app Debug +22 shared Debug +15 Wear Debug e627 app Release: 1291 execuções, zero falhas/erros/pulos. Lint phone Debug/Release e shared/Wear Debug aprovado; git diff --check passou.
 
-[Review](docs/reviews/compact-frame-0.30.md) · [Integridade](downloads/v0.30/VALIDATION.json).
+[Review](docs/reviews/wallpaper-colors-0.31.md) · [Integridade](downloads/v0.31/VALIDATION.json) · [Comportamento e limites](docs/WALLPAPER_COLORS.md).
 
-Moldura compacta/altura/cantos, pixels nativos, toque em áreas viáveis, reaplicação, padding, orientação H/V, estado do editor e backup v1/v2 testados. Sem medição de bateria nem validação física de encaixe/timeout Samsung. APK original Release não depurável, certificado histórico e code30.
+Novos testes: contraste/hints/reserva, destinos independentes, eventos repetidos/coalescidos, consulta atrasada, mudança de origem, tela apagada/retomada, remoção/manual, falha/retry, cancelamento/pausa do editor, backup v1/v2/v3, perda de autorização e reinício do observador. Renderizações nativas Android/Skia incluem mídia/volume e editor. Contadores simulados verificam zero enumerações de sessões por evento de cor com observador pronto, zero releituras de wallpaper em duplicatas e zero entregas de cores com tela apagada.
+
+APK original Release não depurável, assinatura histórica e code31. Sem medição de bateria ou validação física de Depth/LockStar/atualização. Esses resultados demonstram trabalho limitado no ambiente simulado; não substituem comparação no mesmo dispositivo. Wear não foi alterado.

@@ -97,7 +97,12 @@ open class WidgetConfigureActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        if (::editor.isInitialized) editor.refreshInheritedPreview()
+        if (::editor.isInitialized) { editor.refreshInheritedPreview(); editor.resumeWallpaperPreview() }
+    }
+
+    override fun onPause() {
+        if (::editor.isInitialized) editor.pauseWallpaperPreview()
+        super.onPause()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

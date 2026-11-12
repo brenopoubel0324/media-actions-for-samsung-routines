@@ -1,0 +1,62 @@
+{
+  "version": "0.31",
+  "version_code": 31,
+  "channel": "stable",
+  "application_id": "dev.local.mediaactions",
+  "build_type": "release",
+  "debuggable": false,
+  "minified": false,
+  "filename": "media-actions-phone-0.31.apk",
+  "sha256": "60f6501a7e9eecd925b3410446b49ef3bcabe3fa2047555eff2f750524dc0aa9",
+  "bytes": 4811074,
+  "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a",
+  "previous_certificate_matches": true,
+  "requested_permissions": [
+    "android.permission.MODIFY_AUDIO_SETTINGS"
+  ],
+  "test_runs": {
+    "app_debug": {
+      "tests": 627,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app_release": {
+      "tests": 627,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear_debug": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared_debug": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_test_executions": 1291,
+  "lint": "No issues found: phone Debug/Release, shared Debug, Wear Debug",
+  "backup_format_version": 3,
+  "backup_import_versions": [
+    1,
+    2,
+    3
+  ],
+  "wear_version": "0.9-experimental",
+  "review": "docs/reviews/wallpaper-colors-0.31.md",
+  "physical_depth_wallpaper_tested": false,
+  "physical_host_rendering_tested": false,
+  "physical_upgrade_tested": false,
+  "battery_measured": false,
+  "simulation_assertions": {
+    "wallpaper_queries_on_duplicate_callbacks": 0,
+    "media_session_enumerations_per_ready_observer_color_event": 0,
+    "wallpaper_remoteviews_deliveries_while_screen_off": 0
+  }
+}

@@ -90,12 +90,16 @@ class MediaWidgetProvider : AppWidgetProvider() {
             for (id in ids) configurations[id] = Configuration(WidgetStyleStore.load(context, id).normalized(),
                 Bundle(manager.getAppWidgetOptions(id)))
         }
+        fun reload(context: Context, id: Int) {
+            configurations[id] = Configuration(WidgetStyleStore.load(context, id).normalized(),
+                Bundle(AppWidgetManager.getInstance(context).getAppWidgetOptions(id)))
+        }
         fun refresh(context: Context, ids: List<Int>, snapshot: WidgetUpdateSnapshot) {
             val manager = AppWidgetManager.getInstance(context)
             for (id in ids) {
                 val config = configurations[id] ?: continue
-                val style = config.style
                 val options = config.options
+                val style = WidgetWallpaperRuntime.get(context)?.resolve(id, config.style, options) ?: config.style
                 // Quantization affects only the drawn ring (less than 0.1%); commands retain full precision.
                 val fraction = if (style.progressRing && snapshot.state == WidgetPlaybackState.PLAYING)
                     snapshot.progress?.fraction?.times(1024)?.toInt()?.coerceIn(0, 1024) else null

@@ -43,7 +43,8 @@ object WidgetRenderer {
     fun render(context: Context, id: Int, options: Bundle,
         snapshot: WidgetUpdateSnapshot? = null,
         appearance: WidgetAppearance? = null): RemoteViews {
-        val style = appearance ?: WidgetStyleStore.load(context, id)
+        val requested = appearance ?: WidgetStyleStore.load(context, id)
+        val style = WidgetWallpaperRuntime.get(context)?.resolve(id, requested, options) ?: requested
         val data = snapshot ?: WidgetUpdateSnapshot.capture(AndroidSessionGateway(context), style.progressRing)
         val state = data.state
         val showProgress = shouldShowProgress(style, state)

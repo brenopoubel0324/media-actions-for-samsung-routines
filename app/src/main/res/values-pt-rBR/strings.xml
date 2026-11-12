@@ -245,4 +245,16 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="widget_corner_medium">Médio · 16 dp</string>
     <string name="widget_corner_round">Arredondado · 24 dp</string>
     <string name="widget_corner_extra">Bem arredondado · 32 dp</string>
+    <string name="widget_color_mode">Cores</string>
+    <string name="widget_color_fixed">Manual</string>
+    <string name="widget_color_wallpaper">Automático pelo wallpaper</string>
+    <string name="widget_color_fallback">Cor de reserva</string>
+    <string name="widget_wallpaper_source">Origem do wallpaper</string>
+    <string name="widget_wallpaper_follow">Seguir localização do widget</string>
+    <string name="widget_wallpaper_borders">Adaptar também as bordas</string>
+    <string name="widget_wallpaper_unknown_location">Escolha Tela inicial ou Tela de bloqueio acima, ou identifique a localização do widget. Até lá, será usada a cor de reserva.</string>
+    <string name="widget_wallpaper_fallback">Cores do wallpaper indisponíveis. Usando a cor de reserva.</string>
+    <string name="widget_wallpaper_dark_active">Contraste do wallpaper: ícones escuros.</string>
+    <string name="widget_wallpaper_white_active">Contraste do wallpaper: ícones brancos.</string>
+    <string name="widget_wallpaper_help">Usa as cores informadas pelo Android. Wallpapers animados precisam avisar quando as cores mudam. Estima o contraste geral, não a área atrás do widget. Sem acesso à imagem ou consultas periódicas.</string>
 </resources>

@@ -18,6 +18,16 @@ class WidgetAppearanceSection(
     private val onApplied: (() -> Unit)? = null,
 ) {
     private val volume = widgetId?.let {WidgetRegistry.isVolume(context,it)} ?: false
+    private val wallpaperPreviewToken = Any()
+    private var wallpaperPreviewActive = false
+    private var wallpaperPreviewKey: Pair<WidgetAppearance, WallpaperDestination?>? = null
+    private var previewUpdate: (() -> Unit)? = null
+    private var wallpaperStatus: TextView? = null
+    internal fun resumeWallpaperPreview() { wallpaperPreviewActive = true; previewUpdate?.invoke() }
+    internal fun pauseWallpaperPreview() {
+        wallpaperPreviewActive = false; wallpaperPreviewKey = null
+        WidgetWallpaperRuntime.get(context)?.coordinator?.preview(wallpaperPreviewToken, null, null)
+    }
     private var originalAppearance = WidgetStyleStore.load(context, widgetId)
     private enum class AppearanceIntent { KEEP, INHERIT, CUSTOM }
     private var originalHasOverride = widgetId?.let { WidgetStyleStore.hasOverride(context, it) } ?: false
@@ -257,6 +267,7 @@ class WidgetAppearanceSection(
         val container = SettingsUi.column(context)
         rebuild = {
             val reopen = expanded
+            wallpaperPreviewKey = null
             generation++
             sections.clear(); textFields.clear(); frameSettingsVisibility = null
             previewContainer?.removeAllViews()
@@ -305,20 +316,35 @@ class WidgetAppearanceSection(
         val effective = label(details, R.string.widget_spacing_help, 12f).apply {
             id = R.id.widget_effective_spacing; accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
         }
-        val hostSizes = if (widgetId == null) emptyList() else try {
-            WidgetRenderer.reportedSizes(AppWidgetManager.getInstance(context.applicationContext).getAppWidgetOptions(widgetId))
-        } catch (_: RuntimeException) { emptyList() }
+        val hostOptions = if (widgetId == null) Bundle.EMPTY else try {
+            AppWidgetManager.getInstance(context.applicationContext).getAppWidgetOptions(widgetId)
+        } catch (_: RuntimeException) { Bundle.EMPTY }
+        val hostSizes = WidgetRenderer.reportedSizes(hostOptions)
         var previewSize = hostSizes.firstOrNull()
         fun updatePreview() {
             if (epoch != generation) return
+            val destination = WidgetWallpaperColors.destination(draft, location, hostOptions)
+            val runtime = WidgetWallpaperRuntime.get(context)
+            val key = draft to destination
+            if (wallpaperPreviewActive && wallpaperPreviewKey != key) {
+                wallpaperPreviewKey = key
+                runtime?.coordinator?.preview(wallpaperPreviewToken, draft, destination) { previewUpdate?.invoke() }
+            }
+            val resolved = runtime?.coordinator?.resolve(draft, destination) ?: draft
+            wallpaperStatus?.text = context.getString(when {
+                destination == null -> R.string.widget_wallpaper_unknown_location
+                runtime?.coordinator?.detected(destination) == null -> R.string.widget_wallpaper_fallback
+                resolved.darkIcons -> R.string.widget_wallpaper_dark_active
+                else -> R.string.widget_wallpaper_white_active
+            })
             val available = if (preview.width > 0) min(360f, (preview.width / context.resources.displayMetrics.density - 16).coerceAtLeast(1f)) else 280f
             val size = previewSize ?: SizeF(available,
                 if (draft.widgetBorder && draft.frameMode == WidgetFrameMode.COMPACT) 160f else 56f)
             preview.background = GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                if (draft.darkIcons) intArrayOf(0xFFF0ECE2.toInt(), 0xFFC7DCD5.toInt()) else intArrayOf(0xFF244B58.toInt(), 0xFF172335.toInt()))
+                if (resolved.darkIcons) intArrayOf(0xFFF0ECE2.toInt(), 0xFFC7DCD5.toInt()) else intArrayOf(0xFF244B58.toInt(), 0xFF172335.toInt()))
                 .apply { cornerRadius = dp(18).toFloat() }
             preview.removeAllViews()
-            val view = WidgetRenderer.build(context, AppWidgetManager.INVALID_APPWIDGET_ID, draft, size,
+            val view = WidgetRenderer.build(context, AppWidgetManager.INVALID_APPWIDGET_ID, resolved, size,
                 bindControls = false, playback = if(volume) WidgetPlaybackState.PAUSED else previewState, progress = WidgetTrackProgress(0.42f), volume=volume).apply(context, preview)
             val scale = min(1f, min(available / size.width, 72f / size.height))
             view.scaleX = scale; view.scaleY = scale
@@ -340,6 +366,7 @@ class WidgetAppearanceSection(
                 if (widgetId != null && hostSizes.isEmpty()) { append("\n"); append(context.getString(R.string.widget_size_unavailable)) }
             }
         }
+        previewUpdate = { updatePreview() }
         states.setOnCheckedChangeListener { _, id ->
             previewState = when (id) { R.id.widget_preview_playing -> WidgetPlaybackState.PLAYING; R.id.widget_preview_paused -> WidgetPlaybackState.PAUSED; else -> WidgetPlaybackState.UNKNOWN }
             updatePreview()
@@ -385,6 +412,7 @@ class WidgetAppearanceSection(
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                         location = WidgetLocation.entries[position]
                         sections[R.id.settings_location]?.summary(WidgetLocationStore.description(context, widgetId, location))
+                        updatePreview()
                     }
                     override fun onNothingSelected(parent: AdapterView<*>?) = Unit
                 }
@@ -410,13 +438,59 @@ class WidgetAppearanceSection(
             }
         })
         }
-        label(icons, R.string.settings_icon_color)
+        label(icons, R.string.widget_color_mode).labelFor = R.id.widget_color_mode
+        val automatic = SettingsUi.column(context)
+        val fallbackLabel = label(icons, if (draft.colorMode == WidgetColorMode.WALLPAPER) R.string.widget_color_fallback else R.string.settings_icon_color)
+        val colorMode = Spinner(context).apply {
+            id = R.id.widget_color_mode; minimumHeight = dp(48)
+            contentDescription = context.getString(R.string.widget_color_mode)
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item,
+                listOf(context.getString(R.string.widget_color_fixed), context.getString(R.string.widget_color_wallpaper)))
+                .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+            setSelection(draft.colorMode.ordinal)
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    val selected = WidgetColorMode.entries[position]
+                    if (draft.colorMode != selected) { edit(draft.copy(colorMode = selected)); updatePreview() }
+                    automatic.visibility = if (selected == WidgetColorMode.WALLPAPER) View.VISIBLE else View.GONE
+                    fallbackLabel.setText(if (selected == WidgetColorMode.WALLPAPER) R.string.widget_color_fallback else R.string.settings_icon_color)
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+            }
+        }
+        icons.addView(colorMode, icons.indexOfChild(fallbackLabel))
         val colors = RadioGroup(context).apply { orientation = RadioGroup.HORIZONTAL }
         val light = RadioButton(context).apply { id = View.generateViewId(); setText(R.string.widget_icons_white) }
         val dark = RadioButton(context).apply { id = View.generateViewId(); setText(R.string.widget_icons_dark) }
         colors.addView(light); colors.addView(dark); colors.check(if (draft.darkIcons) dark.id else light.id)
         colors.setOnCheckedChangeListener { _, id -> edit(draft.copy(darkIcons = id == dark.id)); updatePreview() }
         icons.addView(colors)
+        automatic.visibility = if (draft.colorMode == WidgetColorMode.WALLPAPER) View.VISIBLE else View.GONE
+        label(automatic, R.string.widget_wallpaper_source).labelFor = R.id.widget_wallpaper_source
+        automatic.addView(Spinner(context).apply {
+            id = R.id.widget_wallpaper_source; minimumHeight = dp(48)
+            contentDescription = context.getString(R.string.widget_wallpaper_source)
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, listOf(
+                R.string.widget_wallpaper_follow, R.string.widget_location_home_screen, R.string.widget_location_lock_screen).map(context::getString))
+                .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+            setSelection(draft.wallpaperTarget.ordinal)
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    if (draft.wallpaperTarget != WidgetWallpaperTarget.entries[position]) {
+                        edit(draft.copy(wallpaperTarget = WidgetWallpaperTarget.entries[position])); updatePreview()
+                    }
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+            }
+        })
+        automatic.addView(SettingsUi.toggle(context, R.string.widget_wallpaper_borders, draft.autoBorderColors, R.id.widget_wallpaper_borders) {
+            edit(draft.copy(autoBorderColors = it)); updatePreview()
+        })
+        wallpaperStatus = label(automatic, R.string.widget_wallpaper_fallback, 13f).apply {
+            id = R.id.widget_wallpaper_status; accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+        }
+        label(automatic, R.string.widget_wallpaper_help, 13f)
+        icons.addView(automatic)
         label(icons, R.string.widget_icon_size).labelFor = R.id.widget_scale_value
         scaleControl = WidgetNumberControl(context, context.getString(R.string.widget_icon_size), 20, 150, draft.iconScalePercent,
             R.id.widget_scale_value, R.id.widget_scale_slider, R.id.widget_scale_decrease, R.id.widget_scale_increase, "%") {

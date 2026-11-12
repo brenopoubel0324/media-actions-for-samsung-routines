@@ -242,4 +242,16 @@
     <string name="widget_corner_medium">Medium · 16 dp</string>
     <string name="widget_corner_round">Rounded · 24 dp</string>
     <string name="widget_corner_extra">Extra rounded · 32 dp</string>
+    <string name="widget_color_mode">Colors</string>
+    <string name="widget_color_fixed">Manual</string>
+    <string name="widget_color_wallpaper">Automatic from wallpaper</string>
+    <string name="widget_color_fallback">Fallback color</string>
+    <string name="widget_wallpaper_source">Wallpaper source</string>
+    <string name="widget_wallpaper_follow">Follow widget location</string>
+    <string name="widget_wallpaper_borders">Adapt borders too</string>
+    <string name="widget_wallpaper_unknown_location">Choose Home screen or Lock screen above, or identify the widget location. Until then, the fallback color is used.</string>
+    <string name="widget_wallpaper_fallback">Wallpaper colors unavailable. Using the fallback color.</string>
+    <string name="widget_wallpaper_dark_active">Wallpaper contrast: dark icons.</string>
+    <string name="widget_wallpaper_white_active">Wallpaper contrast: white icons.</string>
+    <string name="widget_wallpaper_help">Uses colors reported by Android. Live wallpapers must report color changes. This estimates overall contrast, not the area behind the widget. No image access or polling.</string>
 </resources>

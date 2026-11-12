@@ -20,19 +20,20 @@ object WidgetProgressArtwork {
         val inset = maxOf(10f, width + 4f)
         val radius = 64f - inset
         val oval = RectF(inset, inset, 128f - inset, 128f - inset)
+        val ring = if (style.colorMode == WidgetColorMode.WALLPAPER) color else Color.WHITE
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = 0x55FFFFFF; strokeWidth = width; this.style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND
+            this.color = (ring and 0x00FFFFFF) or 0x55000000; strokeWidth = width; this.style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND
         }
         canvas.drawOval(oval, paint)
         val fraction = progress?.fraction?.takeIf { it.isFinite() }?.coerceIn(0f, 1f)
         if (fraction != null) {
-            paint.color = Color.WHITE
+            paint.color = ring
             canvas.drawArc(oval, -90f, 360f * fraction, false, paint)
             val angle = Math.toRadians((fraction * 360 - 90).toDouble())
             val x = 64f + radius * cos(angle).toFloat(); val y = 64f + radius * sin(angle).toFloat()
-            paint.style = Paint.Style.FILL; paint.color = Color.WHITE
+            paint.style = Paint.Style.FILL; paint.color = ring
             canvas.drawCircle(x, y, width + 3f, paint)
-            paint.color = 0xFF26313B.toInt()
+            paint.color = if (style.colorMode == WidgetColorMode.WALLPAPER && style.darkIcons) Color.WHITE else 0xFF26313B.toInt()
             canvas.drawCircle(x, y, width + 1f, paint)
         }
         val halfIcon = (50f * (style.iconScalePercent / 100f)).coerceIn(10f, 46f)
