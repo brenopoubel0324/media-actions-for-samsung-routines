@@ -252,9 +252,15 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="widget_wallpaper_source">Origem do wallpaper</string>
     <string name="widget_wallpaper_follow">Seguir localização do widget</string>
     <string name="widget_wallpaper_borders">Adaptar também as bordas</string>
-    <string name="widget_wallpaper_unknown_location">Escolha Tela inicial ou Tela de bloqueio acima, ou identifique a localização do widget. Até lá, será usada a cor de reserva.</string>
+    <string name="widget_wallpaper_unknown_location">Escolha Tela inicial ou Tela de bloqueio em Origem do wallpaper, ou identifique a localização do widget. Até lá, será usada a cor de reserva.</string>
     <string name="widget_wallpaper_fallback">Cores do wallpaper indisponíveis. Usando a cor de reserva.</string>
     <string name="widget_wallpaper_dark_active">Contraste do wallpaper: ícones escuros.</string>
     <string name="widget_wallpaper_white_active">Contraste do wallpaper: ícones brancos.</string>
     <string name="widget_wallpaper_help">Usa as cores informadas pelo Android. Wallpapers animados precisam avisar quando as cores mudam. Estima o contraste geral, não a área atrás do widget. Sem acesso à imagem ou consultas periódicas.</string>
+    <string name="widget_wallpaper_diagnostic_title">Estado das cores do wallpaper</string>
+    <string name="widget_wallpaper_loading">Lendo as cores do wallpaper…</string>
+    <string name="widget_wallpaper_error">Não foi possível ler as cores do wallpaper. Usando a cor de reserva. Copie o diagnóstico para ver a falha.</string>
+    <string name="widget_wallpaper_refresh">Atualizar cores</string>
+    <string name="widget_wallpaper_copy">Copiar diagnóstico</string>
+    <string name="widget_wallpaper_copy_failed">Não foi possível copiar o diagnóstico. Tente novamente.</string>
 </resources>

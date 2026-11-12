@@ -88,4 +88,7 @@
     <item type="id" name="widget_wallpaper_source" />
     <item type="id" name="widget_wallpaper_borders" />
     <item type="id" name="widget_wallpaper_status" />
+    <item type="id" name="widget_wallpaper_diagnostic_card" />
+    <item type="id" name="widget_wallpaper_refresh" />
+    <item type="id" name="widget_wallpaper_copy" />
 </resources>

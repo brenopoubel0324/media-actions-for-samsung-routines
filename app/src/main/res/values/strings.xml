@@ -249,9 +249,15 @@
     <string name="widget_wallpaper_source">Wallpaper source</string>
     <string name="widget_wallpaper_follow">Follow widget location</string>
     <string name="widget_wallpaper_borders">Adapt borders too</string>
-    <string name="widget_wallpaper_unknown_location">Choose Home screen or Lock screen above, or identify the widget location. Until then, the fallback color is used.</string>
+    <string name="widget_wallpaper_unknown_location">Choose Home screen or Lock screen in Wallpaper source, or identify the widget location. Until then, the fallback color is used.</string>
     <string name="widget_wallpaper_fallback">Wallpaper colors unavailable. Using the fallback color.</string>
     <string name="widget_wallpaper_dark_active">Wallpaper contrast: dark icons.</string>
     <string name="widget_wallpaper_white_active">Wallpaper contrast: white icons.</string>
     <string name="widget_wallpaper_help">Uses colors reported by Android. Live wallpapers must report color changes. This estimates overall contrast, not the area behind the widget. No image access or polling.</string>
+    <string name="widget_wallpaper_diagnostic_title">Wallpaper color status</string>
+    <string name="widget_wallpaper_loading">Reading wallpaper colors…</string>
+    <string name="widget_wallpaper_error">Could not read wallpaper colors. Using the fallback color. Copy the diagnostic for the error.</string>
+    <string name="widget_wallpaper_refresh">Refresh colors</string>
+    <string name="widget_wallpaper_copy">Copy diagnostic</string>
+    <string name="widget_wallpaper_copy_failed">Could not copy the diagnostic. Please try again.</string>
 </resources>

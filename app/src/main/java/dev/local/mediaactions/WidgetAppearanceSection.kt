@@ -321,6 +321,32 @@ class WidgetAppearanceSection(
         } catch (_: RuntimeException) { Bundle.EMPTY }
         val hostSizes = WidgetRenderer.reportedSizes(hostOptions)
         var previewSize = hostSizes.firstOrNull()
+        val colorStatusCard = SettingsUi.card(context, body).apply {
+            id = R.id.widget_wallpaper_diagnostic_card
+            visibility = if (draft.colorMode == WidgetColorMode.WALLPAPER) View.VISIBLE else View.GONE
+        }
+        label(colorStatusCard, R.string.widget_wallpaper_diagnostic_title, 15f)
+        wallpaperStatus = label(colorStatusCard, R.string.widget_wallpaper_loading, 13f).apply {
+            id = R.id.widget_wallpaper_status; accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+        }
+        val colorActions = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
+        val refreshColors = SettingsUi.button(context, context.getString(R.string.widget_wallpaper_refresh)) {
+            WidgetWallpaperRuntime.get(context)?.coordinator?.recheck(WidgetWallpaperColors.destination(draft, location, hostOptions))
+        }.apply { id = R.id.widget_wallpaper_refresh }
+        colorActions.addView(refreshColors, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(8) })
+        colorActions.addView(SettingsUi.button(context, context.getString(R.string.widget_wallpaper_copy)) {
+            val destination = WidgetWallpaperColors.destination(draft, location, hostOptions)
+            val engine = WidgetWallpaperRuntime.get(context)?.coordinator
+            try {
+                val report = WidgetWallpaperDiagnostic.report(context, draft, destination, engine?.reading(destination),
+                    engine?.isReading(destination) == true, engine?.isObserving() == true, widgetId)
+                context.getSystemService(android.content.ClipboardManager::class.java).setPrimaryClip(
+                    android.content.ClipData.newPlainText(context.getString(R.string.widget_wallpaper_diagnostic_title), report))
+            } catch (_: RuntimeException) {
+                android.widget.Toast.makeText(context, R.string.widget_wallpaper_copy_failed, android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }.apply { id = R.id.widget_wallpaper_copy }, LinearLayout.LayoutParams(0, -2, 1f))
+        colorStatusCard.addView(colorActions)
         fun updatePreview() {
             if (epoch != generation) return
             val destination = WidgetWallpaperColors.destination(draft, location, hostOptions)
@@ -331,12 +357,13 @@ class WidgetAppearanceSection(
                 runtime?.coordinator?.preview(wallpaperPreviewToken, draft, destination) { previewUpdate?.invoke() }
             }
             val resolved = runtime?.coordinator?.resolve(draft, destination) ?: draft
-            wallpaperStatus?.text = context.getString(when {
-                destination == null -> R.string.widget_wallpaper_unknown_location
-                runtime?.coordinator?.detected(destination) == null -> R.string.widget_wallpaper_fallback
-                resolved.darkIcons -> R.string.widget_wallpaper_dark_active
-                else -> R.string.widget_wallpaper_white_active
-            })
+            colorStatusCard.visibility = if (draft.colorMode == WidgetColorMode.WALLPAPER) View.VISIBLE else View.GONE
+            val engine = runtime?.coordinator
+            val reading = engine?.reading(destination)
+            wallpaperStatus?.text = WidgetWallpaperDiagnostic.status(context, destination, reading,
+                engine?.isReading(destination) == true)
+            refreshColors.isEnabled = draft.colorMode == WidgetColorMode.WALLPAPER && engine != null &&
+                destination != null && engine.isReading(destination) == false
             val available = if (preview.width > 0) min(360f, (preview.width / context.resources.displayMetrics.density - 16).coerceAtLeast(1f)) else 280f
             val size = previewSize ?: SizeF(available,
                 if (draft.widgetBorder && draft.frameMode == WidgetFrameMode.COMPACT) 160f else 56f)
@@ -486,9 +513,6 @@ class WidgetAppearanceSection(
         automatic.addView(SettingsUi.toggle(context, R.string.widget_wallpaper_borders, draft.autoBorderColors, R.id.widget_wallpaper_borders) {
             edit(draft.copy(autoBorderColors = it)); updatePreview()
         })
-        wallpaperStatus = label(automatic, R.string.widget_wallpaper_fallback, 13f).apply {
-            id = R.id.widget_wallpaper_status; accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
-        }
         label(automatic, R.string.widget_wallpaper_help, 13f)
         icons.addView(automatic)
         label(icons, R.string.widget_icon_size).labelFor = R.id.widget_scale_value

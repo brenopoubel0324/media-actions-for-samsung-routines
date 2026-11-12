@@ -56,11 +56,11 @@ internal class WidgetWallpaperRuntime(private val app: Context) {
         return coordinator.resolve(style, WidgetWallpaperColors.destination(style, WidgetLocationStore.load(app, id), options))
     }
 
-    private fun subscribe(changed: (WallpaperDestination, Boolean?) -> Unit): Boolean {
+    private fun subscribe(changed: (WallpaperDestination, WallpaperColorReading) -> Unit): Boolean {
         unsubscribe()
         val manager = app.getSystemService(WallpaperManager::class.java)
         val callback = WallpaperManager.OnColorsChangedListener { colors, which ->
-            val value = WidgetWallpaperColors.darkIcons(colors)
+            val value = WallpaperColorReading.fromColors(colors)
             if (which and WallpaperManager.FLAG_SYSTEM != 0) changed(WallpaperDestination.HOME, value)
             if (which and WallpaperManager.FLAG_LOCK != 0) changed(WallpaperDestination.LOCK, value)
         }
@@ -86,14 +86,13 @@ internal class WidgetWallpaperRuntime(private val app: Context) {
         executor?.shutdownNow(); executor = null
     }
 
-    private fun read(destination: WallpaperDestination, completed: (Boolean?) -> Unit) {
+    private fun read(destination: WallpaperDestination, completed: (WallpaperColorReading) -> Unit) {
         val worker = executor ?: Executors.newSingleThreadExecutor { task -> Thread(task, "widget-wallpaper-colors").apply { isDaemon = true } }.also { executor = it }
         worker.execute {
-            val colors = try {
-                app.getSystemService(WallpaperManager::class.java).getWallpaperColors(
-                    if (destination == WallpaperDestination.HOME) WallpaperManager.FLAG_SYSTEM else WallpaperManager.FLAG_LOCK)
-            } catch (_: RuntimeException) { null }
-            val value = WidgetWallpaperColors.darkIcons(colors)
+            val value = try {
+                WallpaperColorReading.fromColors(app.getSystemService(WallpaperManager::class.java).getWallpaperColors(
+                    if (destination == WallpaperDestination.HOME) WallpaperManager.FLAG_SYSTEM else WallpaperManager.FLAG_LOCK))
+            } catch (error: RuntimeException) { WallpaperColorReading(null, errorClass = error.javaClass.simpleName) }
             handler.post { completed(value) }
         }
     }

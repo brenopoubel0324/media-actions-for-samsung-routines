@@ -20,8 +20,8 @@ class WallpaperColorCoordinatorTest {
         val callbacks = mutableListOf<(WallpaperDestination, Boolean?) -> Unit>()
         var subscriptions=0; var removals=0; var success=true; var canSubscribe=true
         val engine = WallpaperColorCoordinator(
-            { cb -> subscriptions++; callbacks+=cb; canSubscribe }, { removals++ },
-            { source, done -> reads+=source to done }, { queue+=it },
+            { cb -> subscriptions++; callbacks+={ source, value -> cb(source,WallpaperColorReading(value)) }; canSubscribe }, { removals++ },
+            { source, done -> reads+=source to { value -> done(WallpaperColorReading(value)) } }, { queue+=it },
             { changes -> changes.forEach { (target, style) -> updates+=target.id to style }; if(success) changes.map { it.first.id }.toSet() else emptySet() })
         fun drain() { var steps=0; while(queue.isNotEmpty()) { check(++steps<30); queue.removeFirst()() } }
         fun event(value:Boolean?,source:WallpaperDestination=WallpaperDestination.HOME) { callbacks.last()(source,value) }

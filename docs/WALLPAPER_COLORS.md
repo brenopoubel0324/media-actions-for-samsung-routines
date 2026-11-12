@@ -1,3 +1,5 @@
+Na **0.34**, o estado da detecção fica em um cartão próprio no editor, com releitura manual e cópia dos dados recebidos. [Como diagnosticar](WALLPAPER_DIAGNOSTIC.md). A compatibilidade real com Depth continua pendente.
+
 # Cores automáticas pelo wallpaper — 0.31
 
 Em **Editar widget instalado → Ícones → Cores**, escolha **Automático pelo wallpaper**. Funciona nos widgets de mídia e volume. Ajustes antigos continuam em **Manual**. **Cor de reserva** mantém a sua escolha branco/escuro quando o Android não disponibiliza as cores. **Adaptar também as bordas** é opcional: aplica o mesmo contraste às duas bordas, preservando a transparência das cores salvas. Desativar o modo automático recupera as cores manuais; a detecção nunca é gravada no perfil.
@@ -16,7 +18,7 @@ A implementação usa apenas [WallpaperManager.getWallpaperColors](https://devel
 
 A Application faz uma reconciliação das instâncias ao iniciar o processo. Eventos de configuração/host reconciliam a lista, coalescidos. A observação de cores existe somente com consumidor automático de origem conhecida: widget instalado ou prévia de um editor em primeiro plano. A prévia não salva configurações; pausar o editor remove sua assinatura. Sem consumidores, listener, receiver e executor de leitura são liberados. Não há serviço novo, alarmes, jobs, wake lock ou polling.
 
-As consultas iniciais rodam em executor fora da UI: uma por destino necessário. A Application guarda apenas dois valores de contraste, sem imagem. Callback de mudança usa seu próprio payload, sem consultar novamente o wallpaper nem varrer instâncias. Cores repetidas que resultam no mesmo visual não entregam novos RemoteViews. Callbacks e entregas próximas são agrupados em uma passagem da fila principal. Respostas de consultas anteriores à mudança/configuração não sobrescrevem dados mais novos.
+As consultas iniciais rodam em executor fora da UI: uma por destino necessário. A Application guarda até dois registros pequenos de contraste, primária/hints e eventual classe de erro, sem imagem. Callback de mudança usa seu próprio payload, sem consultar novamente o wallpaper nem varrer instâncias. Cores repetidas que resultam no mesmo visual não entregam novos RemoteViews. Callbacks e entregas próximas são agrupados em uma passagem da fila principal. Respostas de consultas anteriores à mudança/configuração não sobrescrevem dados mais novos.
 
 Com a tela apagada, callbacks apenas alteram o cache; não entregam RemoteViews. Ao acender, consulta novamente os destinos necessários e entrega somente diferenças de visual. Isso recupera mudanças perdidas, sem timer. A retomada das sessões continua sob a política existente do observador de mídia, independente das cores.
 

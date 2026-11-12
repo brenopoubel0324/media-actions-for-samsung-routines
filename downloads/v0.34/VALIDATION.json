@@ -1,0 +1,61 @@
+{
+  "version": "0.34",
+  "version_code": 34,
+  "channel": "stable",
+  "application_id": "dev.local.mediaactions",
+  "build_type": "release",
+  "debuggable": false,
+  "minified": false,
+  "filename": "media-actions-phone-0.34.apk",
+  "sha256": "ccfa6b4a291dc3d71b03f9d910edc2ff42ff63c062d38479a52dd02142cae68c",
+  "bytes": 4827458,
+  "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a",
+  "previous_certificate_matches": true,
+  "requested_permissions": [
+    "android.permission.MODIFY_AUDIO_SETTINGS"
+  ],
+  "test_runs": {
+    "app_debug": {
+      "tests": 653,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app_release": {
+      "tests": 653,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear_debug": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared_debug": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_test_executions": 1343,
+  "lint": "No issues found: phone Debug/Release, shared Debug, Wear Debug",
+  "backup_format_version": 4,
+  "backup_import_versions": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "wear_version": "0.9-experimental",
+  "review": "docs/reviews/wallpaper-diagnostic-0.34.md",
+  "physical_depth_wallpaper_tested": false,
+  "physical_host_rendering_tested": false,
+  "physical_upgrade_tested": false,
+  "battery_measured": false,
+  "wallpaper_detection_algorithm_changed": false,
+  "fallback_border_fix": true,
+  "user_color_issue_resolved": false
+}

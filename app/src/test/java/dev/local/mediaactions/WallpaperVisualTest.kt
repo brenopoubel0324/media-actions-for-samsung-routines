@@ -70,9 +70,8 @@ class WallpaperVisualTest {
             Thread.sleep(10);shadowOf(Looper.getMainLooper()).idle();layout(decor,480,1050)
             assertEquals(app.getString(R.string.widget_wallpaper_dark_active),activity.findViewById<android.widget.TextView>(R.id.widget_wallpaper_status).text)
             val scroll=activity.findViewById<ScrollView>(R.id.widget_configuration_scroll)
-            val mode=activity.findViewById<View>(R.id.widget_color_mode);val rect=Rect(0,0,mode.width,mode.height)
-            scroll.offsetDescendantRectToMyCoords(mode,rect);scroll.scrollTo(0,rect.top+scroll.scrollY-32);settle(decor)
-            save(raster(decor),"wallpaper-automatico-configuracao")
+            scroll.scrollTo(0,0);settle(decor)
+            save(raster(decor),"wallpaper-diagnostico-configuracao")
         }
         WidgetWallpaperRuntime.get(app)?.coordinator?.close()
     }

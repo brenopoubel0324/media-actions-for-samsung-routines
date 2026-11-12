@@ -7,7 +7,15 @@ import kotlin.math.pow
 
 internal enum class WallpaperDestination { HOME, LOCK }
 
-/** Only two contrast bits are cached. No wallpaper images, paths or actionable sessions. */
+/** Bounded color metadata only. No wallpaper images, paths or actionable sessions. */
+internal data class WallpaperColorReading(val darkIcons: Boolean?, val primaryColor: Int? = null,
+    val hints: Int? = null, val errorClass: String? = null) {
+    companion object {
+        fun fromColors(colors: WallpaperColors?) = WallpaperColorReading(WidgetWallpaperColors.darkIcons(colors),
+            colors?.primaryColor?.toArgb(), colors?.colorHints)
+    }
+}
+
 internal object WidgetWallpaperColors {
     val darkInk: Int = Color.rgb(26, 29, 34)
 
@@ -40,10 +48,11 @@ internal object WidgetWallpaperColors {
     }
 
     fun resolve(style: WidgetAppearance, detectedDark: Boolean?): WidgetAppearance {
-        if (style.colorMode == WidgetColorMode.FIXED || detectedDark == null) return style
-        val ink = if (detectedDark) darkInk else Color.WHITE
+        if (style.colorMode == WidgetColorMode.FIXED) return style
+        val effectiveDark = detectedDark ?: style.darkIcons
+        val ink = if (effectiveDark) darkInk else Color.WHITE
         fun border(saved: Int) = (saved and -0x1000000) or (ink and 0x00FFFFFF)
-        return style.copy(darkIcons = detectedDark,
+        return style.copy(darkIcons = effectiveDark,
             borderColor = if (style.autoBorderColors) border(style.borderColor) else style.borderColor,
             buttonBorderColor = if (style.autoBorderColors) border(style.buttonBorderColor) else style.buttonBorderColor)
     }
@@ -51,9 +60,9 @@ internal object WidgetWallpaperColors {
 
 /** Main-thread state machine. The runtime supplies off-thread reads and coalesced delivery. */
 internal class WallpaperColorCoordinator(
-    private val subscribe: ((WallpaperDestination, Boolean?) -> Unit) -> Boolean,
+    private val subscribe: ((WallpaperDestination, WallpaperColorReading) -> Unit) -> Boolean,
     private val unsubscribe: () -> Unit,
-    private val read: (WallpaperDestination, (Boolean?) -> Unit) -> Unit,
+    private val read: (WallpaperDestination, (WallpaperColorReading) -> Unit) -> Unit,
     private val enqueue: (() -> Unit) -> Unit,
     private val render: (List<Pair<Target, WidgetAppearance>>) -> Set<Int>,
 ) {
@@ -61,10 +70,11 @@ internal class WallpaperColorCoordinator(
     private data class Preview(val style: WidgetAppearance, val destination: WallpaperDestination?, val changed: () -> Unit)
     private val targets = linkedMapOf<Int, Target>()
     private val previews = linkedMapOf<Any, Preview>()
-    private val cache = mutableMapOf<WallpaperDestination, Boolean?>()
+    private val cache = mutableMapOf<WallpaperDestination, WallpaperColorReading>()
     private val revisions = mutableMapOf<WallpaperDestination, Long>()
     private val pending = mutableSetOf<WallpaperDestination>()
-    private val previewDelivered = mutableMapOf<Any, Pair<WidgetAppearance, Boolean>>()
+    private data class PreviewKey(val style: WidgetAppearance, val reading: WallpaperColorReading?, val pending: Boolean)
+    private val previewDelivered = mutableMapOf<Any, PreviewKey>()
     private val delivered = mutableMapOf<Int, WidgetAppearance>()
     private var needed = emptySet<WallpaperDestination>()
     private var generation = 0
@@ -74,8 +84,16 @@ internal class WallpaperColorCoordinator(
     private var flushPending = false
     private var interactive = true
 
-    fun resolve(style: WidgetAppearance, destination: WallpaperDestination?) = WidgetWallpaperColors.resolve(style, cache[destination])
-    fun detected(destination: WallpaperDestination?): Boolean? = cache[destination]
+    fun resolve(style: WidgetAppearance, destination: WallpaperDestination?) = WidgetWallpaperColors.resolve(style, cache[destination]?.darkIcons)
+    fun detected(destination: WallpaperDestination?): Boolean? = cache[destination]?.darkIcons
+    fun reading(destination: WallpaperDestination?): WallpaperColorReading? = cache[destination]
+    fun isReading(destination: WallpaperDestination?): Boolean = destination in pending
+    fun isObserving(): Boolean = subscribed
+    fun recheck(destination: WallpaperDestination? = null) {
+        if (destination == null) {
+            if (pending.isEmpty()) updateConsumers(forceRead = true)
+        } else if (destination in destinations() && destination !in pending) updateConsumers(reread = destination)
+    }
 
     fun reconcile(values: List<Target>) {
         val next = values.filter { it.style.colorMode == WidgetColorMode.WALLPAPER }.associateBy { it.id }
@@ -94,7 +112,7 @@ internal class WallpaperColorCoordinator(
     }
 
     private fun destinations() = (targets.values.mapNotNull { it.destination } + previews.values.mapNotNull { it.destination }).toSet()
-    private fun updateConsumers(forceRead: Boolean = false) {
+    private fun updateConsumers(forceRead: Boolean = false, reread: WallpaperDestination? = null) {
         val wanted = destinations()
         if (wanted != needed) {
             generation++; pending.clear()
@@ -113,16 +131,17 @@ internal class WallpaperColorCoordinator(
             val epoch = ++subscriptionEpoch
             subscribed = subscribe { destination, value ->
                 if (subscribed && epoch == subscriptionEpoch && destination in needed) {
-                    val changed = !cache.containsKey(destination) || cache[destination] != value
+                    val changed = !cache.containsKey(destination) || cache[destination]?.darkIcons != value.darkIcons
+                    val previewChanged = cache[destination] != value && previews.values.any { it.destination == destination }
                     revisions[destination] = (revisions[destination] ?: 0L) + 1
                     cache[destination] = value
-                    if (changed || deliveryFailed) scheduleFlush()
+                    if (changed || previewChanged || deliveryFailed) scheduleFlush()
                 }
             }
             initialRead = initialRead || subscribed
         }
         if (interactive) for (destination in wanted) {
-            if ((!cache.containsKey(destination) || initialRead) && pending.add(destination)) {
+            if ((!cache.containsKey(destination) || initialRead || destination == reread) && pending.add(destination)) {
                 val epoch = generation
                 val revision = revisions[destination] ?: 0L
                 read(destination) { value ->
@@ -161,7 +180,7 @@ internal class WallpaperColorCoordinator(
                     changes.forEach { (target, style) -> if (target.id in successful) delivered[target.id] = style }
                 } else deliveryFailed = false
                 previews.toMap().forEach { (token, preview) ->
-                    val key = resolve(preview.style, preview.destination) to (cache[preview.destination] != null)
+                    val key = PreviewKey(resolve(preview.style, preview.destination), cache[preview.destination], preview.destination in pending)
                     if (previewDelivered[token] != key) {
                         previewDelivered[token] = key
                         preview.changed()

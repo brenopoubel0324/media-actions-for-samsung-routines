@@ -35,10 +35,11 @@ object WallpaperProbe {
     val reads=AtomicInteger();var adds=0;var removes=0
     var callback:WallpaperManager.OnColorsChangedListener?=null
     @Volatile var colors:WallpaperColors?=null
+    @Volatile var failRead=false
 }
 @Implements(WallpaperManager::class)
 class ObservedWallpaperShadow:ShadowWallpaperManager() {
-    @Implementation fun getWallpaperColors(which:Int):WallpaperColors? { WallpaperProbe.reads.incrementAndGet();return WallpaperProbe.colors }
+    @Implementation fun getWallpaperColors(which:Int):WallpaperColors? { WallpaperProbe.reads.incrementAndGet();if(WallpaperProbe.failRead)throw SecurityException("test private detail");return WallpaperProbe.colors }
     @Implementation fun addOnColorsChangedListener(callback:WallpaperManager.OnColorsChangedListener,handler:Handler?) { WallpaperProbe.adds++;WallpaperProbe.callback=callback }
     @Implementation fun removeOnColorsChangedListener(callback:WallpaperManager.OnColorsChangedListener) { WallpaperProbe.removes++;if(WallpaperProbe.callback===callback)WallpaperProbe.callback=null }
 }
@@ -50,7 +51,7 @@ class WallpaperRuntimeTest {
     private val auto=WidgetAppearance(colorMode=WidgetColorMode.WALLPAPER,wallpaperTarget=WidgetWallpaperTarget.HOME)
     private fun idle()=shadowOf(Looper.getMainLooper()).idle()
     @Before fun setup() {
-        WallpaperProbe.reads.set(0);WallpaperProbe.adds=0;WallpaperProbe.removes=0;WallpaperProbe.callback=null;WallpaperProbe.colors=null
+        WallpaperProbe.reads.set(0);WallpaperProbe.adds=0;WallpaperProbe.removes=0;WallpaperProbe.callback=null;WallpaperProbe.colors=null;WallpaperProbe.failRead=false
         EnergyCounters.tracked.clear();EnergyCounters.clear();EnergyCounters.failUpdates=0;EnergyCounters.failSessionReads=0
         shadowOf(app.getSystemService(PowerManager::class.java)).setIsInteractive(true)
         runtime.coordinator.screen(true);idle()
