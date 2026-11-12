@@ -1,3 +1,5 @@
+A partir da **0.32**, há também [Justa aos botões](FITTED_WIDGET_FRAME.md), que aproxima o contorno do desenho dos ícones nos dois eixos sem diminuir a área de toque. O guia abaixo registra os modos lançados na0.30; o backup atual é v4.
+
 # Moldura compacta e arredondamento — 0.30
 
 Em **Editar widget instalado → Bordas**, ative a moldura e escolha **Formato da moldura → Compacta**. Ajuste a altura entre56 e160dp (padrão64) e o arredondamento. Salve para aplicar. O editor mantém rascunho/prévia; Cancelar não grava.

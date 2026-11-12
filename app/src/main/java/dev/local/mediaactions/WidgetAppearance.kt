@@ -13,7 +13,7 @@ enum class WidgetIconStyle {
 enum class WidgetColorMode { FIXED, WALLPAPER }
 enum class WidgetWallpaperTarget { FOLLOW_LOCATION, HOME, LOCK }
 
-enum class WidgetFrameMode { FILL, COMPACT }
+enum class WidgetFrameMode { FILL, COMPACT, FIT_BUTTONS }
 
 enum class WidgetFrameCorner(val radiusDp: Int, val label: Int) {
     AUTOMATIC(-1, R.string.widget_corner_auto), SQUARE(0, R.string.widget_corner_square),

@@ -254,4 +254,6 @@
     <string name="widget_wallpaper_dark_active">Wallpaper contrast: dark icons.</string>
     <string name="widget_wallpaper_white_active">Wallpaper contrast: white icons.</string>
     <string name="widget_wallpaper_help">Uses colors reported by Android. Live wallpapers must report color changes. This estimates overall contrast, not the area behind the widget. No image access or polling.</string>
+    <string name="widget_frame_fit">Close to buttons</string>
+    <string name="widget_frame_fit_help">Fits the border around the control group with a small gap. Touch targets stay unchanged; icon size and spacing remain independent.</string>
 </resources>

@@ -28,7 +28,7 @@ internal object SettingsBackupCodec {
         val root = tokener.nextValue() as? JSONObject ?: error("Expected object")
         require(tokener.nextClean() == '\u0000')
         require(root.get("format") == FORMAT)
-        val version = number(root, "version").also { require(it in 1..3) }
+        val version = number(root, "version").also { require(it in 1..4) }
         val defaults = style(root.getJSONObject("defaults"), version)
         val interval = number(root, "interval_seconds").also { require(it in WidgetProgressSettings.intervals) }
         val profiles = root.getJSONArray("profiles")
@@ -52,7 +52,7 @@ internal object SettingsBackupCodec {
             .put("kind", if (profile.volume) "volume" else "media")
             .put("appearance", style(profile.appearance)).put("follow_defaults", profile.followDefaults)
             .put("location", profile.location.name)) }
-        return JSONObject().put("format", FORMAT).put("version", 3).put("defaults", style(backup.defaults))
+        return JSONObject().put("format", FORMAT).put("version", 4).put("defaults", style(backup.defaults))
             .put("interval_seconds", backup.intervalSeconds).put("profiles", profiles).toString(2).also {
                 // Validate our own output with exactly the same contract as the importer.
                 decode(it)
@@ -98,7 +98,7 @@ internal object SettingsBackupCodec {
             if (version == 1) WidgetFrameCorner.AUTOMATIC else WidgetFrameCorner.entries.firstOrNull { it.name == value.get("frame_corner") } ?: error("Unknown frame corner"),
             if (version < 3) WidgetColorMode.FIXED else WidgetColorMode.entries.firstOrNull { it.name == value.get("color_mode") } ?: error("Unknown color mode"),
             if (version < 3) WidgetWallpaperTarget.FOLLOW_LOCATION else WidgetWallpaperTarget.entries.firstOrNull { it.name == value.get("wallpaper_target") } ?: error("Unknown wallpaper target"),
-            if (version < 3) false else boolean(value, "auto_border_colors")).also { require(it == it.normalized()) { "Invalid appearance range" } }
+            if (version < 3) false else boolean(value, "auto_border_colors")).also { require(it == it.normalized()) { "Invalid appearance range" }; require(version >= 4 || it.frameMode != WidgetFrameMode.FIT_BUTTONS) { "Frame mode requires backup v4" } }
     }
     private fun style(value: WidgetAppearance) = with(value) {
         JSONObject().put("scale", iconScalePercent).put("spacing", spacingDp).put("dark_icons", darkIcons)

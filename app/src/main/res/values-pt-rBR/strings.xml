@@ -257,4 +257,6 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="widget_wallpaper_dark_active">Contraste do wallpaper: ícones escuros.</string>
     <string name="widget_wallpaper_white_active">Contraste do wallpaper: ícones brancos.</string>
     <string name="widget_wallpaper_help">Usa as cores informadas pelo Android. Wallpapers animados precisam avisar quando as cores mudam. Estima o contraste geral, não a área atrás do widget. Sem acesso à imagem ou consultas periódicas.</string>
+    <string name="widget_frame_fit">Justa aos botões</string>
+    <string name="widget_frame_fit_help">Ajusta a borda ao grupo de controles com pouca folga. As áreas de toque são preservadas; tamanho dos ícones e espaçamento continuam independentes.</string>
 </resources>

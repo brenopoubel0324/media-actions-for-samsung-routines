@@ -339,7 +339,7 @@ class WidgetAppearanceSection(
             })
             val available = if (preview.width > 0) min(360f, (preview.width / context.resources.displayMetrics.density - 16).coerceAtLeast(1f)) else 280f
             val size = previewSize ?: SizeF(available,
-                if (draft.widgetBorder && draft.frameMode == WidgetFrameMode.COMPACT) 160f else 56f)
+                if (draft.widgetBorder && draft.frameMode != WidgetFrameMode.FILL) 160f else 56f)
             preview.background = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 if (resolved.darkIcons) intArrayOf(0xFFF0ECE2.toInt(), 0xFFC7DCD5.toInt()) else intArrayOf(0xFF244B58.toInt(), 0xFF172335.toInt()))
                 .apply { cornerRadius = dp(18).toFloat() }
@@ -527,7 +527,7 @@ class WidgetAppearanceSection(
         val mode = Spinner(context).apply {
             id = R.id.widget_frame_mode
             adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item,
-                listOf(context.getString(R.string.widget_frame_fill), context.getString(R.string.widget_frame_compact)))
+                listOf(context.getString(R.string.widget_frame_fill), context.getString(R.string.widget_frame_compact), context.getString(R.string.widget_frame_fit)))
                 .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
             setSelection(draft.frameMode.ordinal)
         }
@@ -546,14 +546,17 @@ class WidgetAppearanceSection(
                 override fun onNothingSelected(parent: AdapterView<*>?) = Unit
             }
         })
-        label(frameSettings, R.string.widget_frame_height)
+        val heightSettings = SettingsUi.column(context)
+        frameSettings.addView(heightSettings)
+        label(heightSettings, R.string.widget_frame_height)
         frameHeightControl = WidgetNumberControl(context, context.getString(R.string.widget_frame_height), 56, 160,
             draft.frameHeightDp, R.id.widget_frame_height_value, R.id.widget_frame_height_slider,
             R.id.widget_frame_height_decrease, R.id.widget_frame_height_increase, "dp") {
                 edit(draft.copy(frameHeightDp = it)); updatePreview()
-            }.also { frameSettings.addView(it) }
+            }.also { heightSettings.addView(it) }
         fun frameControls() {
             frameSettings.visibility = if (draft.widgetBorder) View.VISIBLE else View.GONE
+            heightSettings.visibility = if (draft.frameMode == WidgetFrameMode.FIT_BUTTONS) View.GONE else View.VISIBLE
             frameHeightControl?.isEnabled = draft.frameMode == WidgetFrameMode.COMPACT
         }
         mode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -563,6 +566,7 @@ class WidgetAppearanceSection(
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
         label(frameSettings, R.string.widget_frame_help, 13f)
+        label(frameSettings, R.string.widget_frame_fit_help, 13f)
         borders.addView(frameSettings)
         frameSettingsVisibility = ::frameControls
         frameControls()
