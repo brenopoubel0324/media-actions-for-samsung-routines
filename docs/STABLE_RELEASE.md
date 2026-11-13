@@ -17,3 +17,9 @@ Gerar `:app:assembleRelease`; o Gradle produz APK sem assinatura. A distribuiç�
 Validar com apksigner e zipalign; conferir package, versionName/code, ausência de debuggable/testOnly, permissões e comparação do certificado com o APK anterior. Não modificar o APK após assinatura. Registrar hashes e manifest em `downloads/v0.34`. Não adicionar o keystore privado ao git. Minificação fica desativada nesta primeira promoção; introduzir R8 é uma alteração própria, com validação adequada.
 
 Executar testes do app Release, regressões Debug dos três módulos e lint phone Debug/Release + shared/Wear Debug. Publicar GitHub Release sem flag prerelease e conferir main/tag/target, hashes dos arquivos públicos e flag de canal. Os APKs Debug têm sufixo dev; Preview mantém sufixo preview e package separado. Nenhum deles é o download principal estável.
+
+## Gate de CI antes da distribuição
+
+A [validação completa](CI.md) da fonte relevante deve estar aprovada antes de entregar. `main` e mudanças de risco acionam esse gate; tags não repetem o mesmo build. Também pode ser solicitado manualmente com `validation=full` na ref desejada. Não considerar o escopo cotidiano ou documental suficiente para publicação.
+
+Os candidatos compilados em CI são inspecionados, porém o Release fica sem a assinatura oficial. O workflow não recebe a chave histórica nem publica. Para distribuir binário já validado, registrar a fonte/commit e suas evidências junto dos hashes/manifest/certificado; não assumir associação pelo diretório ou nome do APK. O gate de assinatura/integridade descrito acima continua obrigatório. Mudanças em `downloads/` não têm atalho documental.

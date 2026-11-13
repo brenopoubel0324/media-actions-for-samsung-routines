@@ -94,11 +94,13 @@ O APK phone solicita somente a permissão normal `MODIFY_AUDIO_SETTINGS` para vo
 
 ## Build e validação
 
-JDK 21 para executar Gradle; bytecode Java/Kotlin 17. AGP 8.13.2, Kotlin 2.2.21, Gradle 8.14.6, compile/target SDK 36, minSdk 33 e Google Play services Wearable 20.0.1. Módulos `:app` (celular), `:wear` (relógio) e `:shared` (contratos/seleção/gateway/protocolo).
+JDK 21 para executar Gradle; bytecode Java/Kotlin 17. AGP 8.13.2, Kotlin 2.2.21, Gradle 8.14.7, compile/target SDK 36, minSdk 33 e Google Play services Wearable 20.0.1. Módulos `:app` (celular), `:wear` (relógio) e `:shared` (contratos/seleção/gateway/protocolo).
 
 ```sh
 ./gradlew :app:assembleDebug :wear:assembleDebug testDebugUnitTest lintDebug
 ```
+
+O [CI proporcional](docs/CI.md) preserva o check `android`: PR comum usa Debug/lint dos módulos afetados, mudanças de risco e integração na `main` exigem completo com Release/Preview. Documentação segura dispensa a cadeia Android. Execução manual completa está disponível; APKs de CI não são a distribuição oficial.
 
 Os APKs debug fornecidos usam o mesmo certificado dos APKs anteriores para preservar atualização. Não há chave privada no repositório; para distribuição futura, manter sua chave fora do projeto e preservar a identidade das instalações. Celular e relógio precisam compartilhar applicationId/certificado para Data Layer.
 
