@@ -18,3 +18,9 @@ Passaram 23 testes Python, incluindo CLI e repositórios Git reais, propagação
 Validação remota pendente de ativação: conferir um único run completo do push desta configuração na main; não disparar suíte como diagnóstico e não contar bloqueio como passe. Proteções/billing não foram alterados. O custo total não foi medido e o completo agora inclui cobertura que não existia; nenhuma promessa de redução de fatura. Gate de APK oficial permanece externo, com fonte/evidências/assinatura obrigatórias; inspeção do candidato CI não atesta binário em downloads.
 
 Riscos residuais: não foi possível ler proteção de branch (HTTP 403), sem confirmação de checks exigidos. A aprovação local desta orquestração não é execução da suíte Android nem teste físico. A primeira execução remota precisa confirmar tasks, isolamento Preview, ferramentas do runner e parsing de candidatos.
+
+## Ativação remota observada
+
+Push na `main` do commit `69ba0c13eb16a3469ea77491cc85b668e686b411` gerou [run 43496004471](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/actions/runs/43496004471), attempt 1. O job `android` 132129151898 retornou failure com **zero etapas**, anotação: The job was not started because your account is locked due to a billing issue. Houve também aviso de migração futura de ubuntu-latest; não é a causa da interrupção. Não houve rerun ou dispatch manual.
+
+Estado: configuração publicada/ativa, validação local aprovada em duas rodadas, validação remota bloqueada por billing. Não declarar passe do CI. A documentação preserva execução completa local rastreável para entrega quando a infraestrutura estiver indisponível; não remove nem contorna checks obrigatórios. Nenhum build Android novo foi executado localmente para esta mudança. Após regularização, conferir um único completo manual na ref atual. Alterações finais registram o bloqueio e essa preservação do fluxo local, sem mudar o código do workflow/seletor.

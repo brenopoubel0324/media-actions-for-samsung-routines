@@ -20,6 +20,6 @@ Executar testes do app Release, regressões Debug dos três módulos e lint phon
 
 ## Gate de CI antes da distribuição
 
-A [validação completa](CI.md) da fonte relevante deve estar aprovada antes de entregar. `main` e mudanças de risco acionam esse gate; tags não repetem o mesmo build. Também pode ser solicitado manualmente com `validation=full` na ref desejada. Não considerar o escopo cotidiano ou documental suficiente para publicação.
+A [validação completa](CI.md) da fonte relevante deve estar aprovada antes de entregar. `main` e mudanças de risco acionam esse gate; tags não repetem o mesmo build. Também pode ser solicitado manualmente com `validation=full` na ref desejada. Não considerar o escopo cotidiano ou documental suficiente para publicação. Se o serviço de CI estiver bloqueado, manter a cadeia completa local com fonte/evidências/inspeção registradas, como no fluxo anterior; registrar o bloqueio remoto sem declarar CI aprovado e sem contornar checks obrigatórios da branch.
 
 Os candidatos compilados em CI são inspecionados, porém o Release fica sem a assinatura oficial. O workflow não recebe a chave histórica nem publica. Para distribuir binário já validado, registrar a fonte/commit e suas evidências junto dos hashes/manifest/certificado; não assumir associação pelo diretório ou nome do APK. O gate de assinatura/integridade descrito acima continua obrigatório. Mudanças em `downloads/` não têm atalho documental.
