@@ -65,5 +65,7 @@
   "battery_measured": false,
   "identity_selection": "pending; current name and icon preserved",
   "wear_distribution": "unchanged 0.9 experimental",
-  "full_log_sha256": "1663a38d6ea0cd7f159255b5a450cd499701295c4801fe737453a8818b5f92c0"
+  "full_log_sha256": "9649ce5e4d4eb912e757036e17fbb98e2f1ae17cc5bc8f820fc4c723834c05c8",
+  "full_log_original_sha256": "1663a38d6ea0cd7f159255b5a450cd499701295c4801fe737453a8818b5f92c0",
+  "log_normalization": "Trailing whitespace removed from public log; raw hash recorded separately."
 }
