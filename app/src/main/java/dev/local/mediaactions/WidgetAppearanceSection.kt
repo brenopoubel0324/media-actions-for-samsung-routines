@@ -17,7 +17,9 @@ class WidgetAppearanceSection(
     initialAppearance: WidgetAppearance? = null,
     private val onApplied: (() -> Unit)? = null,
 ) {
-    private val volume = widgetId?.let {WidgetRegistry.isVolume(context,it)} ?: false
+    private val kind = widgetId?.let { WidgetRegistry.kind(context, it) } ?: WidgetKind.MEDIA
+    private val volume = kind == WidgetKind.VOLUME
+    private val combined = kind == WidgetKind.PLAYBACK_VOLUME
     private val wallpaperPreviewToken = Any()
     private var wallpaperPreviewActive = false
     private var wallpaperPreviewKey: Pair<WidgetAppearance, WallpaperDestination?>? = null
@@ -75,6 +77,7 @@ class WidgetAppearanceSection(
     }
     fun saveUiState(out: Bundle) {
         out.putInt("settings_section", expanded); out.putString("preview_state", previewState.name)
+        out.putString("widget_original_kind", kind.name)
         out.putString("widget_location_draft", location.name)
         out.putString("widget_original_location", originalLocation.name)
         out.putBoolean("widget_original_override", originalHasOverride)
@@ -166,7 +169,7 @@ class WidgetAppearanceSection(
             if (borderControls?.validate() == false || buttonBorderControls?.validate() == false ||
                 (draft.widgetBorder && draft.frameMode == WidgetFrameMode.COMPACT && frameHeightControl?.validate() == false)) return invalid(R.id.settings_borders)
         }
-        if (widgetId != null && (!WidgetRegistry.isOwnWidget(context, widgetId) || WidgetRegistry.isVolume(context,widgetId) != volume))
+        if (widgetId != null && (WidgetRegistry.kind(context, widgetId) != kind))
             return rejectSave(R.string.widget_configuration_missing)
 
         val desired = draft.normalized()
@@ -311,7 +314,7 @@ class WidgetAppearanceSection(
             else -> R.id.widget_preview_unknown
         })
         if(!volume) previewGroup.addView(states)
-        label(previewGroup, if(volume) R.string.volume_preview_help else R.string.settings_preview_help, 12f)
+        label(previewGroup, when { volume -> R.string.volume_preview_help; combined -> R.string.playback_volume_preview_help; else -> R.string.settings_preview_help }, 12f)
         previewGroup.addView(details)
         val effective = label(details, R.string.widget_spacing_help, 12f).apply {
             id = R.id.widget_effective_spacing; accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
@@ -365,32 +368,41 @@ class WidgetAppearanceSection(
             refreshColors.isEnabled = draft.colorMode == WidgetColorMode.WALLPAPER && engine != null &&
                 destination != null && engine.isReading(destination) == false
             val available = if (preview.width > 0) min(360f, (preview.width / context.resources.displayMetrics.density - 16).coerceAtLeast(1f)) else 280f
-            val size = previewSize ?: SizeF(available,
+            val size = previewSize ?: SizeF(if (combined) maxOf(144f, available) else available,
                 if (draft.widgetBorder && draft.frameMode == WidgetFrameMode.COMPACT) 160f else 56f)
             preview.background = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 if (resolved.darkIcons) intArrayOf(0xFFF0ECE2.toInt(), 0xFFC7DCD5.toInt()) else intArrayOf(0xFF244B58.toInt(), 0xFF172335.toInt()))
                 .apply { cornerRadius = dp(18).toFloat() }
             preview.removeAllViews()
             val view = WidgetRenderer.build(context, AppWidgetManager.INVALID_APPWIDGET_ID, resolved, size,
-                bindControls = false, playback = if(volume) WidgetPlaybackState.PAUSED else previewState, progress = WidgetTrackProgress(0.42f), volume=volume).apply(context, preview)
+                bindControls = false, playback = if(volume) WidgetPlaybackState.PAUSED else previewState, progress = WidgetTrackProgress(0.42f), kind=kind).apply(context, preview)
             val scale = min(1f, min(available / size.width, 72f / size.height))
             view.scaleX = scale; view.scaleY = scale
             preview.addView(view, FrameLayout.LayoutParams((size.width * context.resources.displayMetrics.density).toInt(),
                 (size.height * context.resources.displayMetrics.density).toInt(), android.view.Gravity.CENTER))
-            for (id in if(volume) listOf(R.id.widget_previous,R.id.widget_next) else listOf(R.id.widget_previous, R.id.widget_toggle, R.id.widget_next)) view.findViewById<View>(id).apply {
+            for (id in if(volume) listOf(R.id.widget_previous,R.id.widget_next) else listOf(R.id.widget_previous, R.id.widget_toggle, R.id.widget_next)) view.findViewById<View>(id)?.apply {
                 contentDescription = context.getString(R.string.widget_preview_action, contentDescription)
                 setOnClickListener { /* Appearance demo only. */ }
             }
-            val g = WidgetContentLayout.calculate(size,draft,volume).geometry
+            val content = WidgetContentLayout.calculate(size,draft,kind)
+            val g = content.geometry
             effective.text = buildString {
                 append(context.getString(if (hostSizes.isEmpty()) R.string.widget_sample_size else R.string.widget_reported_size, size.width.toInt(), size.height.toInt()))
+                if (combined && !PlaybackVolumeLayout.isUsable(size)) {
+                    append("\n"); append(context.getString(R.string.playback_volume_size_help))
+                    return@buildString
+                }
                 append("\n"); append(context.getString(R.string.widget_effective_spacing, g.gapDp, g.buttonDp + g.gapDp))
                 append("\n"); append(context.getString(R.string.widget_effective_padding, g.widgetPaddingHorizontalDp, g.widgetPaddingVerticalDp))
-                if (g.widgetPaddingHorizontalDp < draft.widgetPaddingHorizontalDp || g.widgetPaddingVerticalDp < draft.widgetPaddingVerticalDp) {
+                if (g.widgetPaddingHorizontalDp != draft.widgetPaddingHorizontalDp || g.widgetPaddingVerticalDp != draft.widgetPaddingVerticalDp) {
                     append("\n"); append(context.getString(R.string.widget_padding_limited, draft.widgetPaddingHorizontalDp, draft.widgetPaddingVerticalDp))
                 }
                 if (!draft.fillWidth && g.gapDp < draft.spacingDp) { append("\n"); append(context.getString(R.string.widget_spacing_limited, draft.spacingDp, g.gapDp)) }
-                if (widgetId != null && hostSizes.isEmpty()) { append("\n"); append(context.getString(R.string.widget_size_unavailable)) }
+                if (combined && content.vertical && draft.widgetBorder && draft.frameMode == WidgetFrameMode.COMPACT) {
+                    val frameHeight = maxOf(draft.frameHeightDp, content.rowHeight + draft.borderWidthDp * 2).coerceAtMost(size.height.toInt())
+                    append("\n"); append(context.getString(R.string.playback_volume_effective_frame, frameHeight))
+                }
+                if (widgetId != null && hostSizes.isEmpty()) { append("\n"); append(context.getString(if (combined) R.string.playback_volume_sample_help else R.string.widget_size_unavailable)) }
             }
         }
         previewUpdate = { updatePreview() }
@@ -528,6 +540,7 @@ class WidgetAppearanceSection(
             manualSpacing.visibility = if (it) View.GONE else View.VISIBLE; updatePreview()
         })
         if(volume) label(spacing,R.string.volume_orientation_help,13f)
+        if(combined) label(spacing,R.string.playback_volume_size_help,13f)
         spacing.addView(manualSpacing)
         label(manualSpacing, R.string.widget_button_spacing).labelFor = R.id.widget_spacing_value
         spacingControl = WidgetNumberControl(context, context.getString(R.string.widget_button_spacing), 0, WidgetAppearance.MAX_SPACING_DP,
@@ -599,6 +612,7 @@ class WidgetAppearanceSection(
         })
         label(playback, R.string.widget_progress_help, 13f)
         } else label(playback,R.string.volume_widget_help,13f)
+        if(combined) label(playback,R.string.playback_volume_access_help,13f)
         playback.addView(SettingsUi.toggle(context, R.string.widget_touch_feedback, draft.touchFeedback, R.id.widget_touch_feedback) { edit(draft.copy(touchFeedback = it)); updatePreview() })
         confirmation = label(body, if (widgetId == null) R.string.widget_style_scope else R.string.widget_style_scope_single, 12f).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
         if (showApplyButton) body.addView(SettingsUi.button(context, context.getString(R.string.widget_apply_style), true) { applyChanges() }, LinearLayout.LayoutParams(-1, dp(52)))

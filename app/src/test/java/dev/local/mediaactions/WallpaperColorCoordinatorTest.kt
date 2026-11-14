@@ -27,7 +27,7 @@ class WallpaperColorCoordinatorTest {
         fun event(value:Boolean?,source:WallpaperDestination=WallpaperDestination.HOME) { callbacks.last()(source,value) }
     }
     private fun target(id:Int=1,source:WallpaperDestination?=WallpaperDestination.HOME,style:WidgetAppearance=automatic) =
-        WallpaperColorCoordinator.Target(id,false,style,source)
+        WallpaperColorCoordinator.Target(id,WidgetKind.MEDIA,style,source)
 
     @Test fun fixedWidgetsNeverSubscribeOrReadAndUnknownHostsUseFallback() {
         val h=Harness();h.engine.reconcile(listOf(target(style=WidgetAppearance())));h.drain()

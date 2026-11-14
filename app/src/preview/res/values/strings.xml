@@ -3,4 +3,5 @@
     <string name="widget_name">Media controls (Preview)</string>
     <string name="listener_name">Media Actions Preview — media session access</string>
     <string name="volume_widget_name">Media volume (Preview)</string>
+    <string name="playback_volume_widget_name">Playback and volume (Preview)</string>
 </resources>

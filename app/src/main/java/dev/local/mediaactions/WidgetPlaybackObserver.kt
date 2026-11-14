@@ -2,7 +2,6 @@ package dev.local.mediaactions
 
 import android.appwidget.AppWidgetManager
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -92,8 +91,11 @@ class WidgetPlaybackObserver(context: Context,
 
     private fun loadTargets() {
         try {
-            ids = AppWidgetManager.getInstance(app)
-                .getAppWidgetIds(ComponentName(app, MediaWidgetProvider::class.java)).toList()
+            val widgets = AppWidgetManager.getInstance(app)
+            ids = WidgetRegistry.playbackIds(app).filter { id ->
+                val kind = WidgetRegistry.kind(app, id) ?: return@filter false
+                WidgetRenderer.hasUsablePlaybackSize(widgets.getAppWidgetOptions(id), kind)
+            }
             progressIds = ids.filter { WidgetStyleStore.load(app, it).progressRing }
             presentation.prepare(app, ids)
         } catch (_: RuntimeException) { ids = emptyList(); progressIds = emptyList() }

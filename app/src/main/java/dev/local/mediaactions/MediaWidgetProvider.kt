@@ -74,9 +74,9 @@ class MediaWidgetProvider : AppWidgetProvider() {
 
     /** Small, listener-lifetime visual keys; no RemoteViews/bitmaps or actionable sessions are retained. */
     internal class PresentationCache {
-        private data class Key(val style: WidgetAppearance, val sizes: List<android.util.SizeF>,
+        private data class Key(val kind: WidgetKind, val style: WidgetAppearance, val sizes: List<android.util.SizeF>,
             val state: WidgetPlaybackState, val progress: Int?)
-        private data class Configuration(val style: WidgetAppearance, val options: Bundle)
+        private data class Configuration(val kind: WidgetKind, val style: WidgetAppearance, val options: Bundle)
         private val delivered = mutableMapOf<Int, Key>()
         private val configurations = mutableMapOf<Int, Configuration>()
         fun retain(ids: List<Int>) {
@@ -87,28 +87,37 @@ class MediaWidgetProvider : AppWidgetProvider() {
             retain(ids)
             delivered.clear() // Explicit host/configuration deliveries may have changed what is displayed.
             val manager = AppWidgetManager.getInstance(context)
-            for (id in ids) configurations[id] = Configuration(WidgetStyleStore.load(context, id).normalized(),
-                Bundle(manager.getAppWidgetOptions(id)))
+            for (id in ids) {
+                val kind = WidgetRegistry.kind(context, id) ?: continue
+                configurations[id] = Configuration(kind, WidgetStyleStore.load(context, id).normalized(),
+                    Bundle(manager.getAppWidgetOptions(id)))
+            }
         }
         fun reload(context: Context, id: Int) {
-            configurations[id] = Configuration(WidgetStyleStore.load(context, id).normalized(),
+            val kind = WidgetRegistry.kind(context, id) ?: return
+            configurations[id] = Configuration(kind, WidgetStyleStore.load(context, id).normalized(),
                 Bundle(AppWidgetManager.getInstance(context).getAppWidgetOptions(id)))
         }
         fun refresh(context: Context, ids: List<Int>, snapshot: WidgetUpdateSnapshot) {
             val manager = AppWidgetManager.getInstance(context)
-            for (id in ids) {
+            var failure: RuntimeException? = null
+            for (id in ids) try {
                 val config = configurations[id] ?: continue
                 val options = config.options
                 val style = WidgetWallpaperRuntime.get(context)?.resolve(id, config.style, options) ?: config.style
                 // Quantization affects only the drawn ring (less than 0.1%); commands retain full precision.
                 val fraction = if (style.progressRing && snapshot.state == WidgetPlaybackState.PLAYING)
                     snapshot.progress?.fraction?.times(1024)?.toInt()?.coerceIn(0, 1024) else null
-                val key = Key(style, WidgetRenderer.reportedSizes(options), snapshot.state, fraction)
+                val key = Key(config.kind, style, WidgetRenderer.reportedSizes(options), snapshot.state, fraction)
                 if (delivered[id] == key) continue
+                if (WidgetRegistry.kind(context, id) != config.kind) continue
                 val data = snapshot.copy(progress = fraction?.let { WidgetTrackProgress(it / 1024f) })
-                manager.updateAppWidget(id, WidgetRenderer.render(context, id, options, data, style))
+                manager.updateAppWidget(id, WidgetRenderer.render(context, id, options, data, style, kind = config.kind))
                 delivered[id] = key // Commit only after successful host delivery.
+            } catch (error: RuntimeException) {
+                if (failure == null) failure = error
             }
+            failure?.let { throw it }
         }
     }
 

@@ -9,7 +9,7 @@ import java.util.WeakHashMap
 /** Deduplicates options callbacks only. Explicit update/save/recovery paths always remain forced. */
 internal object WidgetOptionsUpdates {
     private const val MAX_ENTRIES = 128
-    private data class Key(val volume: Boolean, val sizes: List<SizeF>, val category: Int,
+    private data class Key(val kind: WidgetKind, val sizes: List<SizeF>, val category: Int,
         val appearance: WidgetAppearance, val ownAppearance: Boolean, val location: WidgetLocation)
     private class Attempt(val key: Key)
     private class State {
@@ -20,8 +20,12 @@ internal object WidgetOptionsUpdates {
     private val applications = WeakHashMap<Context, LinkedHashMap<Int, State>>()
 
     fun deliver(context: Context, id: Int, volume: Boolean, options: Bundle, update: (WidgetAppearance) -> Unit): Boolean {
+        return deliver(context, id, if (volume) WidgetKind.VOLUME else WidgetKind.MEDIA, options, update)
+    }
+
+    fun deliver(context: Context, id: Int, kind: WidgetKind, options: Bundle, update: (WidgetAppearance) -> Unit): Boolean {
         val app = context.applicationContext
-        val key = Key(volume, WidgetRenderer.reportedSizes(options),
+        val key = Key(kind, WidgetRenderer.reportedSizes(options),
             options.getInt(AppWidgetManager.OPTION_APPWIDGET_HOST_CATEGORY, 0),
             WidgetStyleStore.load(app, id).normalized(), WidgetStyleStore.hasOverride(app, id),
             WidgetLocationStore.load(app, id))

@@ -23,8 +23,9 @@ class BackupVisualTest {
         if(large) app.resources.updateConfiguration(android.content.res.Configuration(app.resources.configuration).apply {fontScale=1.3f},app.resources.displayMetrics)
         val defaults=WidgetAppearance(iconScalePercent=65,spacingDp=24,progressRing=true,centerBorderOnly=true)
         val backup=SettingsBackup(defaults,15,listOf(
-            BackupProfile("Mídia · Bloqueio",false,defaults,false,WidgetLocation.LOCK_SCREEN),
-            BackupProfile("Volume · Tablet",true,defaults.copy(iconScalePercent=50),false,WidgetLocation.HOME_SCREEN)))
+            BackupProfile("Mídia · Bloqueio",WidgetKind.MEDIA,defaults,false,WidgetLocation.LOCK_SCREEN),
+            BackupProfile("Volume · Tablet",WidgetKind.VOLUME,defaults.copy(iconScalePercent=50),false,WidgetLocation.HOME_SCREEN),
+            BackupProfile("Reprodução e volume",WidgetKind.PLAYBACK_VOLUME,defaults,false,WidgetLocation.HOME_SCREEN)))
         SettingsBackupStore.restore(app,backup,false)
         Robolectric.buildActivity(BackupActivity::class.java).setup().use {c ->
             if(review) {

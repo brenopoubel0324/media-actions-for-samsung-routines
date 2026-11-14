@@ -42,10 +42,11 @@ object WidgetRenderer {
 
     fun render(context: Context, id: Int, options: Bundle,
         snapshot: WidgetUpdateSnapshot? = null,
-        appearance: WidgetAppearance? = null): RemoteViews {
+        appearance: WidgetAppearance? = null, kind: WidgetKind = WidgetKind.MEDIA): RemoteViews {
         val requested = appearance ?: WidgetStyleStore.load(context, id)
         val style = WidgetWallpaperRuntime.get(context)?.resolve(id, requested, options) ?: requested
-        val data = snapshot ?: WidgetUpdateSnapshot.capture(AndroidSessionGateway(context), style.progressRing)
+        val data = if (!hasUsablePlaybackSize(options, kind)) WidgetUpdateSnapshot(WidgetPlaybackState.UNKNOWN, null)
+            else snapshot ?: WidgetUpdateSnapshot.capture(AndroidSessionGateway(context), style.progressRing)
         val state = data.state
         val showProgress = shouldShowProgress(style, state)
         val progress = if (showProgress) data.progress else null
@@ -53,9 +54,15 @@ object WidgetRenderer {
             WidgetPlaybackIcons.center(style.iconStyle, state),
             if (style.darkIcons) Color.rgb(26, 29, 34) else Color.WHITE, style, progress) else null
         val sizes = reportedSizes(options)
-        if (sizes.isEmpty()) return build(context, id, style, null, playback = state, progress = progress, progressBitmap = progressBitmap)
-        if (sizes.size == 1) return build(context, id, style, sizes.single(), playback = state, progress = progress, progressBitmap = progressBitmap)
-        return RemoteViews(sizes.associateWith { build(context, id, style, it, playback = state, progress = progress, progressBitmap = progressBitmap) })
+        if (sizes.isEmpty()) return build(context, id, style, null, playback = state, progress = progress, progressBitmap = progressBitmap, kind = kind)
+        if (sizes.size == 1) return build(context, id, style, sizes.single(), playback = state, progress = progress, progressBitmap = progressBitmap, kind = kind)
+        return RemoteViews(sizes.associateWith { build(context, id, style, it, playback = state, progress = progress, progressBitmap = progressBitmap, kind = kind) })
+    }
+
+    internal fun hasUsablePlaybackSize(options: Bundle, kind: WidgetKind): Boolean = when (kind) {
+        WidgetKind.MEDIA -> true // Preserve legacy hosts that do not report dimensions.
+        WidgetKind.VOLUME -> false
+        WidgetKind.PLAYBACK_VOLUME -> reportedSizes(options).any(PlaybackVolumeLayout::isUsable)
     }
 
     private fun shouldShowProgress(style: WidgetAppearance, playback: WidgetPlaybackState) =
@@ -77,13 +84,25 @@ object WidgetRenderer {
 
     internal fun build(context: Context, id: Int, appearance: WidgetAppearance, size: SizeF?,
         bindControls: Boolean = true, playback: WidgetPlaybackState = WidgetPlaybackState.PAUSED,
-        progress: WidgetTrackProgress? = null, progressBitmap: Bitmap? = null, volume: Boolean = false): RemoteViews =
-        RemoteViews(context.packageName, if(volume) {if(VolumeWidgetLayout.isVertical(size)) R.layout.widget_volume_vertical else R.layout.widget_volume_controls} else R.layout.widget_media_controls).apply {
-            val style = (if(volume) appearance.copy(progressRing=false,centerBorderOnly=false) else appearance).normalized()
-            val buttons = if(volume) listOf(R.id.widget_previous,R.id.widget_next) else buttons
-            val gaps = if(volume) listOf(R.id.widget_gap_left) else listOf(R.id.widget_gap_left,R.id.widget_gap_right)
+        progress: WidgetTrackProgress? = null, progressBitmap: Bitmap? = null, volume: Boolean = false,
+        kind: WidgetKind = if (volume) WidgetKind.VOLUME else WidgetKind.MEDIA): RemoteViews {
+        val volumeOnly = kind == WidgetKind.VOLUME
+        val combined = kind == WidgetKind.PLAYBACK_VOLUME
+        if (combined && !PlaybackVolumeLayout.isUsable(size)) return RemoteViews(context.packageName,
+            R.layout.widget_playback_volume_resize).apply {
+                setTextColor(R.id.widget_resize_hint, if (appearance.darkIcons) Color.rgb(26,29,34) else Color.WHITE)
+            }
+        val layout = when (kind) {
+            WidgetKind.MEDIA -> R.layout.widget_media_controls
+            WidgetKind.VOLUME -> if (VolumeWidgetLayout.isVertical(size)) R.layout.widget_volume_vertical else R.layout.widget_volume_controls
+            WidgetKind.PLAYBACK_VOLUME -> if (VolumeWidgetLayout.isVertical(size)) R.layout.widget_playback_volume_vertical else R.layout.widget_playback_volume_controls
+        }
+        return RemoteViews(context.packageName, layout).apply {
+            val style = (if(volumeOnly) appearance.copy(progressRing=false,centerBorderOnly=false) else appearance).normalized()
+            val buttons = if(volumeOnly) listOf(R.id.widget_previous,R.id.widget_next) else buttons
+            val gaps = if(volumeOnly) listOf(R.id.widget_gap_left) else listOf(R.id.widget_gap_left,R.id.widget_gap_right)
             val showProgress = shouldShowProgress(style, playback)
-            val content = WidgetContentLayout.calculate(size, style, volume)
+            val content = WidgetContentLayout.calculate(size, style, kind)
             val geometry = content.geometry
             val compact = style.widgetBorder && style.frameMode == WidgetFrameMode.COMPACT
             val border = if (style.frameCorner == WidgetFrameCorner.AUTOMATIC)
@@ -117,8 +136,12 @@ object WidgetRenderer {
                 WidgetIconStyle.DOUBLE_TRIANGLES -> R.drawable.ic_double_previous to R.drawable.ic_double_next
                 WidgetIconStyle.SQUARE -> R.drawable.ic_square_previous to R.drawable.ic_square_next
             }
-            val icons = if(volume) listOf(R.drawable.ic_volume_minus,R.drawable.ic_volume_plus) else listOf(sides.first, WidgetPlaybackIcons.center(style.iconStyle, playback), sides.second)
-            if(!volume) {
+            val icons = when (kind) {
+                WidgetKind.VOLUME -> listOf(R.drawable.ic_volume_minus, R.drawable.ic_volume_plus)
+                WidgetKind.PLAYBACK_VOLUME -> listOf(R.drawable.ic_volume_minus, WidgetPlaybackIcons.center(style.iconStyle, playback), R.drawable.ic_volume_plus)
+                WidgetKind.MEDIA -> listOf(sides.first, WidgetPlaybackIcons.center(style.iconStyle, playback), sides.second)
+            }
+            if(!volumeOnly) {
             setContentDescription(R.id.widget_toggle, context.getString(when (playback) {
                 WidgetPlaybackState.PLAYING -> R.string.widget_pause_action
                 WidgetPlaybackState.PAUSED -> R.string.widget_play_action
@@ -126,13 +149,15 @@ object WidgetRenderer {
                 WidgetPlaybackState.UNKNOWN -> R.string.widget_state_unknown
             }))
             setInt(R.id.widget_toggle, "setImageAlpha", if (playback == WidgetPlaybackState.TRANSITIONING) 150 else 255)
-            } else {
+            }
+            if (kind.hasVolume) {
                 setContentDescription(R.id.widget_previous,context.getString(R.string.volume_lower))
                 setContentDescription(R.id.widget_next,context.getString(R.string.volume_raise))
             }
             val color = if (style.darkIcons) Color.rgb(26, 29, 34) else Color.WHITE
             for (index in buttons.indices) {
-                val hasBorder = style.buttonBorder && playback != WidgetPlaybackState.UNKNOWN &&
+                val playbackButton = kind == WidgetKind.MEDIA || buttons[index] == R.id.widget_toggle
+                val hasBorder = style.buttonBorder && (!playbackButton || playback != WidgetPlaybackState.UNKNOWN) &&
                     (!style.centerBorderOnly || index == 1) &&
                     !(index == 1 && showProgress)
                 val background = when {
@@ -170,7 +195,7 @@ object WidgetRenderer {
                     setViewPadding(id, px, px, px, px)
                 }
                 pad(R.id.widget_previous, geometry.sidePaddingDp)
-                if(!volume) pad(R.id.widget_toggle, geometry.centerPaddingDp)
+                if(!volumeOnly) pad(R.id.widget_toggle, geometry.centerPaddingDp)
                 pad(R.id.widget_next, geometry.sidePaddingDp)
             } else {
                 setViewLayoutHeight(R.id.widget_controls_row, if (compact) content.rowHeight.toFloat() else -1f,
@@ -182,20 +207,26 @@ object WidgetRenderer {
                     setViewLayoutWidth(view, 0f, TypedValue.COMPLEX_UNIT_DIP)
                 }
                 for (button in buttons) {
-                    val dp = if (!volume && button == R.id.widget_toggle) geometry.centerPaddingDp else geometry.sidePaddingDp
+                    val dp = if (!volumeOnly && button == R.id.widget_toggle) geometry.centerPaddingDp else geometry.sidePaddingDp
                     val px = (dp * context.resources.displayMetrics.density).toInt()
                     setViewPadding(button, px, px, px, px)
                 }
             }
             if (showProgress) setViewPadding(R.id.widget_toggle, 0, 0, 0, 0)
-            if(bindControls && volume) {
+            if(bindControls && volumeOnly) {
                 setOnClickPendingIntent(R.id.widget_previous,VolumeWidgetProvider.controlIntent(context,id,false))
                 setOnClickPendingIntent(R.id.widget_next,VolumeWidgetProvider.controlIntent(context,id,true))
             }
-            if (bindControls && !volume) {
+            if (bindControls && kind == WidgetKind.MEDIA) {
                 setOnClickPendingIntent(R.id.widget_previous, MediaWidgetProvider.controlIntent(context, id, MediaAction.PREVIOUS))
                 setOnClickPendingIntent(R.id.widget_toggle, MediaWidgetProvider.controlIntent(context, id, MediaAction.PLAY_PAUSE))
                 setOnClickPendingIntent(R.id.widget_next, MediaWidgetProvider.controlIntent(context, id, MediaAction.NEXT))
             }
+            if (bindControls && combined) {
+                setOnClickPendingIntent(R.id.widget_previous, PlaybackVolumeWidgetProvider.controlIntent(context, id, PlaybackVolumeWidgetProvider.Command.LOWER))
+                setOnClickPendingIntent(R.id.widget_toggle, PlaybackVolumeWidgetProvider.controlIntent(context, id, PlaybackVolumeWidgetProvider.Command.TOGGLE))
+                setOnClickPendingIntent(R.id.widget_next, PlaybackVolumeWidgetProvider.controlIntent(context, id, PlaybackVolumeWidgetProvider.Command.RAISE))
+            }
         }
+    }
 }

@@ -260,4 +260,15 @@
     <string name="widget_wallpaper_refresh">Refresh colors</string>
     <string name="widget_wallpaper_copy">Copy diagnostic</string>
     <string name="widget_wallpaper_copy_failed">Could not copy the diagnostic. Please try again.</string>
+    <string name="playback_volume_widget_name">Playback and volume</string>
+    <string name="playback_volume_widget_description">Play/Pause and local media volume, with three touch controls that adapt to horizontal or vertical space.</string>
+    <string name="playback_volume_resize">Resize the widget</string>
+    <string name="playback_volume_size_help">Three controls need at least 144 × 48 dp horizontally or 48 × 144 dp vertically. If the host does not report usable space, the widget asks you to resize and exposes no actions.</string>
+    <string name="playback_volume_preview_help">Appearance sample only. Play/Pause controls media; −/+ change this device’s media volume. The buttons in this preview do not send commands.</string>
+    <string name="playback_volume_sample_help">The host has not reported this widget’s size. This is a horizontal example; the installed widget waits for usable dimensions before exposing controls.</string>
+    <string name="playback_volume_effective_frame">Effective vertical frame height: %1$d dp. It must enclose all three controls.</string>
+    <string name="backup_version_notice">New backups require an app version that supports format v5. Older backups remain importable.</string>
+    <string name="playback_volume_access_help">Volume works without Notification access. Play/Pause needs access to media sessions; the buttons on either side change only this device’s media volume.</string>
+    <string name="playback_volume_missing_access">Open the app and grant Notification access to control playback. Volume still works.</string>
+    <string name="playback_volume_widget_install">For both controls, add Playback and volume from your launcher or LockStar widget picker.</string>
 </resources>

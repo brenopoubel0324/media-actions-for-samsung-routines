@@ -31,7 +31,7 @@ class MediaNotificationListener : NotificationListenerService() {
         playbackObserver?.close()
         playbackObserver = null
         try {
-            MediaWidgetProvider.refreshAll(this, WidgetPlaybackState.UNKNOWN)
+            WidgetRegistry.refreshPlayback(this, WidgetPlaybackState.UNKNOWN)
         } catch (_: RuntimeException) { /* Host failure must not prevent listener cleanup or rebind. */ }
     }
 }

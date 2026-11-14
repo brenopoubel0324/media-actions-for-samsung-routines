@@ -14,20 +14,25 @@ internal data class VolumeWidgetLayout(val vertical: Boolean, val geometry: Widg
         private fun isVertical(width: Float, height: Float) = width.isFinite() && height.isFinite() && width > 0 && height > width
         fun isVertical(size: SizeF?): Boolean = size != null && isVertical(size.width,size.height)
 
-        fun calculate(width: Float, height: Float, appearance: WidgetAppearance): VolumeWidgetLayout {
+        fun calculate(width: Float, height: Float, appearance: WidgetAppearance, buttonCount: Int = 2): VolumeWidgetLayout {
+            require(buttonCount in 2..3)
+            val minimumHeight = buttonCount * 48
+            val gaps = buttonCount - 1
             if (!isVertical(width,height))
-                return VolumeWidgetLayout(false, WidgetGeometry.calculate(width,height,appearance,2))
+                return VolumeWidgetLayout(false, WidgetGeometry.calculate(width,height,appearance,buttonCount))
             val style = appearance.normalized()
             val horizontal = min(style.widgetPaddingHorizontalDp, floor(((width-48)/2).coerceAtLeast(0f)).toInt())
-            val vertical = min(style.widgetPaddingVerticalDp, floor(((height-96)/2).coerceAtLeast(0f)).toInt())
+            val vertical = min(style.widgetPaddingVerticalDp, floor(((height-minimumHeight)/2).coerceAtLeast(0f)).toInt())
             val availableWidth = width-horizontal*2
             val availableHeight = height-vertical*2
             var gap = floor(min(if(style.fillWidth) 0f else style.spacingDp.toFloat(),
-                (availableHeight-96).coerceAtLeast(0f))).toInt()
-            val button = floor(min(availableWidth,(availableHeight-gap)/2)).toInt().coerceIn(1,128)
-            if(style.fillWidth) gap = floor(availableHeight-button*2).toInt().coerceAtLeast(0)
+                ((availableHeight-minimumHeight)/gaps).coerceAtLeast(0f))).toInt()
+            val button = floor(min(availableWidth,(availableHeight-gap*gaps)/buttonCount)).toInt().coerceIn(1,128)
+            if(style.fillWidth) gap = floor((availableHeight-button*buttonCount)/gaps).toInt().coerceAtLeast(0)
             val iconPadding = (button*(1-min(1f,0.82f*style.iconScalePercent/100f))/2).roundToInt().coerceAtLeast(0)
-            return VolumeWidgetLayout(true, WidgetGeometry(button,gap,iconPadding,iconPadding,horizontal,vertical,2))
+            val centerPadding = if (buttonCount == 3)
+                (button*(1-min(1f,0.95f*style.iconScalePercent/100f))/2).roundToInt().coerceAtLeast(0) else iconPadding
+            return VolumeWidgetLayout(true, WidgetGeometry(button,gap,iconPadding,centerPadding,horizontal,vertical,buttonCount))
         }
     }
 }

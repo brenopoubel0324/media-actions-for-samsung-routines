@@ -113,6 +113,7 @@ class BackupActivity : Activity() {
         body = SettingsUi.column(this).apply { setPadding(dp(20), dp(16), dp(20), dp(24)) }
         SettingsUi.label(this, body, getString(R.string.backup_title), 25f, true)
         SettingsUi.label(this, body, getString(R.string.backup_scope))
+        SettingsUi.label(this, body, getString(R.string.backup_version_notice), 13f)
         val files = SettingsUi.card(this, body)
         export = button(files, R.string.backup_export, R.id.backup_export) { transfer.prepareExport() }
         importButton = button(files, R.string.backup_import, R.id.backup_import) { picker(false) }
@@ -158,7 +159,11 @@ class BackupActivity : Activity() {
         val saved = runCatching { SettingsBackupStore.imported(this) }.getOrNull()?.profiles.orEmpty()
         if (saved.isEmpty()) SettingsUi.label(this, profiles, getString(R.string.backup_profiles_empty))
         for (profile in saved) {
-            val kind = getString(if (profile.volume) R.string.volume_widget_name else R.string.widget_name)
+            val kind = getString(when (profile.kind) {
+                WidgetKind.MEDIA -> R.string.widget_name
+                WidgetKind.VOLUME -> R.string.volume_widget_name
+                WidgetKind.PLAYBACK_VOLUME -> R.string.playback_volume_widget_name
+            })
             val caption = "${profile.name}\n$kind · ${getString(profile.location.label)}"
             SettingsUi.button(this, caption) { chooseProfile(profile) }.also {
                 it.isEnabled = !transfer.busy; profiles.addView(it, LinearLayout.LayoutParams(-1, -2))
@@ -179,7 +184,7 @@ class BackupActivity : Activity() {
             }.setNegativeButton(android.R.string.cancel, null).show()
     }
     private fun chooseWidget(profile: BackupProfile) {
-        val ids = WidgetRegistry.ids(this).filter { WidgetRegistry.isVolume(this, it) == profile.volume }
+        val ids = WidgetRegistry.ids(this).filter { WidgetRegistry.kind(this, it) == profile.kind }
         if (ids.isEmpty()) {
             AlertDialog.Builder(this).setMessage(R.string.backup_add_widget).setPositiveButton(android.R.string.ok, null).show()
             return

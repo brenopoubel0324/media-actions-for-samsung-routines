@@ -263,4 +263,15 @@ A opção externa Editar e os limites de tamanho dependem do LockStar e do firmw
     <string name="widget_wallpaper_refresh">Atualizar cores</string>
     <string name="widget_wallpaper_copy">Copiar diagnóstico</string>
     <string name="widget_wallpaper_copy_failed">Não foi possível copiar o diagnóstico. Tente novamente.</string>
+    <string name="playback_volume_widget_name">Reprodução e volume</string>
+    <string name="playback_volume_widget_description">Play/Pause e volume de mídia local, com três controles que se adaptam ao espaço horizontal ou vertical.</string>
+    <string name="playback_volume_resize">Redimensione o widget</string>
+    <string name="playback_volume_size_help">Os três controles precisam de pelo menos 144 × 48 dp na horizontal ou 48 × 144 dp na vertical. Sem espaço utilizável informado pelo host, o widget pede redimensionamento e não expõe ações.</string>
+    <string name="playback_volume_preview_help">Exemplo de aparência. Play/Pause controla a mídia; −/+ alteram o volume de mídia deste aparelho. Os botões desta prévia não enviam comandos.</string>
+    <string name="playback_volume_sample_help">O host ainda não informou as dimensões deste widget. Este é um exemplo horizontal; o widget instalado aguarda dimensões utilizáveis antes de expor os controles.</string>
+    <string name="playback_volume_effective_frame">Altura efetiva da moldura vertical: %1$d dp. Ela precisa envolver os três controles.</string>
+    <string name="backup_version_notice">Novos backups exigem uma versão do app compatível com o formato v5. Backups antigos continuam importáveis.</string>
+    <string name="playback_volume_access_help">Volume funciona sem acesso às notificações. Play/Pause precisa de acesso às sessões de mídia; os botões laterais alteram apenas o volume de mídia deste aparelho.</string>
+    <string name="playback_volume_missing_access">Abra o app e conceda acesso às notificações para controlar a reprodução. O volume continua funcionando.</string>
+    <string name="playback_volume_widget_install">Para reunir os controles, adicione Reprodução e volume pela lista de widgets do launcher ou do LockStar.</string>
 </resources>

@@ -81,8 +81,8 @@ class CompactWidgetFrameTest {
         assertEquals(WidgetFrameMode.FILL,WidgetAppearanceState.read(Bundle())!!.frameMode)
     }
     @Test fun backupV2PreservesFrameAndV1StillImportsWithLegacyGeometry() {
-        val value=SettingsBackup(compact,15,listOf(BackupProfile("Compacta",false,compact,false,WidgetLocation.LOCK_SCREEN)))
-        val text=SettingsBackupCodec.encode(value);assertEquals(4,JSONObject(text).getInt("version"));assertEquals(value,SettingsBackupCodec.decode(text))
+        val value=SettingsBackup(compact,15,listOf(BackupProfile("Compacta",WidgetKind.MEDIA,compact,false,WidgetLocation.LOCK_SCREEN)))
+        val text=SettingsBackupCodec.encode(value);assertEquals(5,JSONObject(text).getInt("version"));assertEquals(value,SettingsBackupCodec.decode(text))
         val old=JSONObject(text).put("version",1)
         old.getJSONObject("defaults").remove("frame_mode");old.getJSONObject("defaults").remove("frame_height")
         old.getJSONArray("profiles").getJSONObject(0).getJSONObject("appearance").apply{remove("frame_mode");remove("frame_height")}

@@ -66,7 +66,7 @@ internal class WallpaperColorCoordinator(
     private val enqueue: (() -> Unit) -> Unit,
     private val render: (List<Pair<Target, WidgetAppearance>>) -> Set<Int>,
 ) {
-    data class Target(val id: Int, val volume: Boolean, val style: WidgetAppearance, val destination: WallpaperDestination?)
+    data class Target(val id: Int, val kind: WidgetKind, val style: WidgetAppearance, val destination: WallpaperDestination?)
     private data class Preview(val style: WidgetAppearance, val destination: WallpaperDestination?, val changed: () -> Unit)
     private val targets = linkedMapOf<Int, Target>()
     private val previews = linkedMapOf<Any, Preview>()

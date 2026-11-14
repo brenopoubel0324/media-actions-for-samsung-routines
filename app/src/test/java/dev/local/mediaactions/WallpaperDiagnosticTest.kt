@@ -96,7 +96,7 @@ class WallpaperDiagnosticTest {
         val reads=mutableListOf<Pair<WallpaperDestination,(WallpaperColorReading)->Unit>>()
         val queue=ArrayDeque<()->Unit>()
         val coordinator=WallpaperColorCoordinator({true},{},{source,done->reads+=source to done},{queue+=it},{emptySet()})
-        coordinator.reconcile(listOf(WallpaperColorCoordinator.Target(1,false,automatic,WallpaperDestination.HOME)))
+        coordinator.reconcile(listOf(WallpaperColorCoordinator.Target(1,WidgetKind.MEDIA,automatic,WallpaperDestination.HOME)))
         coordinator.preview(Any(),automatic,WallpaperDestination.LOCK){}
         reads.last().second(WallpaperColorReading(null))
         val before=reads.size

@@ -1,6 +1,6 @@
 # Identidade do app — nome, símbolo e posicionamento
 
-**Data:** 14/11/2026. **Base:** `0970d86e32caf60e0086fd86059a8988ae116d6d`, celular 0.34 e Wear 0.9 experimental. **Estado:** plano de descoberta, criação e aplicação futura; marca e nome ainda não escolhidos. Nenhum recurso do aplicativo foi alterado.
+**Data:** 14/11/2026. **Base:** `0970d86e32caf60e0086fd86059a8988ae116d6d`, celular 0.34 e Wear 0.9 experimental. **Estado:** descoberta e três propostas visuais executadas em 14/11/2026; [triagem e prancha](../identidade/naming.md) apresentadas ao usuário. A escolha de nome/símbolo e sua aplicação aos recursos do app permanecem pendentes; a identidade atual foi preservada.
 
 ## 1. Problema e objetivo
 

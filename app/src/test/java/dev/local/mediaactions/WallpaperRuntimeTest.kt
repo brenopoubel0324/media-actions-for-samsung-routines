@@ -135,8 +135,8 @@ class WallpaperRuntimeTest {
         val style=auto.copy(autoBorderColors=true,darkIcons=true,wallpaperTarget=WidgetWallpaperTarget.LOCK)
         WidgetStyleStore.save(app,style);assertEquals(style,WidgetStyleStore.load(app))
         assertEquals(style,WidgetAppearanceState.read(WidgetAppearanceState.write(style)))
-        val value=SettingsBackup(style,15,listOf(BackupProfile("Lock",false,style,false,WidgetLocation.LOCK_SCREEN)))
-        val text=SettingsBackupCodec.encode(value);assertEquals(value,SettingsBackupCodec.decode(text));assertEquals(4,JSONObject(text).getInt("version"))
+        val value=SettingsBackup(style,15,listOf(BackupProfile("Lock",WidgetKind.MEDIA,style,false,WidgetLocation.LOCK_SCREEN)))
+        val text=SettingsBackupCodec.encode(value);assertEquals(value,SettingsBackupCodec.decode(text));assertEquals(5,JSONObject(text).getInt("version"))
         for(version in 1..2) {
             val old=JSONObject(text).put("version",version)
             for(obj in listOf(old.getJSONObject("defaults"),old.getJSONArray("profiles").getJSONObject(0).getJSONObject("appearance"))) {

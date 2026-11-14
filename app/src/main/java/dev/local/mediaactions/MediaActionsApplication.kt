@@ -42,9 +42,10 @@ internal class WidgetWallpaperRuntime(private val app: Context) {
             reconcilePending = false
             try {
                 val manager = AppWidgetManager.getInstance(app)
-                coordinator.reconcile(WidgetRegistry.ids(app).map { id ->
+                coordinator.reconcile(WidgetRegistry.ids(app).mapNotNull { id ->
+                    val kind = WidgetRegistry.kind(app, id) ?: return@mapNotNull null
                     val style = WidgetStyleStore.load(app, id)
-                    WallpaperColorCoordinator.Target(id, WidgetRegistry.isVolume(app, id), style,
+                    WallpaperColorCoordinator.Target(id, kind, style,
                         WidgetWallpaperColors.destination(style, WidgetLocationStore.load(app, id), manager.getAppWidgetOptions(id)))
                 })
             } catch (_: RuntimeException) { /* Preserve the last registry; retry on the next host/configuration event. */ }
@@ -102,17 +103,19 @@ internal class WidgetWallpaperRuntime(private val app: Context) {
         val manager = AppWidgetManager.getInstance(app)
         val mediaObserver = observer?.get()
         // One permission/state check per batch, independent of the number of media widgets.
-        val snapshot = if (changes.any { !it.first.volume }) mediaObserver?.wallpaperSnapshot() else null
+        val snapshot = if (changes.any { (target, _) ->
+                WidgetRenderer.hasUsablePlaybackSize(manager.getAppWidgetOptions(target.id), target.kind)
+            }) mediaObserver?.wallpaperSnapshot() else null
         val successful = mutableSetOf<Int>()
         for ((target, resolved) in changes) try {
             // A queued callback must never overwrite a saved manual choice or a removed instance.
-            val owns = if (target.volume) VolumeWidgetProvider.isOwnWidget(app, target.id) else MediaWidgetProvider.isOwnWidget(app, target.id)
+            val owns = WidgetRegistry.kind(app, target.id) == target.kind
             if (!owns || WidgetStyleStore.load(app, target.id) != target.style) continue
-            if (target.volume) manager.updateAppWidget(target.id,
+            if (target.kind == WidgetKind.VOLUME) manager.updateAppWidget(target.id,
                 VolumeWidgetProvider.render(app, target.id, manager.getAppWidgetOptions(target.id), resolved))
             else if (snapshot == null || mediaObserver?.refreshWallpaper(target.id, snapshot) != true)
                 manager.updateAppWidget(target.id, WidgetRenderer.render(app, target.id,
-                    manager.getAppWidgetOptions(target.id), WidgetUpdateSnapshot(WidgetPlaybackState.UNKNOWN, null), resolved))
+                    manager.getAppWidgetOptions(target.id), snapshot ?: WidgetUpdateSnapshot(WidgetPlaybackState.UNKNOWN, null), resolved, kind = target.kind))
             successful += target.id
         } catch (_: RuntimeException) { /* Retry this instance on the next event, without a timer. */ }
         return successful

@@ -7,7 +7,7 @@ import org.json.JSONTokener
 import java.io.InputStream
 
 /** Portable appearance profiles, deliberately independent of host widget IDs and app signing keys. */
-internal data class BackupProfile(val name: String, val volume: Boolean, val appearance: WidgetAppearance,
+internal data class BackupProfile(val name: String, val kind: WidgetKind, val appearance: WidgetAppearance,
     val followDefaults: Boolean, val location: WidgetLocation)
 internal data class SettingsBackup(val defaults: WidgetAppearance, val intervalSeconds: Int,
     val profiles: List<BackupProfile>)
@@ -28,7 +28,7 @@ internal object SettingsBackupCodec {
         val root = tokener.nextValue() as? JSONObject ?: error("Expected object")
         require(tokener.nextClean() == '\u0000')
         require(root.get("format") == FORMAT)
-        val version = number(root, "version").also { require(it in 1..4) }
+        val version = number(root, "version").also { require(it in 1..5) }
         val defaults = style(root.getJSONObject("defaults"), version)
         val interval = number(root, "interval_seconds").also { require(it in WidgetProgressSettings.intervals) }
         val profiles = root.getJSONArray("profiles")
@@ -37,11 +37,18 @@ internal object SettingsBackupCodec {
             val value = profiles.getJSONObject(i)
             val name = value.get("name") as? String ?: error("Expected name")
             require(name.isNotBlank() && name.length <= 100 && name.none { it.isISOControl() })
-            val kind = value.get("kind") as? String
-            require(kind == "media" || kind == "volume")
+            val kind = when (value.get("kind")) {
+                "media" -> WidgetKind.MEDIA
+                "volume" -> WidgetKind.VOLUME
+                "playback_volume" -> {
+                    require(version >= 5) { "Widget kind requires backup v5" }
+                    WidgetKind.PLAYBACK_VOLUME
+                }
+                else -> error("Unknown widget kind")
+            }
             val location = WidgetLocation.entries.firstOrNull { it.name == value.get("location") }
                 ?: error("Unknown location")
-            BackupProfile(name, kind == "volume", style(value.getJSONObject("appearance"), version),
+            BackupProfile(name, kind, style(value.getJSONObject("appearance"), version),
                 boolean(value, "follow_defaults"), location)
         })
     }
@@ -49,10 +56,14 @@ internal object SettingsBackupCodec {
         require(backup.profiles.size <= MAX_PROFILES)
         val profiles = JSONArray()
         backup.profiles.forEach { profile -> profiles.put(JSONObject().put("name", profile.name)
-            .put("kind", if (profile.volume) "volume" else "media")
+            .put("kind", when (profile.kind) {
+                WidgetKind.MEDIA -> "media"
+                WidgetKind.VOLUME -> "volume"
+                WidgetKind.PLAYBACK_VOLUME -> "playback_volume"
+            })
             .put("appearance", style(profile.appearance)).put("follow_defaults", profile.followDefaults)
             .put("location", profile.location.name)) }
-        return JSONObject().put("format", FORMAT).put("version", 4).put("defaults", style(backup.defaults))
+        return JSONObject().put("format", FORMAT).put("version", 5).put("defaults", style(backup.defaults))
             .put("interval_seconds", backup.intervalSeconds).put("profiles", profiles).toString(2).also {
                 // Validate our own output with exactly the same contract as the importer.
                 decode(it)
@@ -119,12 +130,13 @@ internal object SettingsBackupStore {
     fun imported(context: Context): SettingsBackup? = context.getSharedPreferences(STORE, 0).getString(LIBRARY, null)
         ?.let(SettingsBackupCodec::decode)
     fun capture(context: Context): SettingsBackup {
-        val installed = WidgetRegistry.ids(context).mapIndexed { index, id ->
-            BackupProfile("${WidgetRegistry.label(context, id)} ${index + 1}", WidgetRegistry.isVolume(context, id),
+        val installed = WidgetRegistry.ids(context).mapIndexedNotNull { index, id ->
+            val kind = WidgetRegistry.kind(context, id) ?: return@mapIndexedNotNull null
+            BackupProfile("${WidgetRegistry.label(context, id)} ${index + 1}", kind,
                 WidgetStyleStore.load(context, id), !WidgetStyleStore.hasOverride(context, id), WidgetLocationStore.load(context, id))
         }
         val saved = imported(context)?.profiles.orEmpty()
-        val combined = (installed + saved).distinctBy { listOf(it.volume, it.appearance, it.followDefaults, it.location) }
+        val combined = (installed + saved).distinctBy { listOf(it.kind, it.appearance, it.followDefaults, it.location) }
         require(combined.size <= SettingsBackupCodec.MAX_PROFILES)
         return SettingsBackup(WidgetStyleStore.load(context), WidgetProgressSettings.load(context), combined)
     }
@@ -139,7 +151,7 @@ internal object SettingsBackupStore {
         return refresh(context)
     }
     fun applyProfile(context: Context, profile: BackupProfile, id: Int, followDefaults: Boolean): Result {
-        require(WidgetRegistry.isOwnWidget(context, id) && WidgetRegistry.isVolume(context, id) == profile.volume)
+        require(WidgetRegistry.kind(context, id) == profile.kind)
         if (!WidgetStyleStore.saveDurably(context, if (followDefaults) null else profile.appearance, id) ||
             !WidgetLocationStore.saveDurably(context, id, profile.location)) return Result.PARTIAL
         return try {

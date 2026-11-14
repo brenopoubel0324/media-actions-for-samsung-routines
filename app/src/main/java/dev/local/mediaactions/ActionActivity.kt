@@ -21,7 +21,7 @@ class ActionActivity : Activity() {
             val app = applicationContext
             PhoneMediaActions(app).execute(action) { result ->
                 Log.i(LOG_TAG, "${action.name}: ${result.javaClass.simpleName}")
-                MediaWidgetProvider.refreshAll(app)
+                WidgetRegistry.refreshPlayback(app)
             }
         } finally {
             // Theme.NoDisplay requires finishing before onResume. No UI, unlock or wake flags.

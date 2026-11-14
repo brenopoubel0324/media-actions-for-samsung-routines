@@ -19,7 +19,7 @@ class PhoneWearService : WearableListenerService() {
                 LinkProtocol.COMMAND -> {
                     val result = endpoint.execute(nodeId, LinkProtocol.request(request))
                     if (result == LinkResult.SENT) {
-                        try { MediaWidgetProvider.refreshAll(this) } catch (_: RuntimeException) { /* Host failure must not resend a command. */ }
+                        try { WidgetRegistry.refreshPlayback(this) } catch (_: RuntimeException) { /* Host failure must not resend a command. */ }
                     }
                     LinkProtocol.encode(result)
                 }

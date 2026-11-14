@@ -6,11 +6,9 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.widget.RemoteViews
-import android.widget.Toast
 
 /** One local music-stream step per click. No media session, timer, Activity or global key event. */
 class VolumeWidgetProvider: AppWidgetProvider() {
@@ -29,12 +27,8 @@ class VolumeWidgetProvider: AppWidgetProvider() {
         if(intent.action!=ACTION){super.onReceive(context,intent);return}
         val id=intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,0)
         if(!isOwnWidget(context,id))return
-        val direction=when(intent.data){uri(id,false)->AudioManager.ADJUST_LOWER;uri(id,true)->AudioManager.ADJUST_RAISE;else->return}
-        try {
-            val audio=context.getSystemService(AudioManager::class.java)
-            if(audio.isVolumeFixed) {Toast.makeText(context,R.string.volume_fixed,Toast.LENGTH_SHORT).show();return}
-            audio.adjustStreamVolume(AudioManager.STREAM_MUSIC,direction,0)
-        } catch(_:RuntimeException) {Toast.makeText(context,R.string.volume_failed,Toast.LENGTH_SHORT).show()}
+        val raise = when(intent.data) { uri(id,false) -> false; uri(id,true) -> true; else -> return }
+        VolumeActions.step(context, raise)
     }
     override fun onDeleted(context:Context,appWidgetIds:IntArray) {
         WidgetWallpaperRuntime.get(context)?.settingsChanged()

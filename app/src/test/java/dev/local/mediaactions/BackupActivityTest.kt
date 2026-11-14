@@ -1,6 +1,9 @@
 package dev.local.mediaactions
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
@@ -8,6 +11,8 @@ import android.os.Bundle
 import android.os.Looper
 import android.view.View
 import android.widget.CheckBox
+import android.widget.Button
+import android.widget.LinearLayout
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,6 +21,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowAlertDialog
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -34,7 +40,7 @@ class BackupActivityTest {
         idle();assertFalse("Timed out waiting for explicit file transfer",transfer.busy)
     }
     private fun example()=SettingsBackup(WidgetAppearance(iconScalePercent=55,widgetPaddingVerticalDp=-12,progressRing=true),15,
-        listOf(BackupProfile("Bloqueio",false,WidgetAppearance(iconStyle=WidgetIconStyle.CIRCULAR),false,WidgetLocation.LOCK_SCREEN)))
+        listOf(BackupProfile("Bloqueio",WidgetKind.MEDIA,WidgetAppearance(iconStyle=WidgetIconStyle.CIRCULAR),false,WidgetLocation.LOCK_SCREEN)))
     private fun text()=SettingsBackupCodec.encode(example())
     private fun uri()=Uri.parse("content://backup-test/settings.json")
     @Test fun privateScreenIsReachableFromHomeAndUsesFrameworkDocumentPicker() {
@@ -157,6 +163,40 @@ class BackupActivityTest {
             resolver.registerInputStreamSupplier(uri()){ByteArrayInputStream(SettingsBackupCodec.encode(example().copy(intervalSeconds=30)).toByteArray())}
             transfer.write(uri());settle(transfer)
             assertEquals(R.string.backup_export_failed,transfer.status)
+        }
+    }
+    @Test fun combinedProfileIsLabeledAndOnlyOffersAnInstalledWidgetOfTheSameKind() {
+        val manager=AppWidgetManager.getInstance(app)
+        val ids=WidgetKind.entries.associateWith {kind ->
+            val type=when(kind) {
+                WidgetKind.MEDIA -> MediaWidgetProvider::class.java
+                WidgetKind.VOLUME -> VolumeWidgetProvider::class.java
+                WidgetKind.PLAYBACK_VOLUME -> PlaybackVolumeWidgetProvider::class.java
+            }
+            val id=shadowOf(manager).createWidget(type,if(kind==WidgetKind.VOLUME)R.layout.widget_volume_controls else R.layout.widget_media_controls)
+            shadowOf(manager).addBoundWidget(id,AppWidgetProviderInfo().apply {provider=ComponentName(app,type)})
+            id
+        }
+        val profile=example().profiles.single().copy(kind=WidgetKind.PLAYBACK_VOLUME)
+        SettingsBackupStore.restore(app,example().copy(profiles=listOf(profile)),false)
+        Robolectric.buildActivity(BackupActivity::class.java).setup().use {c ->
+            val group=c.get().findViewById<LinearLayout>(R.id.backup_profiles)
+            val button=(0 until group.childCount).map {group.getChildAt(it)}.filterIsInstance<Button>().single()
+            assertTrue(button.text.contains(c.get().getString(R.string.playback_volume_widget_name)))
+            button.performClick()
+            val choices=ShadowAlertDialog.getLatestAlertDialog()
+            choices.listView.performItemClick(null,0,0)
+            val widgets=ShadowAlertDialog.getLatestAlertDialog()
+            assertEquals(1,widgets.listView.adapter.count)
+            assertEquals("${WidgetLocationStore.description(c.get(),ids.getValue(WidgetKind.PLAYBACK_VOLUME))}\n${WidgetLocationStore.instanceLabel(c.get(),ids.getValue(WidgetKind.PLAYBACK_VOLUME))}",
+                widgets.listView.adapter.getItem(0).toString())
+            widgets.listView.performItemClick(null,0,0)
+            ShadowAlertDialog.getLatestAlertDialog().getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            idle() // AlertDialog delivers its positive-button callback through the main Handler.
+            settle(model(c.get()))
+            assertEquals(profile.appearance,WidgetStyleStore.load(app,ids.getValue(WidgetKind.PLAYBACK_VOLUME)))
+            assertFalse(WidgetStyleStore.hasOverride(app,ids.getValue(WidgetKind.MEDIA)))
+            assertFalse(WidgetStyleStore.hasOverride(app,ids.getValue(WidgetKind.VOLUME)))
         }
     }
 }

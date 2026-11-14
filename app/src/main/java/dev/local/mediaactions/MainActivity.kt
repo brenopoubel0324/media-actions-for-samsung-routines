@@ -56,6 +56,7 @@ class MainActivity : Activity() {
         label(widget, R.string.settings_widget, 18f, true)
         label(widget, R.string.settings_widget_help, 13f)
         label(widget, R.string.volume_widget_install, 13f)
+        label(widget, R.string.playback_volume_widget_install, 13f)
         button(widget, R.string.widget_edit_existing, true, ::editExistingWidget).id = R.id.widget_edit_existing
         button(widget, R.string.settings_defaults) { startActivity(Intent(this, WidgetDefaultsActivity::class.java)) }.id = R.id.widget_defaults
         button(widget, R.string.progress_settings_title) { startActivity(Intent(this, ProgressSettingsActivity::class.java)) }.id = R.id.progress_settings
@@ -139,7 +140,7 @@ class MainActivity : Activity() {
         val invocation = ++latestInvocation
         result.setText(R.string.action_pending)
         dispatcher.execute(action) { outcome ->
-            MediaWidgetProvider.refreshAll(applicationContext)
+            WidgetRegistry.refreshPlayback(applicationContext)
             if (isDestroyed) return@execute
             Log.i(ActionActivity.LOG_TAG, "${action.name}: ${outcome.javaClass.simpleName}")
             refreshStatus()

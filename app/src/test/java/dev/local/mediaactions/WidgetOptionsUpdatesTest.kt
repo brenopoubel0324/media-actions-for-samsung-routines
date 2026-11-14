@@ -149,6 +149,14 @@ class WidgetOptionsUpdatesTest {
         assertFalse(WidgetOptionsUpdates.deliver(app,id,true,options(64f,240f)){count++})
         assertEquals(2,count)
     }
+    @Test fun aProviderKindChangeCannotReuseAnotherKindsOptionsDelivery() {
+        val (id, _) = widget(false)
+        var delivered = 0
+        assertTrue(WidgetOptionsUpdates.deliver(app, id, WidgetKind.MEDIA, options()) { delivered++ })
+        assertTrue(WidgetOptionsUpdates.deliver(app, id, WidgetKind.PLAYBACK_VOLUME, options()) { delivered++ })
+        assertFalse(WidgetOptionsUpdates.deliver(app, id, WidgetKind.PLAYBACK_VOLUME, options()) { delivered++ })
+        assertEquals(2, delivered)
+    }
     @Test fun pendingDeliverySuppressesReentryAndForgottenCacheForcesFirstUpdate() {
         val(id,_)=widget(true);var count=0
         assertTrue(WidgetOptionsUpdates.deliver(app,id,true,options()) {

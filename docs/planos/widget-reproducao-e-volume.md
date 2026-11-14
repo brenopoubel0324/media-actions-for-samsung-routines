@@ -1,6 +1,6 @@
 # Widget de reprodução e volume — plano de execução
 
-**Atualização:** 13/11/2026. **Base inspecionada:** `962bfa8f8e60c99c28ad0c091bf610d45d6a7fe4`, app 0.34. **Estado:** planejamento; nenhuma implementação ou compatibilidade física confirmada. Este documento substitui a proposta implícita da conversa e incorpora os cinco achados da revisão.
+**Atualização:** 13/11/2026. **Base inspecionada:** `962bfa8f8e60c99c28ad0c091bf610d45d6a7fe4`, app 0.34. **Estado:** implementado na fonte candidata 0.35 em 14/11/2026; validação automatizada em andamento e compatibilidade física pendente. Ver [execução e revisões](../reviews/combined-widget-and-identity-0.35.md). Este documento substitui a proposta implícita da conversa e incorpora os cinco achados da revisão.
 
 ## 1. Objetivo e escopo fechado
 

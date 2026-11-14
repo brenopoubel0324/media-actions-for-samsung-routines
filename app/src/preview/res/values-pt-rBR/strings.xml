@@ -3,4 +3,5 @@
     <string name="widget_name">Controles de mídia (Preview)</string>
     <string name="listener_name">Media Actions Preview — acesso às sessões de mídia</string>
     <string name="volume_widget_name">Volume de mídia (Preview)</string>
+    <string name="playback_volume_widget_name">Reprodução e volume (Preview)</string>
 </resources>
