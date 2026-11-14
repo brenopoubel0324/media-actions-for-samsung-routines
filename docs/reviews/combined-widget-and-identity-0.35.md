@@ -1,6 +1,6 @@
 # Execução dos planos — candidato 0.35
 
-**Data:** 14/11/2026. **Base:** `b610b9a5b7ee4755b6d7493d00e22902a8cb85c0`. **Estado:** implementação candidata; validação completa ainda em andamento, nenhum novo APK oficial publicado.
+**Data:** 14/11/2026. **Base:** `b610b9a5b7ee4755b6d7493d00e22902a8cb85c0`. **Estado:** implementação candidata; validação completa local aprovada; APK oficial 0.35 preparado com identidade atual, publicação registrada separadamente.
 
 ## Escopo executado
 
@@ -31,8 +31,14 @@ Falhas iniciais em fixtures foram corrigidas sem enfraquecer o contrato: constru
 
 ## Validação e pendências
 
-Testes focados exercitam provider/URI/ID, comandos, recusa de autorização, volume sem grant e com sessão autorizada, snapshot compartilhado, deduplicação, progresso, tela apagada, destruição/reconexão, falha de host, edição, geometria, wallpaper e backup legado/v5 em APIs 33/36. Resultado final da cadeia completa e artefatos serão registrados após a execução, sem tratar os primeiros runs com falhas como passe.
+Testes focados exercitam provider/URI/ID, comandos, recusa de autorização, volume sem grant e com sessão autorizada, snapshot compartilhado, deduplicação, progresso, tela apagada, destruição/reconexão, falha de host, edição, geometria, wallpaper e backup legado/v5 em APIs 33/36. Cadeia completa na fonte `37319ad0d4a3f23649a55456bb4d8cfe47e9b1af`: app Release 713 + app Debug 713 + Preview 4 + shared Debug 22 + Wear Debug 15 = **1467 execuções**, zero falhas/erros/pulos. Lints previstos passaram. BUILD SUCCESSFUL em 6min8s; [evidência e APK](../../downloads/v0.35/VALIDATION.json). Os primeiros runs com falhas não foram tratados como passe.
 
 O recorte CI passou nos 23 testes de orquestração e preserva a classificação FULL. Dois runs documentais remotos recentes tiveram sucesso; isso atualiza o histórico de bloqueio de faturamento, mas não comprova um completo Android remoto.
 
 `adb devices -l` não encontrou dispositivo conectado nesta sessão. Comparação antes/depois no mesmo S25/Tab S10+, recuperação física, host LockStar e bindings Watch 8 não foram medidos aqui. Contadores de trabalho automatizados não são uma medição de bateria. Assinatura, hashes e publicação dependem do artefato exato validado e da chave histórica; não se publica identidade ainda não escolhida.
+
+## Fechamento da revisão
+
+Self-audit em duas rodadas de leitura/correção, com três médios resolvidos; revisão independente adicional confirmou as correções. **APROVADO no escopo implementado**, sem achados altos/bloqueantes/médios remanescentes. Permissões e orquestração aprovadas nos recortes registrados. A marca definitiva e os testes físicos continuam pendentes por dependerem, respectivamente, da escolha do usuário e de aparelho acessível.
+
+O APK oficial tem payload idêntico ao Release compilado na fonte acima, mesma assinatura histórica e pacote original. Inspeções de candidatos e assinatura/zipalign passaram. A versão Wear distribuída não mudou.

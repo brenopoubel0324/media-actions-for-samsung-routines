@@ -1,0 +1,69 @@
+{
+  "source_commit": "37319ad0d4a3f23649a55456bb4d8cfe47e9b1af",
+  "source_trees": {
+    "app": "743897b859d621119395c691bae75a4bf02b0257",
+    "shared": "f52ad335c484261692caded0ea518d110e3db834",
+    "wear": "9611b134cf106d635948e0a7a3bae7b60b9e2d76",
+    "gradle": "6213cd0eec895048ea9a24ec01cf84a688877865",
+    "scripts/ci": "5fe191273ea9dc62db42ef77b56f0cd120f65e58"
+  },
+  "validation": "local full passed",
+  "command": "bash ./gradlew :app:assembleDebug :app:assemblePreview :wear:assembleDebug :app:assembleRelease :app:testReleaseUnitTest testDebugUnitTest :app:lintRelease lintDebug :app:testPreviewUnitTest --tests '*VariantIsolationTest*' --console=plain --no-daemon",
+  "exit_code": 0,
+  "test_results": {
+    "app:testReleaseUnitTest": {
+      "tests": 713,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app:testDebugUnitTest": {
+      "tests": 713,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app:testPreviewUnitTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:testDebugUnitTest": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wear:testDebugUnitTest": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_test_executions": 1467,
+  "lint": [
+    "app:lintDebug",
+    "app:lintRelease",
+    "shared:lintDebug",
+    "wear:lintDebug"
+  ],
+  "apk": "media-actions-phone-0.35.apk",
+  "apk_sha256": "99ddef1956bf4bc01e1d17922ece74cc1bc44f572a017fe7dde03c81d1d3c132",
+  "unsigned_apk_sha256": "8797c531fc56a31374370179725a67a1baf45a1aea7baddf9fba9cac35c7288b",
+  "signed_payload_matches_compiled": true,
+  "package": "dev.local.mediaactions",
+  "version_code": 35,
+  "version_name": "0.35",
+  "debuggable": false,
+  "certificate_sha256": "21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a",
+  "permissions": [
+    "android.permission.MODIFY_AUDIO_SETTINGS"
+  ],
+  "physical_tested": false,
+  "battery_measured": false,
+  "identity_selection": "pending; current name and icon preserved",
+  "wear_distribution": "unchanged 0.9 experimental",
+  "full_log_sha256": "1663a38d6ea0cd7f159255b5a450cd499701295c4801fe737453a8818b5f92c0"
+}
