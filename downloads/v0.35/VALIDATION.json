@@ -1,9 +1,9 @@
 {
-  "source_commit": "37319ad0d4a3f23649a55456bb4d8cfe47e9b1af",
+  "source_commit": "a335765582802859f9a15b79e4dc0e49927334cb",
   "source_trees": {
-    "app": "743897b859d621119395c691bae75a4bf02b0257",
-    "shared": "f52ad335c484261692caded0ea518d110e3db834",
-    "wear": "9611b134cf106d635948e0a7a3bae7b60b9e2d76",
+    "app": "1e09733a7d95f899f2f36d279c50abad0e8af809",
+    "shared": "0aa9ad9fc969643609cbd06f73f62cef09b9ac29",
+    "wear": "236365a89c11b0ddd9fd04fdd063c3e723d1b322",
     "gradle": "6213cd0eec895048ea9a24ec01cf84a688877865",
     "scripts/ci": "5fe191273ea9dc62db42ef77b56f0cd120f65e58"
   },
@@ -65,7 +65,14 @@
   "battery_measured": false,
   "identity_selection": "pending; current name and icon preserved",
   "wear_distribution": "unchanged 0.9 experimental",
-  "full_log_sha256": "9649ce5e4d4eb912e757036e17fbb98e2f1ae17cc5bc8f820fc4c723834c05c8",
-  "full_log_original_sha256": "1663a38d6ea0cd7f159255b5a450cd499701295c4801fe737453a8818b5f92c0",
-  "log_normalization": "Trailing whitespace removed from public log; raw hash recorded separately."
+  "full_log_sha256": "0c82f507d908346ec3d69b5d46b69e4f36b3ac5790686561df69f3a7097d3f33",
+  "full_log_original_sha256": "cd68eda477946e3a60fd73eb406fc4977af00ab0e9bb787abd9045047efcc7a7",
+  "log_normalization": "Trailing whitespace removed from public log; raw hash recorded separately.",
+  "previous_source_commit": "37319ad0d4a3f23649a55456bb4d8cfe47e9b1af",
+  "remote_first_run": {
+    "id": 43602148538,
+    "conclusion": "failure",
+    "cause": "NewerVersionAvailable Maven advisory for test-only Robolectric 4.17 -> 4.18; deterministic lint policy fixed, no dependency upgrade."
+  },
+  "validation_note": "Canonical complete rerun passed after lint policy fix; up-to-date results reused by Gradle for unchanged inputs. Runtime APK payload unchanged."
 }

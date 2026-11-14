@@ -31,7 +31,7 @@ Falhas iniciais em fixtures foram corrigidas sem enfraquecer o contrato: constru
 
 ## Validação e pendências
 
-Testes focados exercitam provider/URI/ID, comandos, recusa de autorização, volume sem grant e com sessão autorizada, snapshot compartilhado, deduplicação, progresso, tela apagada, destruição/reconexão, falha de host, edição, geometria, wallpaper e backup legado/v5 em APIs 33/36. Cadeia completa na fonte `37319ad0d4a3f23649a55456bb4d8cfe47e9b1af`: app Release 713 + app Debug 713 + Preview 4 + shared Debug 22 + Wear Debug 15 = **1467 execuções**, zero falhas/erros/pulos. Lints previstos passaram. BUILD SUCCESSFUL em 6min8s; [evidência e APK](../../downloads/v0.35/VALIDATION.json). Os primeiros runs com falhas não foram tratados como passe.
+Testes focados exercitam provider/URI/ID, comandos, recusa de autorização, volume sem grant e com sessão autorizada, snapshot compartilhado, deduplicação, progresso, tela apagada, destruição/reconexão, falha de host, edição, geometria, wallpaper e backup legado/v5 em APIs 33/36. Cadeia completa na fonte `a335765582802859f9a15b79e4dc0e49927334cb`: app Release 713 + app Debug 713 + Preview 4 + shared Debug 22 + Wear Debug 15 = **1467 execuções**, zero falhas/erros/pulos. Lints previstos passaram. Primeiro completo local em 6min8s; repetição após correção do aviso Maven em 1min46s, com reuso de resultados UP-TO-DATE para entradas inalteradas; [evidência e APK](../../downloads/v0.35/VALIDATION.json). Os primeiros runs com falhas não foram tratados como passe.
 
 O recorte CI passou nos 23 testes de orquestração e preserva a classificação FULL. Dois runs documentais remotos recentes tiveram sucesso; isso atualiza o histórico de bloqueio de faturamento, mas não comprova um completo Android remoto.
 
@@ -39,6 +39,8 @@ O recorte CI passou nos 23 testes de orquestração e preserva a classificação
 
 ## Fechamento da revisão
 
-Self-audit em duas rodadas de leitura/correção, com três médios resolvidos; revisão independente adicional confirmou as correções. **APROVADO no escopo implementado**, sem achados altos/bloqueantes/médios remanescentes. Permissões e orquestração aprovadas nos recortes registrados. A marca definitiva e os testes físicos continuam pendentes por dependerem, respectivamente, da escolha do usuário e de aparelho acessível.
+Self-audit em três rodadas de leitura/correção, com três médios resolvidos; revisão independente adicional confirmou as correções. **APROVADO no escopo implementado**, sem achados altos/bloqueantes/médios remanescentes. Permissões e orquestração aprovadas nos recortes registrados. A marca definitiva e os testes físicos continuam pendentes por dependerem, respectivamente, da escolha do usuário e de aparelho acessível.
 
 O APK oficial tem payload idêntico ao Release compilado na fonte acima, mesma assinatura histórica e pacote original. Inspeções de candidatos e assinatura/zipalign passaram. A versão Wear distribuída não mudou.
+
+O primeiro CI remoto completo [43602148538](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/actions/runs/43602148538) falhou apenas no aviso NewerVersionAvailable do Robolectric. A política agora separa essa consulta online de upgrades explícitos; preserva pins, GradleDependency, warningsAsErrors e demais verificações de segurança/API. O novo completo local passou, com nova inspeção e payload do APK inalterado. Novo resultado remoto permanece sujeito ao run da correção.

@@ -10,7 +10,7 @@ Nome e ícone atuais preservados: a nova identidade aguarda escolha entre as [tr
 
 ## Validação e integridade
 
-- Fonte compilada e testada: `37319ad0d4a3f23649a55456bb4d8cfe47e9b1af`.
+- Fonte compilada e testada: `a335765582802859f9a15b79e4dc0e49927334cb`.
 - Cadeia local completa: **1467 execuções de testes**, zero falhas/erros/pulos; Debug/Release/Preview e lints previstos aprovados. [Evidências](VALIDATION.json) e [log](validation-local.log).
 - APK Release não depurável, package `dev.local.mediaactions`, code35/name0.35, única permissão comum `MODIFY_AUDIO_SETTINGS`.
 - Certificado SHA256 histórico: `21b89aea083ff34ac9c9d300c2e068d62614f9555e52446c484695b4299a941a`.

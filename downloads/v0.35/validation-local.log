@@ -10,16 +10,17 @@ Daemon will be stopped at the end of the build
 > Task :shared:writeDebugAarMetadata UP-TO-DATE
 > Task :app:checkDebugAarMetadata UP-TO-DATE
 > Task :shared:processDebugNavigationResources UP-TO-DATE
-> Task :app:processDebugNavigationResources
+> Task :app:processDebugNavigationResources UP-TO-DATE
 > Task :app:compileDebugNavigationResources UP-TO-DATE
 > Task :app:generateDebugResValues UP-TO-DATE
 > Task :shared:generateDebugResValues UP-TO-DATE
 > Task :shared:generateDebugResources UP-TO-DATE
 > Task :shared:packageDebugResources UP-TO-DATE
-> Task :app:mapDebugSourceSetPaths
-> Task :app:generateDebugResources
-> Task :app:packageDebugResources
-> Task :app:mergeDebugResources
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
 > Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
 > Task :app:extractDeepLinksDebug UP-TO-DATE
 > Task :shared:extractDeepLinksDebug UP-TO-DATE
@@ -30,13 +31,15 @@ Daemon will be stopped at the end of the build
 > Task :shared:compileDebugLibraryResources UP-TO-DATE
 > Task :shared:parseDebugLocalResources UP-TO-DATE
 > Task :shared:generateDebugRFile UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
 > Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
-> Task :app:parseDebugLocalResources
 > Task :shared:compileDebugKotlin UP-TO-DATE
 > Task :shared:javaPreCompileDebug UP-TO-DATE
 > Task :shared:compileDebugJavaWithJavac NO-SOURCE
 > Task :shared:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
 > Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac NO-SOURCE
 > Task :app:mergeDebugShaders UP-TO-DATE
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
@@ -45,67 +48,74 @@ Daemon will be stopped at the end of the build
 > Task :shared:generateDebugAssets UP-TO-DATE
 > Task :shared:mergeDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets UP-TO-DATE
-> Task :app:compressDebugAssets
+> Task :app:compressDebugAssets UP-TO-DATE
 > Task :shared:bundleLibRuntimeToJarDebug UP-TO-DATE
-> Task :app:processDebugResources
-> Task :app:desugarDebugFileDependencies
-> Task :shared:processDebugJavaRes UP-TO-DATE
-> Task :app:checkDebugDuplicateClasses
-> Task :app:compileDebugKotlin
-> Task :app:mergeExtDexDebug
-> Task :app:compileDebugJavaWithJavac NO-SOURCE
-> Task :app:dexBuilderDebug
-> Task :app:mergeDebugGlobalSynthetics
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
 > Task :app:processDebugJavaRes UP-TO-DATE
-> Task :shared:bundleLibRuntimeToDirDebug
-> Task :app:mergeLibDexDebug
-> Task :app:mergeDebugJavaResource
-> Task :app:mergeDebugJniLibFolders
-> Task :app:mergeProjectDexDebug
+> Task :shared:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :shared:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
 > Task :shared:mergeDebugJniLibFolders UP-TO-DATE
 > Task :shared:mergeDebugNativeLibs NO-SOURCE
-> Task :shared:copyDebugJniLibsProjectOnly
-> Task :app:validateSigningDebug
+> Task :shared:copyDebugJniLibsProjectOnly UP-TO-DATE
 > Task :app:mergeDebugNativeLibs NO-SOURCE
 > Task :app:stripDebugDebugSymbols NO-SOURCE
-> Task :app:writeDebugAppMetadata
-> Task :app:writeDebugSigningConfigVersions
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:packageDebug UP-TO-DATE
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebug UP-TO-DATE
 > Task :app:prePreviewBuild UP-TO-DATE
 > Task :app:mergePreviewNativeDebugMetadata NO-SOURCE
-> Task :app:checkPreviewAarMetadata
-> Task :app:processPreviewNavigationResources
-> Task :app:compilePreviewNavigationResources
-> Task :app:generatePreviewResValues
-> Task :app:mapPreviewSourceSetPaths
-> Task :app:generatePreviewResources
-> Task :app:packageDebug
-> Task :app:createDebugApkListingFileRedirect
-> Task :app:assembleDebug
-> Task :app:mergePreviewResources
-> Task :app:packagePreviewResources
-> Task :app:createPreviewCompatibleScreenManifests
-> Task :app:extractDeepLinksPreview
-> Task :app:parsePreviewLocalResources
-> Task :app:processPreviewMainManifest
-> Task :app:processPreviewManifest
-> Task :app:processPreviewManifestForPackage
-> Task :app:javaPreCompilePreview
-> Task :app:mergePreviewShaders
+> Task :app:checkPreviewAarMetadata UP-TO-DATE
+> Task :app:processPreviewNavigationResources UP-TO-DATE
+> Task :app:compilePreviewNavigationResources UP-TO-DATE
+> Task :app:generatePreviewResValues UP-TO-DATE
+> Task :app:mapPreviewSourceSetPaths UP-TO-DATE
+> Task :app:generatePreviewResources UP-TO-DATE
+> Task :app:mergePreviewResources UP-TO-DATE
+> Task :app:packagePreviewResources UP-TO-DATE
+> Task :app:parsePreviewLocalResources UP-TO-DATE
+> Task :app:createPreviewCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksPreview UP-TO-DATE
+> Task :app:processPreviewMainManifest UP-TO-DATE
+> Task :app:processPreviewManifest UP-TO-DATE
+> Task :app:processPreviewManifestForPackage UP-TO-DATE
+> Task :app:processPreviewResources UP-TO-DATE
+> Task :app:compilePreviewKotlin UP-TO-DATE
+> Task :app:javaPreCompilePreview UP-TO-DATE
+> Task :app:compilePreviewJavaWithJavac NO-SOURCE
+> Task :app:mergePreviewShaders UP-TO-DATE
 > Task :app:compilePreviewShaders NO-SOURCE
 > Task :app:generatePreviewAssets UP-TO-DATE
-> Task :app:mergePreviewAssets
-> Task :app:compressPreviewAssets
-> Task :app:checkPreviewDuplicateClasses
-> Task :app:desugarPreviewFileDependencies
-> Task :app:processPreviewResources
-> Task :app:mergeExtDexPreview
-> Task :app:mergeLibDexPreview
-> Task :app:mergePreviewJniLibFolders
+> Task :app:mergePreviewAssets UP-TO-DATE
+> Task :app:compressPreviewAssets UP-TO-DATE
+> Task :app:checkPreviewDuplicateClasses UP-TO-DATE
+> Task :app:desugarPreviewFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexPreview UP-TO-DATE
+> Task :app:mergeLibDexPreview UP-TO-DATE
+> Task :app:dexBuilderPreview UP-TO-DATE
+> Task :app:mergePreviewGlobalSynthetics UP-TO-DATE
+> Task :app:processPreviewJavaRes UP-TO-DATE
+> Task :app:mergePreviewJavaResource UP-TO-DATE
+> Task :app:mergeProjectDexPreview UP-TO-DATE
+> Task :app:mergePreviewJniLibFolders UP-TO-DATE
 > Task :app:mergePreviewNativeLibs NO-SOURCE
 > Task :app:stripPreviewDebugSymbols NO-SOURCE
-> Task :app:validateSigningPreview
-> Task :app:writePreviewAppMetadata
-> Task :app:writePreviewSigningConfigVersions
+> Task :app:validateSigningPreview UP-TO-DATE
+> Task :app:writePreviewAppMetadata UP-TO-DATE
+> Task :app:writePreviewSigningConfigVersions UP-TO-DATE
+> Task :app:packagePreview UP-TO-DATE
+> Task :app:createPreviewApkListingFileRedirect UP-TO-DATE
+> Task :app:assemblePreview UP-TO-DATE
 > Task :wear:preBuild UP-TO-DATE
 > Task :wear:preDebugBuild UP-TO-DATE
 > Task :wear:mergeDebugNativeDebugMetadata NO-SOURCE
@@ -132,25 +142,25 @@ Daemon will be stopped at the end of the build
 > Task :wear:compileDebugShaders NO-SOURCE
 > Task :wear:generateDebugAssets UP-TO-DATE
 > Task :wear:mergeDebugAssets UP-TO-DATE
-> Task :wear:compressDebugAssets
-> Task :wear:desugarDebugFileDependencies
-> Task :wear:dexBuilderDebug
-> Task :wear:mergeDebugGlobalSynthetics
+> Task :wear:compressDebugAssets UP-TO-DATE
+> Task :wear:desugarDebugFileDependencies UP-TO-DATE
+> Task :wear:dexBuilderDebug UP-TO-DATE
+> Task :wear:mergeDebugGlobalSynthetics UP-TO-DATE
 > Task :wear:processDebugJavaRes UP-TO-DATE
-> Task :wear:mergeDebugJavaResource
-> Task :wear:checkDebugDuplicateClasses
-> Task :wear:mergeExtDexDebug
-> Task :wear:mergeLibDexDebug
-> Task :wear:mergeProjectDexDebug
-> Task :wear:mergeDebugJniLibFolders
+> Task :wear:mergeDebugJavaResource UP-TO-DATE
+> Task :wear:checkDebugDuplicateClasses UP-TO-DATE
+> Task :wear:mergeExtDexDebug UP-TO-DATE
+> Task :wear:mergeLibDexDebug UP-TO-DATE
+> Task :wear:mergeProjectDexDebug UP-TO-DATE
+> Task :wear:mergeDebugJniLibFolders UP-TO-DATE
 > Task :wear:mergeDebugNativeLibs NO-SOURCE
 > Task :wear:stripDebugDebugSymbols NO-SOURCE
-> Task :wear:validateSigningDebug
-> Task :wear:writeDebugAppMetadata
-> Task :wear:writeDebugSigningConfigVersions
-> Task :wear:packageDebug
-> Task :wear:createDebugApkListingFileRedirect
-> Task :wear:assembleDebug
+> Task :wear:validateSigningDebug UP-TO-DATE
+> Task :wear:writeDebugAppMetadata UP-TO-DATE
+> Task :wear:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :wear:packageDebug UP-TO-DATE
+> Task :wear:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :wear:assembleDebug UP-TO-DATE
 > Task :app:preReleaseBuild UP-TO-DATE
 > Task :app:mergeReleaseJniLibFolders UP-TO-DATE
 > Task :shared:preReleaseBuild UP-TO-DATE
@@ -175,49 +185,41 @@ Daemon will be stopped at the end of the build
 > Task :app:buildKotlinToolingMetadata UP-TO-DATE
 > Task :shared:writeReleaseAarMetadata UP-TO-DATE
 > Task :app:checkReleaseAarMetadata UP-TO-DATE
-> Task :app:processReleaseNavigationResources
+> Task :app:processReleaseNavigationResources UP-TO-DATE
 > Task :app:compileReleaseNavigationResources UP-TO-DATE
 > Task :app:generateReleaseResValues UP-TO-DATE
-> Task :app:mapReleaseSourceSetPaths
-> Task :app:generateReleaseResources
-> Task :app:mergeReleaseResources
-> Task :app:packageReleaseResources
-> Task :app:parseReleaseLocalResources
-> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:mapReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generateReleaseResources UP-TO-DATE
+> Task :app:mergeReleaseResources UP-TO-DATE
+> Task :app:packageReleaseResources UP-TO-DATE
+> Task :app:parseReleaseLocalResources UP-TO-DATE
+> Task :app:createReleaseCompatibleScreenManifests UP-TO-DATE
 > Task :app:extractDeepLinksRelease UP-TO-DATE
 > Task :shared:extractDeepLinksRelease UP-TO-DATE
 > Task :shared:processReleaseManifest UP-TO-DATE
-> Task :app:processReleaseMainManifest
-> Task :app:processReleaseManifest
-> Task :app:processReleaseManifestForPackage
+> Task :app:processReleaseMainManifest UP-TO-DATE
+> Task :app:processReleaseManifest UP-TO-DATE
+> Task :app:processReleaseManifestForPackage UP-TO-DATE
 > Task :shared:compileReleaseLibraryResources UP-TO-DATE
-> Task :app:processReleaseResources
+> Task :app:processReleaseResources UP-TO-DATE
 > Task :shared:bundleLibCompileToJarRelease UP-TO-DATE
-> Task :app:compilePreviewKotlin
-> Task :app:compilePreviewJavaWithJavac NO-SOURCE
-> Task :app:compileReleaseKotlin
-> Task :app:dexBuilderPreview
-> Task :app:mergePreviewGlobalSynthetics
-> Task :app:processPreviewJavaRes
-> Task :app:mergeProjectDexPreview
+> Task :app:compileReleaseKotlin UP-TO-DATE
 > Task :app:javaPreCompileRelease UP-TO-DATE
 > Task :app:compileReleaseJavaWithJavac NO-SOURCE
-> Task :app:mergePreviewJavaResource
-> Task :app:dexBuilderRelease
+> Task :app:dexBuilderRelease UP-TO-DATE
 > Task :app:desugarReleaseFileDependencies UP-TO-DATE
 > Task :app:mergeReleaseStartupProfile UP-TO-DATE
 > Task :app:mergeExtDexRelease UP-TO-DATE
-> Task :app:packagePreview
-> Task :app:createPreviewApkListingFileRedirect
-> Task :app:assemblePreview
+> Task :app:mergeDexRelease UP-TO-DATE
 > Task :shared:prepareReleaseArtProfile UP-TO-DATE
 > Task :app:mergeReleaseArtProfile UP-TO-DATE
 > Task :shared:bundleLibRuntimeToJarRelease UP-TO-DATE
-> Task :app:mergeReleaseGlobalSynthetics UP-TO-DATE
 > Task :app:mergeReleaseShaders UP-TO-DATE
 > Task :app:compileReleaseShaders NO-SOURCE
 > Task :app:generateReleaseAssets UP-TO-DATE
 > Task :shared:mergeReleaseShaders UP-TO-DATE
+> Task :app:mergeReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:compileReleaseArtProfile UP-TO-DATE
 > Task :shared:compileReleaseShaders NO-SOURCE
 > Task :shared:generateReleaseAssets UP-TO-DATE
 > Task :shared:mergeReleaseAssets UP-TO-DATE
@@ -228,7 +230,7 @@ Daemon will be stopped at the end of the build
 > Task :shared:processReleaseJavaRes UP-TO-DATE
 > Task :shared:createFullJarRelease UP-TO-DATE
 > Task :shared:extractProguardFiles UP-TO-DATE
-> Task :shared:generateReleaseLintModel UP-TO-DATE
+> Task :shared:generateReleaseLintModel
 > Task :shared:prepareLintJarForPublish UP-TO-DATE
 > Task :app:generateReleaseLintVitalReportModel
 > Task :shared:checkReleaseAarMetadata UP-TO-DATE
@@ -241,61 +243,37 @@ Daemon will be stopped at the end of the build
 > Task :shared:mergeReleaseJavaResource UP-TO-DATE
 > Task :shared:syncReleaseLibJars UP-TO-DATE
 > Task :shared:bundleReleaseLocalLintAar UP-TO-DATE
-> Task :shared:lintVitalAnalyzeRelease UP-TO-DATE
 > Task :shared:writeReleaseLintModelMetadata UP-TO-DATE
-> Task :app:mergeDexRelease
-> Task :app:compileReleaseArtProfile
-> Task :shared:generateReleaseLintVitalModel UP-TO-DATE
+> Task :shared:generateReleaseLintVitalModel
 > Task :app:processReleaseJavaRes UP-TO-DATE
 > Task :app:mergeReleaseJavaResource UP-TO-DATE
-> Task :app:optimizeReleaseResources
+> Task :app:optimizeReleaseResources UP-TO-DATE
 > Task :app:collectReleaseDependencies UP-TO-DATE
 > Task :app:sdkReleaseDependencyData UP-TO-DATE
 > Task :app:writeReleaseAppMetadata UP-TO-DATE
 > Task :app:writeReleaseSigningConfigVersions UP-TO-DATE
-> Task :app:bundleReleaseClassesToRuntimeJar
-> Task :app:bundleReleaseClassesToCompileJar
-
-> Task :app:compileReleaseUnitTestKotlin
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/AppAuditRegressionTest.kt:55:38 'fun addResolveInfoForIntent(p0: Intent!, p1: ResolveInfo!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/AppAuditRegressionTest.kt:199:23 'fun updateConfiguration(p0: Configuration!, p1: DisplayMetrics!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/BackgroundReliabilityTest.kt:46:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/BackupVisualTest.kt:23:33 'fun updateConfiguration(p0: Configuration!, p1: DisplayMetrics!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/CombinedPlaybackIntegrationTest.kt:70:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/DiagnosticsVisualTest.kt:27:33 'fun updateConfiguration(p0: Configuration!, p1: DisplayMetrics!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/EnergyActivityTest.kt:75:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/SettingsUxTest.kt:113:23 'fun updateConfiguration(p0: Configuration!, p1: DisplayMetrics!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/SpotifyBrowserResumeTest.kt:52:38 'fun addResolveInfoForIntent(p0: Intent!, p1: ResolveInfo!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WallpaperRuntimeTest.kt:56:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WallpaperRuntimeTest.kt:127:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WallpaperRuntimeTest.kt:129:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WidgetInheritanceVisualTest.kt:32:36 'fun updateConfiguration(p0: Configuration!, p1: DisplayMetrics!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WidgetProgressReviewTest.kt:41:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-
+> Task :app:bundleReleaseClassesToRuntimeJar UP-TO-DATE
+> Task :app:bundleReleaseClassesToCompileJar UP-TO-DATE
+> Task :app:compileReleaseUnitTestKotlin UP-TO-DATE
 > Task :app:preReleaseUnitTestBuild UP-TO-DATE
 > Task :app:javaPreCompileReleaseUnitTest UP-TO-DATE
 > Task :app:compileReleaseUnitTestJavaWithJavac NO-SOURCE
-> Task :app:packageReleaseUnitTestForUnitTest
-> Task :app:processReleaseUnitTestManifest
-> Task :app:generateReleaseUnitTestConfig
+> Task :app:packageReleaseUnitTestForUnitTest UP-TO-DATE
+> Task :app:processReleaseUnitTestManifest UP-TO-DATE
+> Task :app:generateReleaseUnitTestConfig UP-TO-DATE
 > Task :app:processReleaseUnitTestJavaRes UP-TO-DATE
-
-> Task :app:testReleaseUnitTest
-Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Djavax.net.ssl.trustStore=/workspace/.tooling/proxy-trust.jks
-
-> Task :app:lintVitalAnalyzeRelease
-> Task :app:lintVitalReportRelease SKIPPED
-> Task :app:lintVitalRelease SKIPPED
-> Task :app:packageRelease
-> Task :app:bundleDebugClassesToRuntimeJar
-> Task :app:createReleaseApkListingFileRedirect
-> Task :app:assembleRelease
+> Task :app:testReleaseUnitTest UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:compileDebugUnitTestKotlin UP-TO-DATE
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
 > Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
-> Task :app:bundleDebugClassesToCompileJar
-> Task :app:packageDebugUnitTestForUnitTest
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:packageDebugUnitTestForUnitTest UP-TO-DATE
 > Task :app:processDebugUnitTestManifest UP-TO-DATE
-> Task :app:generateDebugUnitTestConfig
+> Task :app:generateDebugUnitTestConfig UP-TO-DATE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :app:testDebugUnitTest UP-TO-DATE
 > Task :shared:preDebugUnitTestBuild UP-TO-DATE
 > Task :shared:checkDebugUnitTestAarMetadata UP-TO-DATE
 > Task :shared:generateDebugUnitTestResValues UP-TO-DATE
@@ -326,26 +304,18 @@ Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dht
 > Task :wear:testDebugUnitTest UP-TO-DATE
 > Task :app:generateReleaseLintReportModel
 > Task :app:generateReleaseUnitTestLintModel
-> Task :shared:lintAnalyzeRelease UP-TO-DATE
-
-> Task :app:compileDebugUnitTestKotlin
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/AppAuditRegressionTest.kt:55:38 'fun addResolveInfoForIntent(p0: Intent!, p1: ResolveInfo!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/AppAuditRegressionTest.kt:199:23 'fun updateConfiguration(p0: Configuration!, p1: DisplayMetrics!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/CombinedPlaybackIntegrationTest.kt:70:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WallpaperRuntimeTest.kt:56:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WallpaperRuntimeTest.kt:127:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WallpaperRuntimeTest.kt:129:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-
-> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
-> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
-
-> Task :app:testDebugUnitTest
-Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Djavax.net.ssl.trustStore=/workspace/.tooling/proxy-trust.jks
-
+> Task :shared:lintVitalAnalyzeRelease
+> Task :shared:lintAnalyzeRelease
+> Task :app:lintVitalAnalyzeRelease
+> Task :app:lintVitalReportRelease SKIPPED
+> Task :app:lintVitalRelease SKIPPED
+> Task :app:packageRelease UP-TO-DATE
+> Task :app:createReleaseApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleRelease UP-TO-DATE
 > Task :app:lintAnalyzeRelease
 > Task :shared:preReleaseUnitTestBuild UP-TO-DATE
-> Task :shared:generateReleaseUnitTestLintModel UP-TO-DATE
-> Task :shared:lintAnalyzeReleaseUnitTest UP-TO-DATE
+> Task :shared:generateReleaseUnitTestLintModel
+> Task :shared:lintAnalyzeReleaseUnitTest
 > Task :shared:checkDebugAarMetadata UP-TO-DATE
 > Task :shared:stripDebugDebugSymbols NO-SOURCE
 > Task :shared:copyDebugJniLibsProjectAndLocalJars UP-TO-DATE
@@ -362,71 +332,49 @@ Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dht
 > Task :shared:createFullJarDebug UP-TO-DATE
 > Task :shared:writeDebugLintModelMetadata UP-TO-DATE
 > Task :app:generateDebugAndroidTestLintModel
-> Task :shared:generateDebugLintModel UP-TO-DATE
+> Task :shared:generateDebugLintModel
 > Task :app:generateDebugLintReportModel
 > Task :app:generateDebugUnitTestLintModel
-> Task :shared:lintAnalyzeDebug UP-TO-DATE
-> Task :app:lintAnalyzeDebug
-> Task :app:lintAnalyzeDebugAndroidTest
+> Task :shared:lintAnalyzeDebug
 > Task :app:lintAnalyzeReleaseUnitTest
 > Task :app:lintReportRelease
 > Task :app:lintRelease
+> Task :app:lintAnalyzeDebugAndroidTest
+> Task :app:lintAnalyzeDebug
 > Task :shared:preDebugAndroidTestBuild UP-TO-DATE
 > Task :shared:generateDebugAndroidTestResValues UP-TO-DATE
-> Task :shared:generateDebugAndroidTestLintModel UP-TO-DATE
-> Task :shared:generateDebugUnitTestLintModel UP-TO-DATE
-> Task :shared:lintAnalyzeDebugAndroidTest UP-TO-DATE
-> Task :shared:lintAnalyzeDebugUnitTest UP-TO-DATE
-> Task :shared:generateDebugLintReportModel UP-TO-DATE
-> Task :shared:lintReportDebug UP-TO-DATE
+> Task :shared:generateDebugAndroidTestLintModel
+> Task :shared:generateDebugUnitTestLintModel
+> Task :shared:lintAnalyzeDebugAndroidTest
+> Task :shared:lintAnalyzeDebugUnitTest
+> Task :shared:generateDebugLintReportModel
+> Task :shared:lintReportDebug
 > Task :shared:lintDebug
 > Task :wear:preDebugAndroidTestBuild SKIPPED
 > Task :wear:generateDebugAndroidTestResValues UP-TO-DATE
-> Task :wear:generateDebugAndroidTestLintModel UP-TO-DATE
+> Task :wear:generateDebugAndroidTestLintModel
 > Task :wear:extractProguardFiles UP-TO-DATE
-> Task :wear:generateDebugLintReportModel UP-TO-DATE
-> Task :wear:generateDebugUnitTestLintModel UP-TO-DATE
-> Task :wear:lintAnalyzeDebug UP-TO-DATE
-> Task :wear:lintAnalyzeDebugAndroidTest UP-TO-DATE
-> Task :wear:lintAnalyzeDebugUnitTest UP-TO-DATE
-> Task :wear:lintReportDebug UP-TO-DATE
-> Task :wear:lintDebug
-> Task :app:bundlePreviewClassesToRuntimeJar
-> Task :app:bundlePreviewClassesToCompileJar
+> Task :wear:generateDebugLintReportModel
+> Task :wear:generateDebugUnitTestLintModel
+> Task :wear:lintAnalyzeDebug
 > Task :app:lintAnalyzeDebugUnitTest
 > Task :app:lintReportDebug
 > Task :app:lintDebug
+> Task :wear:lintAnalyzeDebugAndroidTest
+> Task :app:bundlePreviewClassesToRuntimeJar UP-TO-DATE
+> Task :app:bundlePreviewClassesToCompileJar UP-TO-DATE
+> Task :app:compilePreviewUnitTestKotlin UP-TO-DATE
 > Task :app:prePreviewUnitTestBuild UP-TO-DATE
-> Task :app:javaPreCompilePreviewUnitTest
-> Task :app:packagePreviewUnitTestForUnitTest
-> Task :app:processPreviewUnitTestManifest
-> Task :app:generatePreviewUnitTestConfig
-
-> Task :app:compilePreviewUnitTestKotlin
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/AppAuditRegressionTest.kt:55:38 'fun addResolveInfoForIntent(p0: Intent!, p1: ResolveInfo!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/AppAuditRegressionTest.kt:199:23 'fun updateConfiguration(p0: Configuration!, p1: DisplayMetrics!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/BackgroundReliabilityTest.kt:46:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/BackupVisualTest.kt:23:33 'fun updateConfiguration(p0: Configuration!, p1: DisplayMetrics!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/CombinedPlaybackIntegrationTest.kt:70:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/DiagnosticsVisualTest.kt:27:33 'fun updateConfiguration(p0: Configuration!, p1: DisplayMetrics!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/EnergyActivityTest.kt:75:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/ProgressSettingsTest.kt:36:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/SettingsUxTest.kt:113:23 'fun updateConfiguration(p0: Configuration!, p1: DisplayMetrics!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/SpotifyBrowserResumeTest.kt:52:38 'fun addResolveInfoForIntent(p0: Intent!, p1: ResolveInfo!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WallpaperRuntimeTest.kt:56:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WallpaperRuntimeTest.kt:127:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WallpaperRuntimeTest.kt:129:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WidgetInheritanceVisualTest.kt:32:36 'fun updateConfiguration(p0: Configuration!, p1: DisplayMetrics!): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WidgetProgressObserverTest.kt:34:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WidgetProgressObserverTest.kt:55:70 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WidgetProgressObserverTest.kt:58:70 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///workspace/media-actions-review/app/src/test/java/dev/local/mediaactions/WidgetProgressReviewTest.kt:41:66 'fun setIsInteractive(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-
+> Task :app:javaPreCompilePreviewUnitTest UP-TO-DATE
 > Task :app:compilePreviewUnitTestJavaWithJavac NO-SOURCE
-> Task :app:processPreviewUnitTestJavaRes
+> Task :app:packagePreviewUnitTestForUnitTest UP-TO-DATE
+> Task :app:processPreviewUnitTestManifest UP-TO-DATE
+> Task :app:generatePreviewUnitTestConfig UP-TO-DATE
+> Task :app:processPreviewUnitTestJavaRes UP-TO-DATE
+> Task :app:testPreviewUnitTest UP-TO-DATE
+> Task :wear:lintAnalyzeDebugUnitTest
+> Task :wear:lintReportDebug
+> Task :wear:lintDebug
 
-> Task :app:testPreviewUnitTest
-Picked up JAVA_TOOL_OPTIONS: -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Djavax.net.ssl.trustStore=/workspace/.tooling/proxy-trust.jks
-
-BUILD SUCCESSFUL in 6m 8s
-306 actionable tasks: 133 executed, 173 up-to-date
+BUILD SUCCESSFUL in 1m 46s
+306 actionable tasks: 39 executed, 267 up-to-date

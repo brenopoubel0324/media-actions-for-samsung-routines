@@ -1,6 +1,6 @@
 # Validação — 0.35 estável
 
-Cadeia local completa aprovada na fonte `37319ad0d4a3f23649a55456bb4d8cfe47e9b1af`: app Release 713, app Debug 713, Preview 4, shared Debug 22 e Wear Debug 15, total **1467 execuções**, zero falhas/erros/pulos. Lint phone Debug/Release e shared/Wear Debug aprovados. APKs Release/Preview/Wear inspecionados; oficial com mesmo package/certificado, code35 e sem debug/testOnly.
+Cadeia local completa aprovada na fonte `a335765582802859f9a15b79e4dc0e49927334cb`: app Release 713, app Debug 713, Preview 4, shared Debug 22 e Wear Debug 15, total **1467 execuções**, zero falhas/erros/pulos. Lint phone Debug/Release e shared/Wear Debug aprovados. APKs Release/Preview/Wear inspecionados; oficial com mesmo package/certificado, code35 e sem debug/testOnly.
 
 Três médios corrigidos em revisão: feedback de autorização, padding negativo recortando alvos e falha de um host interrompendo o lote. Plugins Permission Manager e CI eficiente e self-audit concluídos. [Execução e limites](docs/reviews/combined-widget-and-identity-0.35.md) · [Integridade](downloads/v0.35/VALIDATION.json).
 
