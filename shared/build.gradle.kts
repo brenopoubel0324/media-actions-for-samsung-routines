@@ -4,7 +4,12 @@ android {
     compileSdk = 36
     defaultConfig { minSdk = 33 }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
-    lint { warningsAsErrors = true }
+    lint {
+        warningsAsErrors = true
+        // Pinned dependency upgrades require explicit review. This Maven advisory
+        // depends on network metadata and must not change a fixed source's result.
+        disable += "NewerVersionAvailable"
+    }
     testOptions { unitTests.isIncludeAndroidResources = true }
 }
 kotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) } }

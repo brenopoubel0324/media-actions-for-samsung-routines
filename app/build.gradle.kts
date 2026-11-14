@@ -38,8 +38,11 @@ android {
         warningsAsErrors = true
         checkReleaseBuilds = true
         // CI runners may ship a newer SDK than 36. Target SDK upgrades require
-        // separate device compatibility validation; keep all other lint checks.
+        // separate device compatibility validation; keep the current target pinned.
         disable += "OldTargetApi"
+        // Pinned dependency upgrades require explicit review. This Maven advisory
+        // depends on network metadata and must not change a fixed source's result.
+        disable += "NewerVersionAvailable"
     }
     testOptions {
         unitTests.isIncludeAndroidResources = true

@@ -8,6 +8,9 @@ android {
         warningsAsErrors = true
         // Keep targetSdk 36 until a separately validated Android upgrade.
         disable += "OldTargetApi"
+        // Pinned dependency upgrades require explicit review. This Maven advisory
+        // depends on network metadata and must not change a fixed source's result.
+        disable += "NewerVersionAvailable"
     }
     testOptions {
         unitTests.isIncludeAndroidResources = true

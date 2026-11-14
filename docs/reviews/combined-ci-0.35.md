@@ -4,7 +4,7 @@
 
 ## Veredito
 
-**APROVADO no recorte da orquestração, sem novos achados.** O diff atual exige cadeia completa. Nenhuma mudança em workflow, seletor, runner ou contratos operacionais do CI foi necessária ou aplicada. O gate completo e o check `android` permanecem.
+**Revisão inicial: APROVADO no recorte da orquestração.** A execução completa posterior revelou o aviso Maven descrito na atualização ao final deste relatório. A correção de determinismo foi aplicada, mas sua validação completa permanece pendente. O gate completo e o check `android` permanecem; não houve mudança no workflow, seletor ou runner.
 
 ## Leitura e validações locais
 
@@ -51,3 +51,13 @@ O check observado chama-se `android`, como no workflow. A consulta read-only de 
 - Não houve redução adicional de tarefas neste diff: a implementação atual continua **full**. Durações de etapas remotas, custo, economia de franquia e bateria não foram medidos nem inferidos.
 - O agente principal está coordenando testes focados locais; ainda deverá executar e registrar o completo na fonte final e inspecionar seus APKs antes da entrega. Um passe documental remoto não substitui essa obrigação.
 - Quando houver publicação de nova versão, atualizar documentação de canal/backup vigente e manifest/certificado/hashes do artefato exato. Não marcar uma fonte em edição como já validada, assinada ou publicada.
+
+## Atualização após o primeiro completo remoto — 14/11/2026
+
+**Achado médio, build/lint:** o [run 43602148538](https://github.com/brenopoubel0324/media-actions-for-samsung-routines/actions/runs/43602148538), fonte `a5dac3dd2f2c150bb3269c310d690f8bf5b4bc79`, efetivamente executou a cadeia Android e falhou em `:app:lintRelease`. O único erro de lint informado foi `NewerVersionAvailable`: Robolectric 4.18 anunciado no Maven para o pin `testImplementation("org.robolectric:robolectric:4.17")`. O log explica que esse detector consulta o repositório central. Não é o bloqueio histórico de faturamento. Log inspecionado: `/workspace/scratch/combined-remote-failure.log`.
+
+O completo local anterior registrou 1.467 testes aprovados e não encontrou esse aviso no ambiente/cache usado. Esse resultado não substitui a falha remota nem valida automaticamente a fonte corrigida. O achado indica catálogo de atualização variável; não demonstrou necessidade funcional de Robolectric 4.18. Robolectric é dependência de testes, e os cenários API 33/36 existentes foram executados com 4.17; a mudança do widget não requer API exclusiva de 4.18.
+
+**Correção aplicada, ainda sem novo passe:** em `app/build.gradle.kts`, `shared/build.gradle.kts` e `wear/build.gradle.kts`, desabilitar apenas `NewerVersionAvailable`, com comentário sobre versões fixadas e consulta variável à rede. Os pins não mudaram. `GradleDependency`, `warningsAsErrors`, `checkReleaseBuilds` do celular e os demais checks de segurança/API/correção foram preservados; não foi criado baseline global ou desligado lint. Política documentada em `docs/CI.md`.
+
+**Validação pendente:** commit da fonte corrigida pelo agente principal, repetição da cadeia completa local/remota pertinente e inspeção de APK. Este ajuste não foi compilado por esta revisão; nenhum novo run, rerun, assinatura ou publicação foi iniciado aqui. Não declarar o run 43602148538 aprovado. A etapa de entrega continua pendente até as evidências da nova fonte serem registradas.
